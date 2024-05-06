@@ -1,0 +1,4 @@
+/usr/*
+*.conan/*
+*.conan2/*
+*/Example/*
