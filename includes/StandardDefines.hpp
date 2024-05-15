@@ -351,39 +351,39 @@ inline bool operator>(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
 }
 
 inline bool operator==(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex == rhs.subindex) && (lhs.type == rhs.type) &&
-      (lhs.name == rhs.name) && (lhs.access == rhs.access) &&
-      (lhs.desc == rhs.desc);
+  return (lhs.subindex == rhs.subindex) &&
+      (lhs.type.index() == rhs.type.index()) && (lhs.name == rhs.name) &&
+      (lhs.access == rhs.access) && (lhs.desc == rhs.desc);
 }
 
 inline bool operator!=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex != rhs.subindex) && (lhs.type != rhs.type) &&
-      (lhs.name != rhs.name) && (lhs.access != rhs.access) &&
-      (lhs.desc != rhs.desc);
+  return (lhs.subindex != rhs.subindex) &&
+      (lhs.type.index() != rhs.type.index()) && (lhs.name != rhs.name) &&
+      (lhs.access != rhs.access) && (lhs.desc != rhs.desc);
 }
 
 inline bool operator<=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex <= rhs.subindex) && (lhs.type <= rhs.type) &&
-      (lhs.name <= rhs.name) && (lhs.access <= rhs.access) &&
-      (lhs.desc <= rhs.desc);
+  return (lhs.subindex <= rhs.subindex) &&
+      (lhs.type.index() <= rhs.type.index()) && (lhs.name <= rhs.name) &&
+      (lhs.access <= rhs.access) && (lhs.desc <= rhs.desc);
 }
 
 inline bool operator>=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex >= rhs.subindex) && (lhs.type >= rhs.type) &&
-      (lhs.name >= rhs.name) && (lhs.access >= rhs.access) &&
-      (lhs.desc >= rhs.desc);
+  return (lhs.subindex >= rhs.subindex) &&
+      (lhs.type.index() >= rhs.type.index()) && (lhs.name >= rhs.name) &&
+      (lhs.access >= rhs.access) && (lhs.desc >= rhs.desc);
 }
 
 inline bool operator<(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex < rhs.subindex) && (lhs.type < rhs.type) &&
-      (lhs.name < rhs.name) && (lhs.access < rhs.access) &&
-      (lhs.desc < rhs.desc);
+  return (lhs.subindex < rhs.subindex) &&
+      (lhs.type.index() < rhs.type.index()) && (lhs.name < rhs.name) &&
+      (lhs.access < rhs.access) && (lhs.desc < rhs.desc);
 }
 
 inline bool operator>(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex > rhs.subindex) && (lhs.type > rhs.type) &&
-      (lhs.name > rhs.name) && (lhs.access > rhs.access) &&
-      (lhs.desc > rhs.desc);
+  return (lhs.subindex > rhs.subindex) &&
+      (lhs.type.index() > rhs.type.index()) && (lhs.name > rhs.name) &&
+      (lhs.access > rhs.access) && (lhs.desc > rhs.desc);
 }
 
 } // namespace IODD
