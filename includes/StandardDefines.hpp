@@ -223,7 +223,7 @@ struct ArrayT : public ComplexDataTypeT {
 
   ArrayT(size_t count, std::vector<SimpleDatatype>&& _values,
       bool subindex_access = true)
-      : values(std::move(values)), ComplexDataTypeT(subindex_access) {
+      : values(std::move(_values)), ComplexDataTypeT(subindex_access) {
     if (values.size() != count) {
       throw std::invalid_argument("Provided vector of size " +
           std::to_string(values.size()) +
