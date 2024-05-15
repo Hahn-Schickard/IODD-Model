@@ -408,16 +408,4 @@ template <typename T> struct std::hash<IODD::ValueRange<T>> {
     return object.hash();
   }
 };
-
-template <> struct std::hash<IODD::RecordItem> {
-  std::size_t operator()(const IODD::RecordItem& object) const noexcept {
-    return object.hash();
-  }
-};
-
-template <> struct std::hash<IODD::Datatype> {
-  std::size_t operator()(const IODD::Datatype& object) const noexcept {
-    return object.hash();
-  }
-};
 #endif //__IODD_STANDARD_DEFINES_HPP
