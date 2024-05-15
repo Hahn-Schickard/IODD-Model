@@ -42,6 +42,8 @@ template <typename T> struct SingleValue : public NamedAttribute {
   size_t hash() const noexcept { return std::hash<T>{}(value); }
 };
 
+template <typename T> using SingleValuePtr = std::shared_ptr<SingleValue<T>>;
+
 template <typename T> struct ValueRange : public NamedAttribute {
   const T lower;
   const T upper;
