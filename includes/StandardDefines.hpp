@@ -278,9 +278,12 @@ struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
   using Records = std::unordered_set<RecordItem, Hash>;
   const Records items;
 
-  RecordT(uint16_t bit_length, Records&& _items, bool subindex_access = true)
-      : FixedBitLength(bit_length), items(std::move(_items)),
-        ComplexDataTypeT(subindex_access) {}
+  RecordT(uint16_t bit_length, Records&& _items)
+      : RecordT(bit_length, false, std::move(_items)) {}
+
+  RecordT(uint16_t bit_length, bool subindex_access, Records&& _items)
+      : FixedBitLength(bit_length), ComplexDataTypeT(subindex_access),
+        items(std::move(_items)) {}
 };
 
 using DataValue = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
