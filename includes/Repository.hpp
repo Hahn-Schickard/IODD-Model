@@ -1,23 +1,22 @@
 #ifndef __IODD_LOCAL_DESCRIPTOR_REPOSITORY_HPP
 #define __IODD_LOCAL_DESCRIPTOR_REPOSITORY_HPP
 
-#include "IODevice.hpp"
+#include "IODeviceDescriptor.hpp"
 
 #include <string>
 #include <unordered_map>
 
 namespace IODD {
 struct Repository {
-  Repository getDescriptor(
-      const std::string& vendor_id, const std::string& device_id);
+  using DescriptorsMap = std::unordered_map<std::string, IODeviceDescriptorPtr>;
 
-  std::string getDeviceIdentity(
-      const std::string& vendor_id, const std::string& device_id);
+  Repository(DescriptorsMap&& descriptors);
 
-  void operator+=(const IODevice& descriptor);
+  IODeviceDescriptorPtr getDescriptor(
+      const std::string& vendor_id, const std::string& device_id);
 
 private:
-  std::unordered_map<std::string, IODevice> descriptors_;
+  DescriptorsMap descriptors_;
 };
 
 } // namespace IODD

@@ -10,10 +10,10 @@ using namespace pugi;
 
 namespace IODD {
 
-IODevice decode(const xml_document& xml) {}
+IODeviceDescriptorPtr decode(const xml_document& xml) {}
 
 Repository deserializeModel(const string& directory_path) {
-  Repository result;
+  Repository::DescriptorsMap map;
   filesystem::path xml_dir = filesystem::path(directory_path).remove_filename();
 
   if (!filesystem::is_directory(xml_dir)) {
@@ -27,7 +27,8 @@ Repository deserializeModel(const string& directory_path) {
       xml_document xml;
       if (auto status =
               xml.load_file(filename.c_str(), parse_default, encoding_utf8)) {
-        result += decode(xml);
+        auto descriptor = decode(xml);
+        map.emplace(descriptor->getDeviceIdentity(), descriptor);
       } else {
         throw runtime_error("Failed to load " + filename +
             " as an XML document. " + status.description());
@@ -35,6 +36,6 @@ Repository deserializeModel(const string& directory_path) {
     }
   }
 
-  return Repository(result);
+  return Repository(move(map));
 }
 } // namespace IODD
