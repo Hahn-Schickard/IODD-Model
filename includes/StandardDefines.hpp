@@ -292,6 +292,22 @@ struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
 using DataValue = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
     OctetStringT, StringT, TimeT, TimeSpanT, ArrayT, RecordT>;
 
+struct Unit : public NamedAttribute {
+  const uint16_t code;
+  const std::string abbr;
+
+  Unit(uint16_t _code, const std::string& _abbr) : code(_code), abbr(_abbr) {}
+
+  Unit(uint16_t _code, const std::string& _abbr, const TextID& name)
+      : NamedAttribute(name), code(_code), abbr(_abbr) {}
+
+  template <typename... Args>
+  Unit(uint16_t _code, const std::string& _abbr, Args&&... args)
+      : code(_code), abbr(_abbr), NamedAttribute(std::forward(args...)) {}
+
+  size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
+};
+
 // Comparator functions
 inline bool operator==(const TextID& lhs, const TextID& rhs) {
   return lhs.id == rhs.id;
@@ -413,6 +429,30 @@ inline bool operator>(const RecordItem& lhs, const RecordItem& rhs) {
       (lhs.access > rhs.access) && (lhs.desc > rhs.desc);
 }
 
+inline bool operator==(const Unit& lhs, const Unit& rhs) {
+  return lhs.code == rhs.code;
+}
+
+inline bool operator!=(const Unit& lhs, const Unit& rhs) {
+  return lhs.code != rhs.code;
+}
+
+inline bool operator<=(const Unit& lhs, const Unit& rhs) {
+  return lhs.code <= rhs.code;
+}
+
+inline bool operator>=(const Unit& lhs, const Unit& rhs) {
+  return lhs.code >= rhs.code;
+}
+
+inline bool operator<(const Unit& lhs, const Unit& rhs) {
+  return lhs.code < rhs.code;
+}
+
+inline bool operator>(const Unit& lhs, const Unit& rhs) {
+  return lhs.code > rhs.code;
+}
+
 } // namespace IODD
 
 // Hashing functions
@@ -430,6 +470,12 @@ template <typename T> struct std::hash<IODD::SingleValue<T>> {
 
 template <typename T> struct std::hash<IODD::ValueRange<T>> {
   std::size_t operator()(const IODD::ValueRange<T>& object) const noexcept {
+    return object.hash();
+  }
+};
+
+template <> struct std::hash<IODD::Unit> {
+  std::size_t operator()(const IODD::Unit& object) const noexcept {
     return object.hash();
   }
 };
