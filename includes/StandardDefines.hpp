@@ -145,7 +145,7 @@ template <size_t MIN, size_t MAX> struct FixedBitLength {
   }
 };
 
-struct UIntegerT : public NumberT<size_t>, public FixedBitLength<2, 64> {
+struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<size_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
@@ -161,7 +161,7 @@ struct UIntegerT : public NumberT<size_t>, public FixedBitLength<2, 64> {
         NumberT(std::move(single_values), std::move(value_ranges)) {}
 };
 
-struct IntegerT : public NumberT<intmax_t>, public FixedBitLength<2, 64> {
+struct IntegerT : public FixedBitLength<2, 64>, public NumberT<intmax_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
