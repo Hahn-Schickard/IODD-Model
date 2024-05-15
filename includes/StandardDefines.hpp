@@ -87,6 +87,15 @@ struct BooleanT {
 
   BooleanT(std::unordered_set<SingleValuePtr<bool>>&& _values)
       : values(std::move(_values)) {}
+
+  NamedAttributePtr getName(bool value) const {
+    if (auto it = values.find(std::make_shared<SingleValue<bool>>(value));
+        it != values.end()) {
+      return *it;
+    }
+    throw std::out_of_range(
+        std::string(value ? "True" : "False") + " value has no assigned named");
+  }
 };
 
 template <typename T> struct NumberT {
@@ -105,6 +114,21 @@ template <typename T> struct NumberT {
   NumberT(SingleValues&& _single_values, ValueRanges&& _value_ranges)
       : single_values(std::move(_single_values)),
         value_ranges(std::move(_value_ranges)) {}
+
+  NamedAttributePtr getName(T value) {
+    if (auto it = single_values.find(std::make_shared<SingleValue<T>>(value));
+        it != single_values.end()) {
+      return *it;
+    } else {
+      for (auto it : value_ranges) {
+        if (it->inRange(value)) {
+          return *it;
+        }
+      }
+    }
+    throw std::out_of_range(
+        std::to_string(value) + " value has no assigned named");
+  }
 };
 
 template <size_t MIN, size_t MAX> struct FixedBitLength {
