@@ -32,6 +32,8 @@ struct NamedAttribute {
   NamedAttribute(Args&&... args) : name(TextID(std::forward(args...))) {}
 };
 
+using NamedAttributePtr = std::shared_ptr<NamedAttribute>;
+
 template <typename T> struct SingleValue : public NamedAttribute {
   const T value;
 
