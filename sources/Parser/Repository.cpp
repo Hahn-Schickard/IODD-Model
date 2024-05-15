@@ -6,8 +6,10 @@ using namespace std;
 
 namespace IODD {
 
-Repository::Repository(DescriptorsMap&& descriptors)
-    : descriptors_(descriptors) {}
+Repository::Repository(DescriptorsMap&& descriptors, UnitsMap&& units,
+    VariablesMap&& std_variables)
+    : descriptors_(descriptors), units_(make_shared<UnitsMap>(units)),
+      std_variables_(make_shared<VariablesMap>(std_variables)) {}
 
 IODeviceDescriptorPtr Repository::getDescriptor(
     const string& vendor_id, const string& device_id) {
