@@ -246,7 +246,7 @@ struct RecordItem {
   RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
       TextID&& _name, std::optional<AccessRights> _access = std::nullopt,
       std::optional<TextID> _desc = std::nullopt)
-      : subindex(subindex),
+      : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
         type(std::move(_type)), name(std::move(_name)), access(_access),
         desc(_desc) {}
@@ -254,7 +254,7 @@ struct RecordItem {
   template <typename... Args>
   RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
       Args&&... args)
-      : subindex(subindex),
+      : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
         type(std::move(_type)), name(std::forward(args...)) {}
 
@@ -262,7 +262,7 @@ struct RecordItem {
   RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
       std::optional<AccessRights> _access, std::optional<TextID> _desc,
       Args&&... args)
-      : subindex(subindex),
+      : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
         type(std::move(_type)), name(std::forward(args...)), access(_access),
         desc(_desc) {}
