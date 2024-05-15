@@ -60,6 +60,8 @@ template <typename T> struct ValueRange : public NamedAttribute {
   }
 };
 
+template <typename T> using ValueRangePtr = std::shared_ptr<ValueRange<T>>;
+
 struct BooleanT {
   const std::unordered_set<SingleValue<bool>> values;
 
