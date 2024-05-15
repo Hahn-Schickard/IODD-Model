@@ -48,7 +48,7 @@ template <typename T> struct ValueRange : public NamedAttribute {
   const T lower;
   const T upper;
 
-  ValueRange(T _lower, T _upper) lower(_lower), upper(_upper) {
+  ValueRange(T _lower, T _upper) : lower(_lower), upper(_upper) {
     if (upper <= lower) {
       throw std::invalid_argument(
           "Upper bound must be larger than lower bound");
