@@ -241,35 +241,8 @@ struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
         ComplexDataTypeT(subindex_access) {}
 };
 
-struct Datatype {
-  using Type = std::variant<BooleanT, UIntegerT, IntegerT, FloatT, OctetStringT,
-      StringT, TimeT, TimeSpanT, ArrayT, RecordT>;
-  const std::string id;
-  const Type type;
-
-  Datatype(const std::string& _id, Type&& _type)
-      : id(_id), type(std::move(_type)) {}
-
-  size_t hash() const noexcept { return std::hash<std::string>{}(id); }
-};
-
-using DatatypeCollection = std::unordered_set<Datatype>;
-
-struct StdSingleValueRef {};
-
-template <typename T> struct VariableT {
-  using Variant =
-      std::variant<StdSingleValueRef, SingleValue<T>, ValueRange<T>>;
-
-  const std::string id;
-  const uint16_t index;
-  const AccessRights access;
-  const bool dynamic = false;
-  const bool modifies_others = false;
-  const bool excluded_from_storage = false;
-  const std::optional<SimpleDatatype>
-      default_value; // is anySimpleType the same as SimpleDatatype?
-};
+using DataValue = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
+    OctetStringT, StringT, TimeT, TimeSpanT, ArrayT, RecordT>;
 
 // Comparator functions
 inline bool operator==(const TextID& lhs, const TextID& rhs) {
