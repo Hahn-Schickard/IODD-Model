@@ -102,8 +102,8 @@ template <typename T> struct NumberT {
   using SingleValues = std::unordered_set<SingleValuePtr<T>>;
   using ValueRanges = std::unordered_set<ValueRangePtr<T>>;
 
-  const std::optional<SingleValues> single_values = std::nullopt;
-  const std::optional<ValueRanges> value_ranges = std::nullopt;
+  const SingleValues single_values;
+  const ValueRanges value_ranges;
 
   NumberT() = default;
 
@@ -196,7 +196,7 @@ struct OctetStringT {
 };
 
 struct StringT : public OctetStringT {
-  const bool utf_encoding = true; // US-ASCII if false
+  const bool utf_encoding; // US-ASCII if false
 
   StringT(size_t length, bool utf = true)
       : OctetStringT(length), utf_encoding(utf) {}
