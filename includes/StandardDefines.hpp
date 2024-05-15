@@ -69,6 +69,10 @@ template <typename T> struct ValueRange : public NamedAttribute {
   ValueRange(T _lower, T _upper, Args&&... args)
       : lower(_lower), upper(_upper), NamedAttribute(std::forward(args...)) {}
 
+  bool inRange(T value) const noexcept {
+    return (value > lower) && (value < upper);
+  }
+
   size_t hash() const noexcept {
     return std::hash<T>{}(lower) + std::hash<T>{}(upper);
   }
