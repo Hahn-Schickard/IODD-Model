@@ -39,6 +39,13 @@ template <typename T> struct SingleValue : public NamedAttribute {
 
   SingleValue(T _value) : value(_value) {}
 
+  SingleValue(T _value, const TextID& name)
+      : value(_value), NamedAttribute(name) {}
+
+  template <typename... Args>
+  SingleValue(T _value, Args&&... args)
+      : value(_value), NamedAttribute(std::forward(args...)) {}
+
   size_t hash() const noexcept { return std::hash<T>{}(value); }
 };
 
@@ -54,6 +61,13 @@ template <typename T> struct ValueRange : public NamedAttribute {
           "Upper bound must be larger than lower bound");
     }
   }
+
+  ValueRange(T _lower, T _upper, const TextID& name)
+      : lower(_lower), upper(_upper), NamedAttribute(name) {}
+
+  template <typename... Args>
+  ValueRange(T _lower, T _upper, Args&&... args)
+      : lower(_lower), upper(_upper), NamedAttribute(std::forward(args...)) {}
 
   size_t hash() const noexcept {
     return std::hash<T>{}(lower) + std::hash<T>{}(upper);
