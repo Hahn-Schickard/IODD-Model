@@ -1,6 +1,7 @@
 #ifndef __IODD_STANDARD_DEFINES_HPP
 #define __IODD_STANDARD_DEFINES_HPP
 
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
