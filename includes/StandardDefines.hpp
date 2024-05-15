@@ -396,14 +396,12 @@ template <> struct std::hash<IODD::TextID> {
 };
 
 template <typename T> struct std::hash<IODD::SingleValue<T>> {
-  template <typename T>
   std::size_t operator()(const IODD::SingleValue<T>& object) const noexcept {
     return object.hash();
   }
 };
 
 template <typename T> struct std::hash<IODD::ValueRange<T>> {
-  template <typename T>
   std::size_t operator()(const IODD::ValueRange<T>& object) const noexcept {
     return object.hash();
   }
