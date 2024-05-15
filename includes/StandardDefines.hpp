@@ -222,11 +222,15 @@ struct RecordItem {
   size_t hash() const noexcept { return subindex; }
 };
 
-struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
-  const std::unordered_set<RecordItem> items;
+struct Hash {
+  size_t operator()(const RecordItem& item) const { return (item.hash()); }
+};
 
-  RecordT(uint16_t bit_length, std::unordered_set<RecordItem>&& _items,
-      bool subindex_access = true)
+struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
+  using Records = std::unordered_set<RecordItem, Hash>;
+  const Records items;
+
+  RecordT(uint16_t bit_length, Records&& _items, bool subindex_access = true)
       : FixedBitLength(bit_length), items(std::move(_items)),
         ComplexDataTypeT(subindex_access) {}
 };
