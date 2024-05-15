@@ -63,17 +63,17 @@ template <typename T> struct ValueRange : public NamedAttribute {
 template <typename T> using ValueRangePtr = std::shared_ptr<ValueRange<T>>;
 
 struct BooleanT {
-  const std::unordered_set<SingleValue<bool>> values;
+  const std::unordered_set<SingleValuePtr<bool>> values;
 
   BooleanT() = default;
 
-  BooleanT(std::unordered_set<SingleValue<bool>>&& _values)
+  BooleanT(std::unordered_set<SingleValuePtr<bool>>&& _values)
       : values(std::move(_values)) {}
 };
 
 template <typename T> struct NumberT {
-  using SingleValues = std::unordered_set<SingleValue<T>>;
-  using ValueRanges = std::unordered_set<ValueRange<T>>;
+  using SingleValues = std::unordered_set<SingleValuePtr<T>>;
+  using ValueRanges = std::unordered_set<ValueRangePtr<T>>;
 
   const std::optional<SingleValues> single_values = std::nullopt;
   const std::optional<ValueRanges> value_ranges = std::nullopt;
