@@ -53,6 +53,44 @@ Repository::UnitsMap decodeUnits(const filesystem::path& path) {
   return result;
 }
 
+enum class Datatype {
+  Boolean,
+  UInteger,
+  Integer,
+  Float32,
+  String,
+  OctetString,
+  Time,
+  TimeSpan,
+  Array,
+  Record,
+  ProcessDataIn,
+  ProcessDataOut
+};
+
+static unordered_map<string, Datatype> const data_types = {
+    {"BooleanT", Datatype::Boolean},
+    {"UIntegerT", Datatype::UInteger},
+    {"IntegerT", Datatype::Integer},
+    {"Float32T", Datatype::Float32},
+    {"StringT", Datatype::String},
+    {"OctetStringT", Datatype::OctetString},
+    {"TimeT", Datatype::Time},
+    {"TimeSpanT", Datatype::TimeSpan},
+    {"ArrayT", Datatype::Array},
+    {"RecordT", Datatype::Record},
+    {"ProcessDataInUnionT", Datatype::ProcessDataIn},
+    {"ProcessDataOutUnionT", Datatype::ProcessDataOut},
+};
+
+Datatype toDatatype(const string& value) {
+  if (auto it = data_types.find(value); it != data_types.end()) {
+    return it->second;
+  }
+  throw invalid_argument("String value: " + value +
+      " can not be converted into IODD::Datatype enumeration");
+}
+
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
   Repository::VariablesMap result;
   auto xml = getXML(path);
