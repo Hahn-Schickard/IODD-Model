@@ -170,7 +170,13 @@ DataValue decodeDataValue(
 
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
   Repository::VariablesMap result;
-  auto xml = getXML(path);
+  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
+  auto datatype_collection = xml.child("DatatypeCollection");
+  for (auto datatype : datatype_collection.children("Datatype")) {
+    result.emplace(datatype.attribute("id").as_string(),
+        decodeDataValue(xml, datatype,
+            toDatatype(datatype.attribute("xsi:type").as_string())));
+  }
   return result;
 }
 
