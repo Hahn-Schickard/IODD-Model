@@ -31,10 +31,7 @@ struct NamedAttribute {
 
   NamedAttribute() = default;
 
-  NamedAttribute(const TextID& _name) : name(_name) {}
-
-  template <typename... Args>
-  NamedAttribute(Args&&... args) : name(TextID(std::forward<Args>(args)...)) {}
+  NamedAttribute(std::optional<TextID>&& _name) : name(std::move(_name)) {}
 };
 
 using NamedAttributePtr = std::shared_ptr<NamedAttribute>;
@@ -44,12 +41,8 @@ template <typename T> struct SingleValue : public NamedAttribute {
 
   SingleValue(T _value) : value(_value) {}
 
-  SingleValue(T _value, const TextID& name)
-      : NamedAttribute(name), value(_value) {}
-
-  template <typename... Args>
-  SingleValue(T _value, Args&&... args)
-      : NamedAttribute(std::forward<Args>(args)...), value(_value) {}
+  SingleValue(T _value, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), value(_value) {}
 
   size_t hash() const noexcept { return std::hash<T>{}(value); }
 };
@@ -67,13 +60,8 @@ template <typename T> struct ValueRange : public NamedAttribute {
     }
   }
 
-  ValueRange(T _lower, T _upper, const TextID& name)
-      : NamedAttribute(name), lower(_lower), upper(_upper) {}
-
-  template <typename... Args>
-  ValueRange(T _lower, T _upper, Args&&... args)
-      : NamedAttribute(std::forward<Args>(args)...), lower(_lower),
-        upper(_upper) {}
+  ValueRange(T _lower, T _upper, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), lower(_lower), upper(_upper) {}
 
   bool inRange(T value) const noexcept {
     return (value > lower) && (value < upper);
@@ -253,28 +241,12 @@ struct RecordItem {
   const std::optional<TextID> desc;
 
   RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
-      TextID&& _name, std::optional<AccessRights> _access = std::nullopt,
-      std::optional<TextID> _desc = std::nullopt)
+      TextID&& _name, std::optional<AccessRights>&& _access = std::nullopt,
+      std::optional<TextID>&& _desc = std::nullopt)
       : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::move(_name)), access(_access),
-        desc(_desc) {}
-
-  template <typename... Args>
-  RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
-      Args&&... args)
-      : subindex(_subindex),
-        bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::forward<Args>(args)...) {}
-
-  template <typename... Args>
-  RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
-      std::optional<AccessRights> _access, std::optional<TextID> _desc,
-      Args&&... args)
-      : subindex(_subindex),
-        bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::forward<Args>(args)...),
-        access(_access), desc(_desc) {}
+        type(std::move(_type)), name(std::move(_name)),
+        access(std::move(_access)), desc(std::move(_desc)) {}
 
   size_t hash() const noexcept { return subindex; }
 };
@@ -304,12 +276,8 @@ struct Unit : public NamedAttribute {
 
   Unit(uint16_t _code, const std::string& _abbr) : code(_code), abbr(_abbr) {}
 
-  Unit(uint16_t _code, const std::string& _abbr, const TextID& name)
-      : NamedAttribute(name), code(_code), abbr(_abbr) {}
-
-  template <typename... Args>
-  Unit(uint16_t _code, const std::string& _abbr, Args&&... args)
-      : NamedAttribute(std::forward<Args>(args)...), code(_code), abbr(_abbr) {}
+  Unit(uint16_t _code, const std::string& _abbr, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), code(_code), abbr(_abbr) {}
 
   size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
 };
