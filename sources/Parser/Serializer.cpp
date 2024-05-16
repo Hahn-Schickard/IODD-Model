@@ -30,21 +30,25 @@ xml_document getXML(const filesystem::path& path) {
   }
 }
 
+TextID decodeLocalization(const xml_node& node, const string& text_id) {
+  auto localizations =
+      node.child("ExternalTextCollection").child("PrimaryLanguage");
+  const auto* localization =
+      localizations.find_child_by_attribute("Text", "id", text_id.c_str())
+          .attribute("value")
+          .as_string();
+  return TextID(text_id, localization);
+}
+
 Repository::UnitsMap decodeUnits(const filesystem::path& path) {
   Repository::UnitsMap result;
   auto xml = getXML(path).child("IODDStandardUnitDefinitions");
   auto units_collection = xml.child("UnitCollection");
-  auto localizations =
-      xml.child("ExternalTextCollection").child("PrimaryLanguage");
   for (auto unit : units_collection.children("Unit")) {
     auto code = unit.attribute("code").as_uint();
     const auto* abbr = unit.attribute("abbr").as_string();
     const auto* text_id = unit.attribute("textId").as_string();
-    const auto* localization =
-        localizations.find_child_by_attribute("Text", "id", text_id)
-            .attribute("value")
-            .as_string();
-    result.emplace(code, Unit(code, abbr, text_id, localization));
+    result.emplace(code, Unit(code, abbr, decodeLocalization(xml, text_id)));
   }
   return result;
 }
