@@ -116,6 +116,56 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
 ArrayT decodeArray(const xml_node& root, const xml_node& node) {}
 
 RecordT decodeRecord(const xml_node& root, const xml_node& node) {}
+
+DataValue decodeDataValue(
+    const xml_node& root, const xml_node& node, Datatype type) {
+  switch (type) {
+  case Datatype::Boolean: {
+    return BooleanT(decodeBoolSingleValues(root, node));
+  }
+  case Datatype::UInteger: {
+    auto length = node.attribute("bitLength").as_uint();
+    return UIntegerT(length, decodeUintSingleValues(root, node),
+        decodeUintValueRanges(root, node));
+  }
+  case Datatype::Integer: {
+    auto length = node.attribute("bitLength").as_uint();
+    return IntegerT(length, decodeIntSingleValues(root, node),
+        decodeIntValueRanges(root, node));
+  }
+  case Datatype::Float32: {
+    return FloatT(decodeFloatSingleValues(root, node),
+        decodeFloatValueRanges(root, node));
+  }
+  case Datatype::String: {
+    throw logic_error("Failed to decoded String DataType Values");
+  }
+  case Datatype::OctetString: {
+    throw logic_error("Failed to decoded OctetString DataType Values");
+  }
+  case Datatype::Time: {
+    throw logic_error("Failed to decoded Time DataType Values");
+  }
+  case Datatype::TimeSpan: {
+    throw logic_error("Failed to decoded TimeSpan DataType Values");
+  }
+  case Datatype::Array: {
+    return decodeArray(root, node);
+  }
+  case Datatype::Record: {
+    return decodeRecord(root, node);
+  }
+  case Datatype::ProcessDataIn: {
+    throw logic_error("Failed to decoded ProcessDataIn DataType Values");
+  }
+  case Datatype::ProcessDataOut: {
+    throw logic_error("Failed to decoded ProcessDataOut DataType Values");
+  }
+  default: {
+    throw invalid_argument("Unrecognized Datatype");
+  }
+  }
+}
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
