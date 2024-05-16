@@ -12,13 +12,18 @@
 namespace IODD {
 
 struct TextID {
-  const std::string id;
-  const std::string locale;
+  TextID(const std::string& id, const std::string& locale)
+      : id_(id), locale_(locale) {}
 
-  TextID(const std::string& _id, const std::string& _locale)
-      : id(_id), locale(_locale) {}
+  std::string id() const { return id_; }
 
-  size_t hash() const noexcept { return std::hash<std::string>{}(id); }
+  std::string locale() const { return locale_; }
+
+  size_t hash() const noexcept { return std::hash<std::string>{}(id_); }
+
+private:
+  std::string id_;
+  std::string locale_;
 };
 
 struct NamedAttribute {
@@ -311,27 +316,27 @@ struct Unit : public NamedAttribute {
 
 // Comparator functions
 inline bool operator==(const TextID& lhs, const TextID& rhs) {
-  return lhs.id == rhs.id;
+  return lhs.id() == rhs.id();
 }
 
 inline bool operator!=(const TextID& lhs, const TextID& rhs) {
-  return lhs.id != rhs.id;
+  return lhs.id() != rhs.id();
 }
 
 inline bool operator<=(const TextID& lhs, const TextID& rhs) {
-  return lhs.id <= rhs.id;
+  return lhs.id() <= rhs.id();
 }
 
 inline bool operator>=(const TextID& lhs, const TextID& rhs) {
-  return lhs.id >= rhs.id;
+  return lhs.id() >= rhs.id();
 }
 
 inline bool operator<(const TextID& lhs, const TextID& rhs) {
-  return lhs.id < rhs.id;
+  return lhs.id() < rhs.id();
 }
 
 inline bool operator>(const TextID& lhs, const TextID& rhs) {
-  return lhs.id > rhs.id;
+  return lhs.id() > rhs.id();
 }
 
 template <typename T>
