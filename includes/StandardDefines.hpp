@@ -40,11 +40,11 @@ template <typename T> struct SingleValue : public NamedAttribute {
   SingleValue(T _value) : value(_value) {}
 
   SingleValue(T _value, const TextID& name)
-      : value(_value), NamedAttribute(name) {}
+      : NamedAttribute(name), value(_value) {}
 
   template <typename... Args>
   SingleValue(T _value, Args&&... args)
-      : value(_value), NamedAttribute(std::forward<Args>(args)...) {}
+      : NamedAttribute(std::forward<Args>(args)...), value(_value) {}
 
   size_t hash() const noexcept { return std::hash<T>{}(value); }
 };
@@ -63,12 +63,12 @@ template <typename T> struct ValueRange : public NamedAttribute {
   }
 
   ValueRange(T _lower, T _upper, const TextID& name)
-      : lower(_lower), upper(_upper), NamedAttribute(name) {}
+      : NamedAttribute(name), lower(_lower), upper(_upper) {}
 
   template <typename... Args>
   ValueRange(T _lower, T _upper, Args&&... args)
-      : lower(_lower), upper(_upper),
-        NamedAttribute(std::forward<Args>(args)...) {}
+      : NamedAttribute(std::forward<Args>(args)...), lower(_lower),
+        upper(_upper) {}
 
   bool inRange(T value) const noexcept {
     return (value > lower) && (value < upper);
@@ -304,7 +304,7 @@ struct Unit : public NamedAttribute {
 
   template <typename... Args>
   Unit(uint16_t _code, const std::string& _abbr, Args&&... args)
-      : code(_code), abbr(_abbr), NamedAttribute(std::forward<Args>(args)...) {}
+      : NamedAttribute(std::forward<Args>(args)...), code(_code), abbr(_abbr) {}
 
   size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
 };
