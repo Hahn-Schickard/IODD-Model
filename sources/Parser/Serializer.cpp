@@ -93,7 +93,19 @@ Datatype toDatatype(const string& value) {
 
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  unordered_set<SingleValuePtr<bool>> result;
+  for (auto node_value : node.children("SingleValue")) {
+    auto value = node_value.attribute("value").as_bool();
+    optional<TextID> localization;
+    if (auto name_node = node_value.child("Name"); !name_node.empty()) {
+      const auto* text_id = name_node.attribute("textId").as_string();
+      localization = decodeLocalization(root, text_id);
+    }
+    result.emplace(make_shared<SingleValue<bool>>(value, move(localization)));
+  }
+  return result;
+}
 
 NumberT<size_t>::SingleValues decodeUintSingleValues(
     const xml_node& root, const xml_node& node) {}
