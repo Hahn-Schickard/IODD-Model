@@ -112,6 +112,10 @@ NumberT<float>::SingleValues decodeFloatSingleValues(
 
 NumberT<float>::ValueRanges decodeFloatValueRanges(
     const xml_node& root, const xml_node& node) {}
+
+ArrayT decodeArray(const xml_node& root, const xml_node& node) {}
+
+RecordT decodeRecord(const xml_node& root, const xml_node& node) {}
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
