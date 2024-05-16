@@ -91,6 +91,29 @@ Datatype toDatatype(const string& value) {
       " can not be converted into IODD::Datatype enumeration");
 }
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
+unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<size_t>::SingleValues decodeUintSingleValues(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<size_t>::ValueRanges decodeUintValueRanges(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<intmax_t>::SingleValues decodeIntSingleValues(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<intmax_t>::ValueRanges decodeIntValueRanges(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<float>::SingleValues decodeFloatSingleValues(
+    const xml_node& root, const xml_node& node) {}
+
+NumberT<float>::ValueRanges decodeFloatValueRanges(
+    const xml_node& root, const xml_node& node) {}
+// NOLINTEND(bugprone-easily-swappable-parameters)
+
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
   Repository::VariablesMap result;
   auto xml = getXML(path);
