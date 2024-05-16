@@ -31,7 +31,22 @@ xml_document getXML(const filesystem::path& path) {
 }
 
 Repository::UnitsMap decodeUnits(const filesystem::path& path) {
-  auto unit_xml = getXML(path);
+  Repository::UnitsMap result;
+  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
+  auto units_collection = xml.child("UnitCollection");
+  auto localizations =
+      xml.child("ExternalTextCollection").child("PrimaryLanguage");
+  for (auto unit : units_collection.children("Unit")) {
+    auto code = unit.attribute("code").as_uint();
+    const auto* abbr = unit.attribute("abbr").as_string();
+    const auto* text_id = unit.attribute("textId").as_string();
+    const auto* localization =
+        localizations.find_child_by_attribute("Text", "id", text_id)
+            .attribute("value")
+            .as_string();
+    result.emplace(code, Unit(code, abbr, text_id, localization));
+  }
+  return result;
 }
 
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
