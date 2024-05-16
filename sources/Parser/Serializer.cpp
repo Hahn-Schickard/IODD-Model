@@ -35,7 +35,9 @@ Repository::UnitsMap decodeUnits(const filesystem::path& path) {
 }
 
 Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
-  auto variables_xml = getXML(path);
+  Repository::VariablesMap result;
+  auto xml = getXML(path);
+  return result;
 }
 
 Repository::DescriptorsMap decodeDescriptors(const filesystem::path& path) {
