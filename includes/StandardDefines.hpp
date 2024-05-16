@@ -29,7 +29,7 @@ struct NamedAttribute {
   NamedAttribute(const TextID& _name) : name(_name) {}
 
   template <typename... Args>
-  NamedAttribute(Args&&... args) : name(TextID(std::forward(args...))) {}
+  NamedAttribute(Args&&... args) : name(TextID(std::forward<Args>(args)...)) {}
 };
 
 using NamedAttributePtr = std::shared_ptr<NamedAttribute>;
@@ -44,7 +44,7 @@ template <typename T> struct SingleValue : public NamedAttribute {
 
   template <typename... Args>
   SingleValue(T _value, Args&&... args)
-      : value(_value), NamedAttribute(std::forward(args...)) {}
+      : value(_value), NamedAttribute(std::forward<Args>(args)...) {}
 
   size_t hash() const noexcept { return std::hash<T>{}(value); }
 };
@@ -67,7 +67,8 @@ template <typename T> struct ValueRange : public NamedAttribute {
 
   template <typename... Args>
   ValueRange(T _lower, T _upper, Args&&... args)
-      : lower(_lower), upper(_upper), NamedAttribute(std::forward(args...)) {}
+      : lower(_lower), upper(_upper),
+        NamedAttribute(std::forward<Args>(args)...) {}
 
   bool inRange(T value) const noexcept {
     return (value > lower) && (value < upper);
@@ -259,7 +260,7 @@ struct RecordItem {
       Args&&... args)
       : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::forward(args...)) {}
+        type(std::move(_type)), name(std::forward<Args>(args)...) {}
 
   template <typename... Args>
   RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
@@ -267,8 +268,8 @@ struct RecordItem {
       Args&&... args)
       : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::forward(args...)), access(_access),
-        desc(_desc) {}
+        type(std::move(_type)), name(std::forward<Args>(args)...),
+        access(_access), desc(_desc) {}
 
   size_t hash() const noexcept { return subindex; }
 };
@@ -303,7 +304,7 @@ struct Unit : public NamedAttribute {
 
   template <typename... Args>
   Unit(uint16_t _code, const std::string& _abbr, Args&&... args)
-      : code(_code), abbr(_abbr), NamedAttribute(std::forward(args...)) {}
+      : code(_code), abbr(_abbr), NamedAttribute(std::forward<Args>(args)...) {}
 
   size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
 };
