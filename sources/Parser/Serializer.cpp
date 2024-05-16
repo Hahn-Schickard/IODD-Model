@@ -68,22 +68,16 @@ enum class Datatype {
   ProcessDataOut
 };
 
-static unordered_map<string, Datatype> const data_types = {
-    {"BooleanT", Datatype::Boolean},
-    {"UIntegerT", Datatype::UInteger},
-    {"IntegerT", Datatype::Integer},
-    {"Float32T", Datatype::Float32},
-    {"StringT", Datatype::String},
-    {"OctetStringT", Datatype::OctetString},
-    {"TimeT", Datatype::Time},
-    {"TimeSpanT", Datatype::TimeSpan},
-    {"ArrayT", Datatype::Array},
-    {"RecordT", Datatype::Record},
-    {"ProcessDataInUnionT", Datatype::ProcessDataIn},
-    {"ProcessDataOutUnionT", Datatype::ProcessDataOut},
-};
-
 Datatype toDatatype(const string& value) {
+  const unordered_map<string, Datatype> data_types = {
+      {"BooleanT", Datatype::Boolean}, {"UIntegerT", Datatype::UInteger},
+      {"IntegerT", Datatype::Integer}, {"Float32T", Datatype::Float32},
+      {"StringT", Datatype::String}, {"OctetStringT", Datatype::OctetString},
+      {"TimeT", Datatype::Time}, {"TimeSpanT", Datatype::TimeSpan},
+      {"ArrayT", Datatype::Array}, {"RecordT", Datatype::Record},
+      {"ProcessDataInUnionT", Datatype::ProcessDataIn},
+      {"ProcessDataOutUnionT", Datatype::ProcessDataOut}};
+
   if (auto it = data_types.find(value); it != data_types.end()) {
     return it->second;
   }
