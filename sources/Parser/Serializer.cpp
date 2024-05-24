@@ -2,6 +2,7 @@
 
 #include <pugixml.hpp>
 
+#include <cstring>
 #include <filesystem>
 #include <stdexcept>
 
@@ -251,7 +252,7 @@ SimpleDatatype decodeSimpleDataValue(
   }
   case Datatype::String: {
     return StringT(node.attribute("fixedLength").as_uint(),
-        (node.attribute("encoding").as_string() == "UTF-8"));
+        strcmp(node.attribute("encoding").as_string(), "UTF-8"));
   }
   case Datatype::OctetString: {
     return OctetStringT(node.attribute("fixedLength").as_uint());
