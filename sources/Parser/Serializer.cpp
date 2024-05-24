@@ -342,16 +342,31 @@ DataValue decodeDataValue(
 }
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
-Repository::VariablesMap decodeStdVariables(const filesystem::path& path) {
-  Repository::VariablesMap result;
+pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
+    const filesystem::path& path) {
   auto xml = getXML(path).child("IODDStandardUnitDefinitions");
   auto datatype_collection = xml.child("DatatypeCollection");
+  Repository::DatatypesMap datatypes;
   for (auto datatype : datatype_collection.children("Datatype")) {
-    result.emplace(datatype.attribute("id").as_string(),
+    datatypes.emplace(datatype.attribute("id").as_string(),
         decodeDataValue(xml, datatype,
             toDatatype(datatype.attribute("xsi:type").as_string())));
   }
-  return result;
+  auto variable_collection = xml.child("VariableCollection");
+  Repository::VariablesMap variables;
+  for (auto variable : variable_collection.children("Variable")) {
+    variables.emplace(variable.attribute("id").as_string(),
+        Variable(variable.attribute("index").as_ullong(),
+            decodeLocalizedText("Name", xml, variable).value(),
+            decodeAccessRights(variable).value(),
+            decodeDataValue(xml, variable,
+                toDatatype(variable.attribute("xsi:type").as_string())),
+            decodeLocalizedText("Description", xml, variable).value(),
+            variable.attribute("dynamic").as_bool(false),
+            variable.attribute("modifiesOtherVariables").as_bool(false),
+            variable.attribute("excludedFromDataStorage").as_bool(false)));
+  }
+  return make_pair(move(datatypes), move(variables));
 }
 
 Repository::DescriptorsMap decodeDescriptors(const filesystem::path& path) {
@@ -374,12 +389,12 @@ Repository deserializeModel(const string& config_directory_path) {
     throw invalid_argument(config_dir.string() + " is not a directory");
   }
 
-  auto descriptors_dir = config_dir / "descriptors";
   auto std_units_filepath = config_dir / "IODD-StandardDefinitions1.1.xml";
   auto std_variables_filepath =
       config_dir / "IODD-StandardUnitDefinitions1.1.1.xml";
-  return Repository(decodeDescriptors(descriptors_dir),
-      decodeUnits(std_units_filepath),
-      decodeStdVariables(std_variables_filepath));
+  auto descriptors_dir = config_dir / "descriptors";
+  return Repository(decodeUnits(std_units_filepath),
+      decodeStdDefinitions(std_variables_filepath),
+      decodeDescriptors(descriptors_dir));
 }
 } // namespace IODD
