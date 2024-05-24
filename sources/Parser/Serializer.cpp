@@ -255,7 +255,7 @@ SimpleDatatype decodeSimpleDataValue(
   }
   case Datatype::String: {
     return StringT(node.attribute("fixedLength").as_uint(),
-        strcmp(node.attribute("encoding").as_string(), "UTF-8"));
+        (strcmp(node.attribute("encoding").as_string(), "UTF-8") != 0));
   }
   case Datatype::OctetString: {
     return OctetStringT(node.attribute("fixedLength").as_uint());
