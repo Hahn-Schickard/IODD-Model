@@ -68,6 +68,47 @@ enum class Datatype {
   ProcessDataOut
 };
 
+string toString(Datatype type) {
+  switch (type) {
+  case Datatype::Boolean: {
+    return "Boolean";
+  }
+  case Datatype::UInteger: {
+    return "UInteger";
+  }
+  case Datatype::Integer: {
+    return "Integer";
+  }
+  case Datatype::Float32: {
+    return "Float32";
+  }
+  case Datatype::String: {
+    return "String";
+  }
+  case Datatype::OctetString: {
+    return "OctetString";
+  }
+  case Datatype::Time: {
+    return "Time";
+  }
+  case Datatype::TimeSpan: {
+    return "TimeSpan";
+  }
+  case Datatype::Array: {
+    return "Array";
+  }
+  case Datatype::Record: {
+    return "Record";
+  }
+  case Datatype::ProcessDataIn: {
+    return "ProcessDataIn";
+  }
+  case Datatype::ProcessDataOut: {
+    return "ProcessDataOut";
+  }
+  }
+}
+
 Datatype toDatatype(const string& value) {
   const unordered_map<string, Datatype> data_types = {
       {"BooleanT", Datatype::Boolean}, {"UIntegerT", Datatype::UInteger},
