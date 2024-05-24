@@ -302,6 +302,20 @@ RecordT decodeRecord(const xml_node& root, const xml_node& node) {
       node.attribute("subindexAccessSupported").as_bool(true), move(records));
 }
 
+template <class... Args> struct VariantCaster {
+  std::variant<Args...> v;
+
+  template <class... ToArgs> operator std::variant<ToArgs...>() const {
+    return std::visit(
+        [](auto&& arg) -> std::variant<ToArgs...> { return arg; }, v);
+  }
+};
+
+template <class... Args>
+auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
+  return {v};
+}
+
 DataValue decodeDataValue(
     const xml_node& root, const xml_node& node, Datatype type) {
   switch (type) {
@@ -318,7 +332,7 @@ DataValue decodeDataValue(
     throw logic_error("Failed to decoded ProcessDataOut DataType Values");
   }
   default: {
-    throw invalid_argument("Unrecognized Datatype");
+    return variantCast(decodeSimpleDataValue(root, node, type));
   }
   }
 }
