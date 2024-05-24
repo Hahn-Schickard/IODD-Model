@@ -86,38 +86,91 @@ Datatype toDatatype(const string& value) {
 }
 
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
+optional<TextID> decodeName(const xml_node& root, const xml_node& node) {
+  if (auto name_node = node.child("Name"); !node.empty()) {
+    return decodeLocalization(root, name_node.attribute("textId").as_string());
+  }
+  return nullopt;
+}
+
 unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
     const xml_node& root, const xml_node& node) {
   unordered_set<SingleValuePtr<bool>> result;
   for (auto node_value : node.children("SingleValue")) {
-    auto value = node_value.attribute("value").as_bool();
-    optional<TextID> localization;
-    if (auto name_node = node_value.child("Name"); !name_node.empty()) {
-      const auto* text_id = name_node.attribute("textId").as_string();
-      localization = decodeLocalization(root, text_id);
-    }
-    result.emplace(make_shared<SingleValue<bool>>(value, move(localization)));
+    result.emplace(make_shared<SingleValue<bool>>(
+        node_value.attribute("value").as_bool(), decodeName(root, node_value)));
   }
   return result;
 }
 
 NumberT<size_t>::SingleValues decodeUintSingleValues(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<size_t>::SingleValues result;
+  for (auto node_value : node.children("SingleValue")) {
+    result.emplace(make_shared<SingleValue<size_t>>(
+        node_value.attribute("value").as_ullong(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 NumberT<size_t>::ValueRanges decodeUintValueRanges(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<size_t>::ValueRanges result;
+  for (auto node_value : node.children("ValueRange")) {
+    result.emplace(make_shared<ValueRange<size_t>>(
+        node_value.attribute("lowerValue").as_ullong(),
+        node_value.attribute("upperValue").as_ullong(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 NumberT<intmax_t>::SingleValues decodeIntSingleValues(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<intmax_t>::SingleValues result;
+  for (auto node_value : node.children("SingleValue")) {
+    result.emplace(make_shared<SingleValue<intmax_t>>(
+        node_value.attribute("value").as_llong(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 NumberT<intmax_t>::ValueRanges decodeIntValueRanges(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<intmax_t>::ValueRanges result;
+  for (auto node_value : node.children("ValueRange")) {
+    result.emplace(make_shared<ValueRange<intmax_t>>(
+        node_value.attribute("lowerValue").as_llong(),
+        node_value.attribute("upperValue").as_llong(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 NumberT<float>::SingleValues decodeFloatSingleValues(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<float>::SingleValues result;
+  for (auto node_value : node.children("SingleValue")) {
+    result.emplace(make_shared<SingleValue<float>>(
+        node_value.attribute("value").as_float(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 NumberT<float>::ValueRanges decodeFloatValueRanges(
-    const xml_node& root, const xml_node& node) {}
+    const xml_node& root, const xml_node& node) {
+  NumberT<float>::ValueRanges result;
+  for (auto node_value : node.children("ValueRange")) {
+    result.emplace(make_shared<ValueRange<float>>(
+        node_value.attribute("lowerValue").as_float(),
+        node_value.attribute("upperValue").as_float(),
+        decodeName(root, node_value)));
+  }
+  return result;
+}
 
 ArrayT decodeArray(const xml_node& root, const xml_node& node) {}
 
