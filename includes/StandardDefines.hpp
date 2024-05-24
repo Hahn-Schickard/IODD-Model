@@ -220,14 +220,7 @@ struct ArrayT : public ComplexDataTypeT {
 
   ArrayT(
       size_t count, bool subindex_access, std::vector<SimpleDatatype>&& _values)
-      : ComplexDataTypeT(subindex_access), values(std::move(_values)) {
-    if (values.size() != count) {
-      throw std::invalid_argument("Provided vector of size " +
-          std::to_string(values.size()) +
-          " does not mach the specified array size of " +
-          std::to_string(count));
-    }
-  }
+      : ComplexDataTypeT(subindex_access), values(std::move(_values)) {}
 };
 
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
