@@ -107,6 +107,9 @@ string toString(Datatype type) {
   case Datatype::ProcessDataOut: {
     return "ProcessDataOut";
   }
+  default: {
+    throw runtime_error("Unhandled Datatype enum value");
+  }
   }
 }
 
