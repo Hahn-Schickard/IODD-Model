@@ -213,14 +213,16 @@ struct ComplexDataTypeT {
 };
 
 struct ArrayT : public ComplexDataTypeT {
+  const size_t count;
   const std::vector<SimpleDatatype> values; // does it allow data type mixing?
 
-  ArrayT(size_t count, std::vector<SimpleDatatype>&& _values)
-      : ArrayT(count, false, std::move(_values)) {}
+  ArrayT(size_t _count, std::vector<SimpleDatatype>&& _values)
+      : ArrayT(_count, false, std::move(_values)) {}
 
-  ArrayT(
-      size_t count, bool subindex_access, std::vector<SimpleDatatype>&& _values)
-      : ComplexDataTypeT(subindex_access), values(std::move(_values)) {}
+  ArrayT(size_t _count, bool subindex_access,
+      std::vector<SimpleDatatype>&& _values)
+      : ComplexDataTypeT(subindex_access), count(_count),
+        values(std::move(_values)) {}
 };
 
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
