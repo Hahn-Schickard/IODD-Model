@@ -229,11 +229,7 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
   return result;
 }
 
-ArrayT decodeArray(const xml_node& root, const xml_node& node) {}
-
-RecordT decodeRecord(const xml_node& root, const xml_node& node) {}
-
-DataValue decodeDataValue(
+SimpleDatatype decodeSimpleDataValue(
     const xml_node& root, const xml_node& node, Datatype type) {
   switch (type) {
   case Datatype::Boolean: {
@@ -254,17 +250,27 @@ DataValue decodeDataValue(
         decodeFloatValueRanges(root, node));
   }
   case Datatype::String: {
-    throw logic_error("Failed to decoded String DataType Values");
+    return StringT(node.attribute("fixedLength").as_uint(),
+        (node.attribute("encoding").as_string() == "UTF-8"));
   }
   case Datatype::OctetString: {
-    throw logic_error("Failed to decoded OctetString DataType Values");
+    return OctetStringT(node.attribute("fixedLength").as_uint());
   }
   case Datatype::Time: {
-    throw logic_error("Failed to decoded Time DataType Values");
+    return TimeT();
   }
   case Datatype::TimeSpan: {
-    throw logic_error("Failed to decoded TimeSpan DataType Values");
+    return TimeSpanT();
   }
+  default: {
+    throw invalid_argument(toString(type) + " is not a simple data type");
+  }
+  }
+}
+
+DataValue decodeDataValue(
+    const xml_node& root, const xml_node& node, Datatype type) {
+  switch (type) {
   case Datatype::Array: {
     return decodeArray(root, node);
   }
