@@ -268,6 +268,40 @@ SimpleDatatype decodeSimpleDataValue(
   }
 }
 
+ArrayT decodeArray(const xml_node& root, const xml_node& node) {
+  vector<SimpleDatatype> values;
+  for (auto node_value : node.children("SimpleDatatype")) {
+    values.push_back(decodeSimpleDataValue(root, node_value,
+        toDatatype(node_value.attribute("xsi:type").as_string())));
+  }
+  // @TODO: obtain DatatypeRef as well and insert it into values
+  return ArrayT(node.attribute("count").as_llong(),
+      node.attribute("subindexAccessSupported").as_bool(true), move(values));
+}
+
+RecordItem decodeRecordItem(const xml_node& root, const xml_node& node) {
+  auto subindex = node.attribute("subindex").as_ullong();
+  auto offset = node.attribute("bitOffset").as_ullong();
+  auto node_value = node.child("SimpleDatatype");
+  auto type = decodeSimpleDataValue(root, node_value,
+      toDatatype(node_value.attribute("xsi:type").as_string()));
+  // @TODO: obtain DatatypeRef as well and insert it into type
+  auto name = decodeLocalizedText("Name", root, node).value();
+  auto access = decodeAccessRights(node);
+  auto desc = decodeLocalizedText("Description ", root, node);
+  return RecordItem(
+      subindex, offset, move(type), move(name), move(access), move(desc));
+}
+
+RecordT decodeRecord(const xml_node& root, const xml_node& node) {
+  RecordT::Records records;
+  for (auto node_value : node.children("RecordItem ")) {
+    records.emplace(decodeRecordItem(root, node_value));
+  }
+  return RecordT(node.attribute("bitLength").as_llong(),
+      node.attribute("subindexAccessSupported").as_bool(true), move(records));
+}
+
 DataValue decodeDataValue(
     const xml_node& root, const xml_node& node, Datatype type) {
   switch (type) {
