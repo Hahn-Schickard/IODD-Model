@@ -275,6 +275,25 @@ struct Unit : public NamedAttribute {
   size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
 };
 
+struct Variable {
+  const size_t index;
+  const TextID name;
+  const AccessRights access;
+  const DataValue value;
+  const std::optional<TextID> desc;
+  const bool dynamic;
+  const bool modifies_others;
+  const bool excluded;
+
+  Variable(size_t _index, TextID&& _name, AccessRights _access,
+      DataValue&& _value, std::optional<TextID>&& _desc = std::nullopt,
+      bool _dynamic = false, bool _modifies_others = false,
+      bool _excluded = false)
+      : index(_index), name(std::move(_name)), access(_access),
+        value(std::move(_value)), desc(std::move(_desc)), dynamic(_dynamic),
+        modifies_others(_modifies_others), excluded(_excluded) {}
+};
+
 // Comparator functions
 inline bool operator==(const TextID& lhs, const TextID& rhs) {
   return lhs.id() == rhs.id();
