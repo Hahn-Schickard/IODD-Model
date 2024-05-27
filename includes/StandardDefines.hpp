@@ -289,6 +289,26 @@ template <typename T> struct RecordItem {
 };
 
 struct Hash {
+  size_t operator()(const BooleanT& boolean) const { return (boolean.hash()); }
+
+  template <typename T> size_t operator()(const NumberT<T>& number) const {
+    return (number.hash());
+  }
+
+  size_t operator()(const OctetStringT& str) const { return (str.hash()); }
+
+  size_t operator()(const StringT& str) const { return (str.hash()); }
+
+  size_t operator()(const TimeT& time) const { return (time.hash()); }
+
+  size_t operator()(const TimeSpanT& time_span) const {
+    return (time_span.hash());
+  }
+
+  template <typename T> size_t operator()(const ArrayT<T>& array) const {
+    return (array.hash());
+  }
+
   template <typename T> size_t operator()(const RecordItem<T>& item) const {
     return (item.hash());
   }
