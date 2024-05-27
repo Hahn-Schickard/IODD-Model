@@ -262,7 +262,7 @@ struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
 
 template <typename T> struct RecordItem {
-  const size_t subindex;
+  const uint8_t subindex;
   const uint16_t bit_offset;
   const T value;
   const TextID name;
