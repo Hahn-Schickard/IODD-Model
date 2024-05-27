@@ -28,64 +28,79 @@ private:
 };
 
 struct NamedAttribute {
-  const std::optional<TextID> name = std::nullopt;
-
   NamedAttribute() = default;
 
-  NamedAttribute(std::optional<TextID>&& _name) : name(std::move(_name)) {}
+  NamedAttribute(std::optional<TextID>&& name) : name_(std::move(name)) {}
+
+  std::optional<TextID> name() { return name_; }
+
+private:
+  std::optional<TextID> name_ = std::nullopt;
 };
 
 using NamedAttributePtr = std::shared_ptr<NamedAttribute>;
 
 template <typename T> struct SingleValue : public NamedAttribute {
-  const T value;
+  SingleValue() = default;
 
-  SingleValue(T _value) : value(_value) {}
+  SingleValue(T value) : value_(value) {}
 
-  SingleValue(T _value, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), value(_value) {}
+  SingleValue(T value, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), value_(value) {}
 
-  size_t hash() const noexcept { return std::hash<T>{}(value); }
+  size_t hash() const noexcept { return std::hash<T>{}(value_); }
+
+  T value() const { return value_; }
+
+private:
+  T value_;
 };
 
 template <typename T> using SingleValuePtr = std::shared_ptr<SingleValue<T>>;
 
 template <typename T> struct ValueRange : public NamedAttribute {
-  const T lower;
-  const T upper;
+  ValueRange() = default;
 
-  ValueRange(T _lower, T _upper) : lower(_lower), upper(_upper) {
-    if (upper <= lower) {
+  ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
+    if (upper_ <= lower_) {
       throw std::invalid_argument(
           "Upper bound must be larger than lower bound");
     }
   }
 
-  ValueRange(T _lower, T _upper, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), lower(_lower), upper(_upper) {}
+  ValueRange(T lower, T upper, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), lower_(lower), upper_(upper) {}
 
   bool inRange(T value) const noexcept {
-    return (value > lower) && (value < upper);
+    return (value > lower_) && (value < upper_);
   }
 
   size_t hash() const noexcept {
-    return std::hash<T>{}(lower) + std::hash<T>{}(upper);
+    return std::hash<T>{}(lower_) + std::hash<T>{}(upper_);
   }
+
+  T lower() const { return lower_; }
+
+  T upper() const { return upper_; }
+
+private:
+  T lower_;
+  T upper_;
 };
 
 template <typename T> using ValueRangePtr = std::shared_ptr<ValueRange<T>>;
 
 struct BooleanT {
-  const std::unordered_set<SingleValuePtr<bool>> values;
+  using Values = std::unordered_set<SingleValuePtr<bool>>;
 
   BooleanT() = default;
 
-  BooleanT(std::unordered_set<SingleValuePtr<bool>>&& _values)
-      : values(std::move(_values)) {}
+  BooleanT(std::unordered_set<SingleValuePtr<bool>>&& values)
+      : values_(std::move(values)) {}
 
   NamedAttributePtr getName(bool value) const {
-    if (auto it = values.find(std::make_shared<SingleValue<bool>>(value));
-        it != values.end()) {
+    if (auto it = values_.find(std::make_shared<SingleValue<bool>>(value));
+        it != values_.end()) {
       return *it;
     }
     throw std::out_of_range(
@@ -94,36 +109,37 @@ struct BooleanT {
 
   size_t hash() const noexcept {
     size_t result;
-    for (const auto& value : values) {
+    for (const auto& value : values_) {
       result += value->hash();
     }
     return result;
   }
+
+  Values values() const { return values_; }
+
+private:
+  Values values_;
 };
 
 template <typename T> struct NumberT {
   using SingleValues = std::unordered_set<SingleValuePtr<T>>;
   using ValueRanges = std::unordered_set<ValueRangePtr<T>>;
 
-  const SingleValues single_values;
-  const ValueRanges value_ranges;
-
   NumberT() = default;
 
-  NumberT(SingleValues&& _values) : single_values(std::move(_values)) {}
+  NumberT(SingleValues&& values) : values_(std::move(values)) {}
 
-  NumberT(ValueRanges&& _values) : value_ranges(std::move(_values)) {}
+  NumberT(ValueRanges&& ranges) : ranges_(std::move(ranges)) {}
 
-  NumberT(SingleValues&& _single_values, ValueRanges&& _value_ranges)
-      : single_values(std::move(_single_values)),
-        value_ranges(std::move(_value_ranges)) {}
+  NumberT(SingleValues&& values, ValueRanges&& ranges)
+      : values_(std::move(values)), ranges_(std::move(ranges)) {}
 
   NamedAttributePtr getName(T value) {
-    if (auto it = single_values.find(std::make_shared<SingleValue<T>>(value));
-        it != single_values.end()) {
+    if (auto it = values_.find(std::make_shared<SingleValue<T>>(value));
+        it != values_.end()) {
       return *it;
     } else {
-      for (auto it : value_ranges) {
+      for (auto it : ranges_) {
         if (it->inRange(value)) {
           return *it;
         }
@@ -135,33 +151,44 @@ template <typename T> struct NumberT {
 
   size_t hash() const noexcept {
     size_t result;
-    for (const auto& value : single_values) {
+    for (const auto& value : values_) {
       result += value->hash();
     }
-    for (const auto& value : value_ranges) {
+    for (const auto& value : ranges_) {
       result += value->hash();
     }
     return result;
   }
+
+private:
+  SingleValues values_;
+  ValueRanges ranges_;
 };
 
 template <size_t MIN, size_t MAX> struct FixedBitLength {
-  const size_t bit_length; // or bit_offset
+  FixedBitLength() = default;
 
-  FixedBitLength(uint8_t bits) : bit_length(bits) {
-    if (bit_length < MIN) {
+  FixedBitLength(uint8_t bits) : bit_length_(bits) {
+    if (bit_length_ < MIN) {
       throw std::invalid_argument(
           "Bit length can not be smaller than " + std::to_string(MIN));
-    } else if (bit_length > MAX) {
+    } else if (bit_length_ > MAX) {
       throw std::invalid_argument(
           "Bit length can not be larger than " + std::to_string(MAX));
     }
   }
+
+  size_t bitLength() { return bit_length_; }
+
+private:
+  size_t bit_length_;
 };
 
 struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<size_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
+
+  UIntegerT() = default;
 
   UIntegerT(uint8_t bits, SingleValues&& values)
       : FixedBitLength(bits), NumberT(std::move(values)) {}
@@ -179,45 +206,56 @@ struct IntegerT : public FixedBitLength<2, 64>, public NumberT<intmax_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
+  IntegerT() = default;
+
   IntegerT(uint8_t bits, SingleValues&& values)
       : FixedBitLength(bits), NumberT(std::move(values)) {}
 
-  IntegerT(uint8_t bits, ValueRanges&& values)
-      : FixedBitLength(bits), NumberT(std::move(values)) {}
+  IntegerT(uint8_t bits, ValueRanges&& ranges)
+      : FixedBitLength(bits), NumberT(std::move(ranges)) {}
 
-  IntegerT(
-      uint8_t bits, SingleValues&& single_values, ValueRanges&& value_ranges)
-      : FixedBitLength(bits),
-        NumberT(std::move(single_values), std::move(value_ranges)) {}
+  IntegerT(uint8_t bits, SingleValues&& values, ValueRanges&& ranges)
+      : FixedBitLength(bits), NumberT(std::move(values), std::move(ranges)) {}
 };
 
 struct FloatT : public NumberT<float> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
+  FloatT() = default;
+
   FloatT(SingleValues&& values) : NumberT(std::move(values)) {}
 
-  FloatT(ValueRanges&& values) : NumberT(std::move(values)) {}
+  FloatT(ValueRanges&& ranges) : NumberT(std::move(ranges)) {}
 
-  FloatT(SingleValues&& single_values, ValueRanges&& value_ranges)
-      : NumberT(std::move(single_values), std::move(value_ranges)) {}
+  FloatT(SingleValues&& values, ValueRanges&& ranges)
+      : NumberT(std::move(values), std::move(ranges)) {}
 };
 
 struct OctetStringT {
-  const size_t fixed_len;
+  OctetStringT() = default;
 
-  OctetStringT(size_t length) : fixed_len(length) {}
+  OctetStringT(size_t length) : length_(length) {}
 
-  size_t hash() const noexcept { return fixed_len; }
+  size_t hash() const noexcept { return length_; }
+
+  size_t length() const { return length_; }
+
+protected:
+  size_t length_;
 };
 
 struct StringT : public OctetStringT {
-  const bool utf_encoding; // US-ASCII if false
+  StringT() = default;
 
-  StringT(size_t length, bool utf = true)
-      : OctetStringT(length), utf_encoding(utf) {}
+  StringT(size_t length, bool utf = true) : OctetStringT(length), utf_(utf) {}
 
-  size_t hash() const noexcept { return (fixed_len < 1) | utf_encoding; }
+  size_t hash() const noexcept { return (length_ < 1) | utf_; }
+
+  bool utf() const { return utf_; }
+
+private:
+  bool utf_; // US-ASCII if false
 };
 
 struct TimeT {
@@ -229,12 +267,15 @@ struct TimeSpanT {
 };
 
 template <typename T, typename SFINAE = void> struct ComplexDataTypeT {
-  const bool subindex_access = true;
-
   ComplexDataTypeT() = default;
 
   ComplexDataTypeT(bool subindex_access_support)
-      : subindex_access(subindex_access_support) {}
+      : subindex_access_(subindex_access_support) {}
+
+  bool subindexAccess() const { return subindex_access_; }
+
+private:
+  bool subindex_access_ = true;
 };
 
 template <typename T>
@@ -248,44 +289,66 @@ using IsSimpleDatatype = typename std::enable_if<
 
 template <typename T>
 struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
-  const size_t count;
-  const std::vector<T> values;
+  ArrayT() = default;
 
-  ArrayT(size_t _count, std::vector<T>&& _values)
-      : ArrayT(_count, false, std::move(_values)) {}
+  ArrayT(size_t count, std::vector<T>&& values)
+      : ArrayT(count, false, std::move(values)) {}
 
-  ArrayT(size_t _count, bool subindex_access, std::vector<T>&& _values)
+  ArrayT(size_t count, bool subindex_access, std::vector<T>&& values)
       : ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
-        count(_count), values(std::move(_values)) {}
+        count_(count), values_(std::move(values)) {}
 
   size_t hash() const noexcept {
     size_t result;
-    for (const auto& value : values) {
+    for (const auto& value : values_) {
       result += value.hash();
     }
     return result;
   }
+
+  size_t count() const { return count_; }
+
+  std::vector<T> values() const { return values_; }
+
+private:
+  size_t count_;
+  std::vector<T> values_;
 };
 
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
 
 template <typename T> struct RecordItem {
-  const uint8_t subindex;
-  const uint16_t bit_offset;
-  const T value;
-  const TextID name;
-  const std::optional<AccessRights> access;
-  const std::optional<TextID> desc;
+  RecordItem() = default;
 
-  RecordItem(uint8_t _subindex, uint16_t _bit_offset, T&& _value,
-      TextID&& _name, std::optional<AccessRights>&& _access = std::nullopt,
-      std::optional<TextID>&& _desc = std::nullopt)
-      : subindex(_subindex),
-        bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        value(std::move(_value)), name(std::move(_name)),
-        access(std::move(_access)), desc(std::move(_desc)) {}
+  RecordItem(uint8_t subindex, uint16_t offset, T&& value, TextID&& name,
+      std::optional<AccessRights>&& access = std::nullopt,
+      std::optional<TextID>&& desc = std::nullopt)
+      : subindex_(subindex),
+        offset_(FixedBitLength<0, 1855>(offset).bitLength()),
+        value_(std::move(value)), name_(std::move(name)),
+        access_(std::move(access)), desc_(std::move(desc)) {}
 
-  size_t hash() const noexcept { return subindex; }
+  size_t hash() const noexcept { return subindex_; }
+
+  uint8_t subindex() const { return subindex_; }
+
+  uint16_t offset() const { return offset_; }
+
+  T value() const { return value_; }
+
+  TextID name() const { return name_; }
+
+  std::optional<AccessRights> access() const { return access_; }
+
+  std::optional<TextID> description() const { return desc_; }
+
+private:
+  uint8_t subindex_;
+  uint16_t offset_;
+  T value_;
+  TextID name_;
+  std::optional<AccessRights> access_;
+  std::optional<TextID> desc_;
 };
 
 struct Hash {
@@ -320,23 +383,28 @@ using RecordItems = std::unordered_set<RecordItem<T>, Hash>;
 template <typename T>
 struct RecordT : public FixedBitLength<1, 1856>,
                  public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
-  const RecordItems<T> items;
+  RecordT() = default;
 
-  RecordT(uint16_t bit_length, RecordItems<T>&& _items)
-      : RecordT(bit_length, false, std::move(_items)) {}
+  RecordT(uint16_t bit_length, RecordItems<T>&& items)
+      : RecordT(bit_length, false, std::move(items)) {}
 
-  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& _items)
+  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& items)
       : FixedBitLength(bit_length), // clang-format off
         ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
-        items(std::move(_items)) {} // clang-format on
+        items_(std::move(items)) {} // clang-format on
 
   size_t hash() const noexcept {
     size_t result;
-    for (const auto& item : items) {
+    for (const auto& item : items_) {
       result += (item.hash() < 8) | item.value.hash();
     }
     return result;
   }
+
+  RecordItems<T> items() const { return items_; }
+
+private:
+  RecordItems<T> items_;
 };
 
 using DataValue = std::variant< // clang-format off
@@ -367,34 +435,59 @@ using DataValue = std::variant< // clang-format off
 >; // clang-format on
 
 struct Unit : public NamedAttribute {
-  const uint16_t code;
-  const std::string abbr;
+  Unit() = default;
 
-  Unit(uint16_t _code, const std::string& _abbr) : code(_code), abbr(_abbr) {}
+  Unit(uint16_t code, const std::string& abbr) : code_(code), abbr_(abbr) {}
 
-  Unit(uint16_t _code, const std::string& _abbr, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), code(_code), abbr(_abbr) {}
+  Unit(uint16_t code, const std::string& abbr, std::optional<TextID>&& name)
+      : NamedAttribute(std::move(name)), code_(code), abbr_(abbr) {}
 
-  size_t hash() const noexcept { return std::hash<uint16_t>{}(code); }
+  size_t hash() const noexcept { return std::hash<uint16_t>{}(code_); }
+
+  uint16_t code() const { return code_; }
+
+  std::string abbr() const { return abbr_; }
+
+private:
+  uint16_t code_;
+  std::string abbr_;
 };
 
 struct Variable {
-  const size_t index;
-  const TextID name;
-  const AccessRights access;
-  const DataValue value;
-  const std::optional<TextID> desc;
-  const bool dynamic;
-  const bool modifies_others;
-  const bool excluded;
+  Variable() = default;
 
-  Variable(size_t _index, TextID&& _name, AccessRights _access,
-      DataValue&& _value, std::optional<TextID>&& _desc = std::nullopt,
-      bool _dynamic = false, bool _modifies_others = false,
-      bool _excluded = false)
-      : index(_index), name(std::move(_name)), access(_access),
-        value(std::move(_value)), desc(std::move(_desc)), dynamic(_dynamic),
-        modifies_others(_modifies_others), excluded(_excluded) {}
+  Variable(size_t index, TextID&& name, AccessRights access, DataValue&& value,
+      std::optional<TextID>&& desc = std::nullopt, bool dynamic = false,
+      bool modifies_others = false, bool excluded = false)
+      : index_(index), name_(std::move(name)), access_(access),
+        value_(std::move(value)), desc_(std::move(desc)), dynamic_(dynamic),
+        modifies_others_(modifies_others), excluded_(excluded) {}
+
+  size_t index() const { return index_; }
+
+  TextID name() const { return name_; }
+
+  AccessRights access() const { return access_; }
+
+  DataValue value() const { return value_; }
+
+  std::optional<TextID> description() const { return desc_; }
+
+  bool dynamic() const { return dynamic_; }
+
+  bool modifiesOthers() const { return modifies_others_; }
+
+  bool excluded() const { return excluded_; }
+
+private:
+  size_t index_;
+  TextID name_;
+  AccessRights access_;
+  DataValue value_;
+  std::optional<TextID> desc_;
+  bool dynamic_;
+  bool modifies_others_;
+  bool excluded_;
 };
 
 // Comparator functions
@@ -424,62 +517,62 @@ inline bool operator>(const TextID& lhs, const TextID& rhs) {
 
 template <typename T>
 inline bool operator==(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value == rhs.value;
+  return lhs.value() == rhs.value();
 }
 
 template <typename T>
 inline bool operator!=(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value != rhs.value;
+  return lhs.value() != rhs.value();
 }
 
 template <typename T>
 inline bool operator<=(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value <= rhs.value;
+  return lhs.value() <= rhs.value();
 }
 
 template <typename T>
 inline bool operator>=(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value >= rhs.value;
+  return lhs.value() >= rhs.value();
 }
 
 template <typename T>
 inline bool operator<(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value < rhs.value;
+  return lhs.value() < rhs.value();
 }
 
 template <typename T>
 inline bool operator>(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {
-  return lhs.value > rhs.value;
+  return lhs.value() > rhs.value();
 }
 
 template <typename T>
 inline bool operator==(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower == rhs.lower) && (lhs.upper == rhs.upper);
+  return (lhs.lower() == rhs.lower()) && (lhs.upper() == rhs.upper());
 }
 
 template <typename T>
 inline bool operator!=(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower != rhs.lower) && (lhs.upper != rhs.upper);
+  return (lhs.lower() != rhs.lower()) && (lhs.upper() != rhs.upper());
 }
 
 template <typename T>
 inline bool operator<=(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower <= rhs.lower) && (lhs.upper <= rhs.upper);
+  return (lhs.lower() <= rhs.lower()) && (lhs.upper() <= rhs.upper());
 }
 
 template <typename T>
 inline bool operator>=(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower >= rhs.lower) && (lhs.upper >= rhs.upper);
+  return (lhs.lower() >= rhs.lower()) && (lhs.upper() >= rhs.upper());
 }
 
 template <typename T>
 inline bool operator<(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower < rhs.lower) && (lhs.upper < rhs.upper);
+  return (lhs.lower() < rhs.lower()) && (lhs.upper() < rhs.upper());
 }
 
 template <typename T>
 inline bool operator>(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
-  return (lhs.lower > rhs.lower) && (lhs.upper > rhs.upper);
+  return (lhs.lower() > rhs.lower()) && (lhs.upper() > rhs.upper());
 }
 
 inline bool operator==(const BooleanT& lhs, const BooleanT& rhs) {
@@ -610,68 +703,68 @@ inline bool operator>(const TimeSpanT& lhs, const TimeSpanT& rhs) {
 
 template <typename T>
 inline bool operator==(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex == rhs.subindex) && (lhs.value == rhs.value) &&
-      (lhs.name == rhs.name) && (lhs.access == rhs.access) &&
-      (lhs.desc == rhs.desc);
+  return (lhs.subindex() == rhs.subindex()) && (lhs.value() == rhs.value()) &&
+      (lhs.name() == rhs.name()) && (lhs.access() == rhs.access()) &&
+      (lhs.description() == rhs.description());
 }
 
 template <typename T>
 inline bool operator!=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex != rhs.subindex) && (lhs.value != rhs.value) &&
-      (lhs.name != rhs.name) && (lhs.access != rhs.access) &&
-      (lhs.desc != rhs.desc);
+  return (lhs.subindex() != rhs.subindex()) && (lhs.value() != rhs.value()) &&
+      (lhs.name() != rhs.name()) && (lhs.access() != rhs.access()) &&
+      (lhs.description() != rhs.description());
 }
 
 template <typename T>
 inline bool operator<=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex <= rhs.subindex) && (lhs.value <= rhs.value) &&
-      (lhs.name <= rhs.name) && (lhs.access <= rhs.access) &&
-      (lhs.desc <= rhs.desc);
+  return (lhs.subindex() <= rhs.subindex()) && (lhs.value() <= rhs.value()) &&
+      (lhs.name() <= rhs.name()) && (lhs.access() <= rhs.access()) &&
+      (lhs.description() <= rhs.description());
 }
 
 template <typename T>
 inline bool operator>=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex >= rhs.subindex) && (lhs.value >= rhs.value) &&
-      (lhs.name >= rhs.name) && (lhs.access >= rhs.access) &&
-      (lhs.desc >= rhs.desc);
+  return (lhs.subindex() >= rhs.subindex()) && (lhs.value() >= rhs.value()) &&
+      (lhs.name() >= rhs.name()) && (lhs.access() >= rhs.access()) &&
+      (lhs.description() >= rhs.description());
 }
 
 template <typename T>
 inline bool operator<(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex < rhs.subindex) && (lhs.value < rhs.value) &&
-      (lhs.name < rhs.name) && (lhs.access < rhs.access) &&
-      (lhs.desc < rhs.desc);
+  return (lhs.subindex() < rhs.subindex()) && (lhs.value() < rhs.value()) &&
+      (lhs.name() < rhs.name()) && (lhs.access() < rhs.access()) &&
+      (lhs.description() < rhs.description());
 }
 
 template <typename T>
 inline bool operator>(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
-  return (lhs.subindex > rhs.subindex) && (lhs.value > rhs.value) &&
-      (lhs.name > rhs.name) && (lhs.access > rhs.access) &&
-      (lhs.desc > rhs.desc);
+  return (lhs.subindex() > rhs.subindex()) && (lhs.value() > rhs.value()) &&
+      (lhs.name() > rhs.name()) && (lhs.access() > rhs.access()) &&
+      (lhs.description() > rhs.description());
 }
 
 inline bool operator==(const Unit& lhs, const Unit& rhs) {
-  return lhs.code == rhs.code;
+  return lhs.code() == rhs.code();
 }
 
 inline bool operator!=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code != rhs.code;
+  return lhs.code() != rhs.code();
 }
 
 inline bool operator<=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code <= rhs.code;
+  return lhs.code() <= rhs.code();
 }
 
 inline bool operator>=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code >= rhs.code;
+  return lhs.code() >= rhs.code();
 }
 
 inline bool operator<(const Unit& lhs, const Unit& rhs) {
-  return lhs.code < rhs.code;
+  return lhs.code() < rhs.code();
 }
 
 inline bool operator>(const Unit& lhs, const Unit& rhs) {
-  return lhs.code > rhs.code;
+  return lhs.code() > rhs.code();
 }
 
 } // namespace IODD
