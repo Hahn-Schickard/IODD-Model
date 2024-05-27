@@ -277,8 +277,8 @@ template <typename T> struct RecordItem {
   const std::optional<AccessRights> access;
   const std::optional<TextID> desc;
 
-  RecordItem(size_t _subindex, uint16_t _bit_offset, T&& _value, TextID&& _name,
-      std::optional<AccessRights>&& _access = std::nullopt,
+  RecordItem(uint8_t _subindex, uint16_t _bit_offset, T&& _value,
+      TextID&& _name, std::optional<AccessRights>&& _access = std::nullopt,
       std::optional<TextID>&& _desc = std::nullopt)
       : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
