@@ -5,6 +5,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -227,10 +228,7 @@ struct TimeSpanT {
   size_t hash() const noexcept { return -2; }
 };
 
-using SimpleDatatype = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
-    OctetStringT, StringT, TimeT, TimeSpanT>;
-
-struct ComplexDataTypeT {
+template <typename T, typename SFINAE = void> struct ComplexDataTypeT {
   const bool subindex_access = true;
 
   ComplexDataTypeT() = default;
@@ -239,58 +237,98 @@ struct ComplexDataTypeT {
       : subindex_access(subindex_access_support) {}
 };
 
-struct ArrayT : public ComplexDataTypeT {
-  const size_t count;
-  const std::vector<SimpleDatatype> values; // does it allow data type mixing?
+template <typename T>
+using IsSimpleDatatype = typename std::enable_if<
+    std::is_same<T, BooleanT>::value || std::is_same<T, UIntegerT>::value ||
+        std::is_same<T, IntegerT>::value || std::is_same<T, FloatT>::value ||
+        std::is_same<T, OctetStringT>::value ||
+        std::is_same<T, StringT>::value || std::is_same<T, TimeT>::value ||
+        std::is_same<T, TimeSpanT>::value,
+    T>::type;
 
-  ArrayT(size_t _count, std::vector<SimpleDatatype>&& _values)
+template <typename T>
+struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
+  const size_t count;
+  const std::vector<T> values;
+
+  ArrayT(size_t _count, std::vector<T>&& _values)
       : ArrayT(_count, false, std::move(_values)) {}
 
-  ArrayT(size_t _count, bool subindex_access,
-      std::vector<SimpleDatatype>&& _values)
-      : ComplexDataTypeT(subindex_access), count(_count),
-        values(std::move(_values)) {}
+  ArrayT(size_t _count, bool subindex_access, std::vector<T>&& _values)
+      : ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
+        count(_count), values(std::move(_values)) {}
 };
 
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
 
-struct RecordItem {
+template <typename T> struct RecordItem {
   const size_t subindex;
   const uint16_t bit_offset;
-  const SimpleDatatype type;
+  const T value;
   const TextID name;
   const std::optional<AccessRights> access;
   const std::optional<TextID> desc;
 
-  RecordItem(size_t _subindex, uint16_t _bit_offset, SimpleDatatype&& _type,
-      TextID&& _name, std::optional<AccessRights>&& _access = std::nullopt,
+  RecordItem(size_t _subindex, uint16_t _bit_offset, T&& _value, TextID&& _name,
+      std::optional<AccessRights>&& _access = std::nullopt,
       std::optional<TextID>&& _desc = std::nullopt)
       : subindex(_subindex),
         bit_offset(FixedBitLength<0, 1855>(_bit_offset).bit_length),
-        type(std::move(_type)), name(std::move(_name)),
+        value(std::move(_value)), name(std::move(_name)),
         access(std::move(_access)), desc(std::move(_desc)) {}
 
   size_t hash() const noexcept { return subindex; }
 };
 
 struct Hash {
-  size_t operator()(const RecordItem& item) const { return (item.hash()); }
+  template <typename T> size_t operator()(const RecordItem<T>& item) const {
+    return (item.hash());
+  }
 };
 
-struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
-  using Records = std::unordered_set<RecordItem, Hash>;
-  const Records items;
+template <typename T>
+using RecordItems = std::unordered_set<RecordItem<T>, Hash>;
 
-  RecordT(uint16_t bit_length, Records&& _items)
+template <typename T>
+struct RecordT : public FixedBitLength<1, 1856>,
+                 public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
+  const RecordItems<T> items;
+
+  RecordT(uint16_t bit_length, RecordItems<T>&& _items)
       : RecordT(bit_length, false, std::move(_items)) {}
 
-  RecordT(uint16_t bit_length, bool subindex_access, Records&& _items)
-      : FixedBitLength(bit_length), ComplexDataTypeT(subindex_access),
-        items(std::move(_items)) {}
+  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& _items)
+      : FixedBitLength(bit_length), // clang-format off
+        ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
+        items(std::move(_items)) {} // clang-format on
 };
 
-using DataValue = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
-    OctetStringT, StringT, TimeT, TimeSpanT, ArrayT, RecordT>;
+using DataValue = std::variant< // clang-format off
+        BooleanT, 
+        UIntegerT, 
+        IntegerT, 
+        FloatT, 
+        OctetStringT, 
+        StringT,
+        TimeT, 
+        TimeSpanT, 
+        ArrayT<BooleanT>, 
+        ArrayT<UIntegerT>, 
+        ArrayT<IntegerT>,
+        ArrayT<FloatT>, 
+        ArrayT<OctetStringT>, 
+        ArrayT<StringT>, 
+        ArrayT<TimeT>,
+        ArrayT<TimeSpanT>, 
+        RecordT<BooleanT>, 
+        RecordT<UIntegerT>,
+        RecordT<IntegerT>, 
+        RecordT<FloatT>, 
+        RecordT<OctetStringT>,
+        RecordT<StringT>, 
+        RecordT<TimeT>, 
+        RecordT<TimeSpanT>
+>; // clang-format on
 
 struct Unit : public NamedAttribute {
   const uint16_t code;
@@ -408,40 +446,172 @@ inline bool operator>(const ValueRange<T>& lhs, const ValueRange<T> rhs) {
   return (lhs.lower > rhs.lower) && (lhs.upper > rhs.upper);
 }
 
-inline bool operator==(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex == rhs.subindex) &&
-      (lhs.type.index() == rhs.type.index()) && (lhs.name == rhs.name) &&
-      (lhs.access == rhs.access) && (lhs.desc == rhs.desc);
+inline bool operator==(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() == rhs.hash();
 }
 
-inline bool operator!=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex != rhs.subindex) &&
-      (lhs.type.index() != rhs.type.index()) && (lhs.name != rhs.name) &&
-      (lhs.access != rhs.access) && (lhs.desc != rhs.desc);
+inline bool operator!=(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() != rhs.hash();
 }
 
-inline bool operator<=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex <= rhs.subindex) &&
-      (lhs.type.index() <= rhs.type.index()) && (lhs.name <= rhs.name) &&
-      (lhs.access <= rhs.access) && (lhs.desc <= rhs.desc);
+inline bool operator<=(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() <= rhs.hash();
 }
 
-inline bool operator>=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex >= rhs.subindex) &&
-      (lhs.type.index() >= rhs.type.index()) && (lhs.name >= rhs.name) &&
-      (lhs.access >= rhs.access) && (lhs.desc >= rhs.desc);
+inline bool operator>=(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() >= rhs.hash();
 }
 
-inline bool operator<(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex < rhs.subindex) &&
-      (lhs.type.index() < rhs.type.index()) && (lhs.name < rhs.name) &&
-      (lhs.access < rhs.access) && (lhs.desc < rhs.desc);
+inline bool operator<(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() < rhs.hash();
 }
 
-inline bool operator>(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex > rhs.subindex) &&
-      (lhs.type.index() > rhs.type.index()) && (lhs.name > rhs.name) &&
-      (lhs.access > rhs.access) && (lhs.desc > rhs.desc);
+inline bool operator>(const BooleanT& lhs, const BooleanT& rhs) {
+  return lhs.hash() > rhs.hash();
+}
+
+template <typename T>
+inline bool operator==(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() == rhs.hash();
+}
+
+template <typename T>
+inline bool operator!=(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() != rhs.hash();
+}
+
+template <typename T>
+inline bool operator<=(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() <= rhs.hash();
+}
+
+template <typename T>
+inline bool operator>=(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() >= rhs.hash();
+}
+
+template <typename T>
+inline bool operator<(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() < rhs.hash();
+}
+
+template <typename T>
+inline bool operator>(const NumberT<T>& lhs, const NumberT<T>& rhs) {
+  return lhs.hash() > rhs.hash();
+}
+
+inline bool operator==(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() == rhs.hash();
+}
+
+inline bool operator!=(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() != rhs.hash();
+}
+
+inline bool operator<=(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() <= rhs.hash();
+}
+
+inline bool operator>=(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() >= rhs.hash();
+}
+
+inline bool operator<(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() < rhs.hash();
+}
+
+inline bool operator>(const OctetStringT& lhs, const OctetStringT& rhs) {
+  return lhs.hash() > rhs.hash();
+}
+
+inline bool operator==(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() == rhs.hash();
+}
+
+inline bool operator!=(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() != rhs.hash();
+}
+
+inline bool operator<=(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() <= rhs.hash();
+}
+
+inline bool operator>=(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() >= rhs.hash();
+}
+
+inline bool operator<(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() < rhs.hash();
+}
+
+inline bool operator>(const TimeT& lhs, const TimeT& rhs) {
+  return lhs.hash() > rhs.hash();
+}
+
+inline bool operator==(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() == rhs.hash();
+}
+
+inline bool operator!=(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() != rhs.hash();
+}
+
+inline bool operator<=(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() <= rhs.hash();
+}
+
+inline bool operator>=(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() >= rhs.hash();
+}
+
+inline bool operator<(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() < rhs.hash();
+}
+
+inline bool operator>(const TimeSpanT& lhs, const TimeSpanT& rhs) {
+  return lhs.hash() > rhs.hash();
+}
+
+template <typename T>
+inline bool operator==(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex == rhs.subindex) && (lhs.value == rhs.value) &&
+      (lhs.name == rhs.name) && (lhs.access == rhs.access) &&
+      (lhs.desc == rhs.desc);
+}
+
+template <typename T>
+inline bool operator!=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex != rhs.subindex) && (lhs.value != rhs.value) &&
+      (lhs.name != rhs.name) && (lhs.access != rhs.access) &&
+      (lhs.desc != rhs.desc);
+}
+
+template <typename T>
+inline bool operator<=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex <= rhs.subindex) && (lhs.value <= rhs.value) &&
+      (lhs.name <= rhs.name) && (lhs.access <= rhs.access) &&
+      (lhs.desc <= rhs.desc);
+}
+
+template <typename T>
+inline bool operator>=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex >= rhs.subindex) && (lhs.value >= rhs.value) &&
+      (lhs.name >= rhs.name) && (lhs.access >= rhs.access) &&
+      (lhs.desc >= rhs.desc);
+}
+
+template <typename T>
+inline bool operator<(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex < rhs.subindex) && (lhs.value < rhs.value) &&
+      (lhs.name < rhs.name) && (lhs.access < rhs.access) &&
+      (lhs.desc < rhs.desc);
+}
+
+template <typename T>
+inline bool operator>(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+  return (lhs.subindex > rhs.subindex) && (lhs.value > rhs.value) &&
+      (lhs.name > rhs.name) && (lhs.access > rhs.access) &&
+      (lhs.desc > rhs.desc);
 }
 
 inline bool operator==(const Unit& lhs, const Unit& rhs) {

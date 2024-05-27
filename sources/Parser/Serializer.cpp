@@ -233,77 +233,210 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
   return result;
 }
 
+template <typename T>
+T decodeSimpleDataValue(
+    const xml_node& /* root */, const xml_node& /* node */) {
+  throw runtime_error(
+      "Failed to decode Simple Data Value. Unsupported data type");
+}
+
+template <>
+BooleanT decodeSimpleDataValue(const xml_node& root, const xml_node& node) {
+  return BooleanT(decodeBoolSingleValues(root, node));
+}
+
+template <>
+UIntegerT decodeSimpleDataValue(const xml_node& root, const xml_node& node) {
+  auto length = node.attribute("bitLength").as_uint();
+  return UIntegerT(length, decodeUintSingleValues(root, node),
+      decodeUintValueRanges(root, node));
+}
+
+template <>
+IntegerT decodeSimpleDataValue(const xml_node& root, const xml_node& node) {
+  auto length = node.attribute("bitLength").as_uint();
+  return IntegerT(length, decodeIntSingleValues(root, node),
+      decodeIntValueRanges(root, node));
+}
+
+template <>
+FloatT decodeSimpleDataValue(const xml_node& root, const xml_node& node) {
+  return FloatT(
+      decodeFloatSingleValues(root, node), decodeFloatValueRanges(root, node));
+}
+
+template <>
+StringT decodeSimpleDataValue(
+    const xml_node& /* root */, const xml_node& node) {
+  return StringT(node.attribute("fixedLength").as_uint(),
+      (strcmp(node.attribute("encoding").as_string(), "UTF-8") != 0));
+}
+
+template <>
+OctetStringT decodeSimpleDataValue(
+    const xml_node& /* root */, const xml_node& node) {
+  return OctetStringT(node.attribute("fixedLength").as_uint());
+}
+
+template <>
+TimeT decodeSimpleDataValue(
+    const xml_node& /* root */, const xml_node& /* node */) {
+  return TimeT();
+}
+
+template <>
+TimeSpanT decodeSimpleDataValue(
+    const xml_node& /* root */, const xml_node& /* node */) {
+  return TimeSpanT();
+}
+
+using SimpleDatatype = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
+    OctetStringT, StringT, TimeT, TimeSpanT>;
+
 SimpleDatatype decodeSimpleDataValue(
     const xml_node& root, const xml_node& node, Datatype type) {
   switch (type) {
   case Datatype::Boolean: {
-    return BooleanT(decodeBoolSingleValues(root, node));
+    return decodeSimpleDataValue<BooleanT>(root, node);
   }
   case Datatype::UInteger: {
-    auto length = node.attribute("bitLength").as_uint();
-    return UIntegerT(length, decodeUintSingleValues(root, node),
-        decodeUintValueRanges(root, node));
+    return decodeSimpleDataValue<UIntegerT>(root, node);
   }
   case Datatype::Integer: {
-    auto length = node.attribute("bitLength").as_uint();
-    return IntegerT(length, decodeIntSingleValues(root, node),
-        decodeIntValueRanges(root, node));
+    return decodeSimpleDataValue<IntegerT>(root, node);
   }
   case Datatype::Float32: {
-    return FloatT(decodeFloatSingleValues(root, node),
-        decodeFloatValueRanges(root, node));
+    return decodeSimpleDataValue<FloatT>(root, node);
   }
   case Datatype::String: {
-    return StringT(node.attribute("fixedLength").as_uint(),
-        (strcmp(node.attribute("encoding").as_string(), "UTF-8") != 0));
+    return decodeSimpleDataValue<StringT>(root, node);
   }
   case Datatype::OctetString: {
-    return OctetStringT(node.attribute("fixedLength").as_uint());
+    return decodeSimpleDataValue<OctetStringT>(root, node);
   }
   case Datatype::Time: {
-    return TimeT();
+    return decodeSimpleDataValue<TimeT>(root, node);
   }
   case Datatype::TimeSpan: {
-    return TimeSpanT();
-  }
+    return decodeSimpleDataValue<TimeSpanT>(root, node);
   default: {
     throw invalid_argument(toString(type) + " is not a simple data type");
   }
   }
+  }
 }
 
-ArrayT decodeArray(const xml_node& root, const xml_node& node) {
-  vector<SimpleDatatype> values;
+using ArrayValue = variant<ArrayT<BooleanT>, ArrayT<UIntegerT>,
+    ArrayT<IntegerT>, ArrayT<FloatT>, ArrayT<OctetStringT>, ArrayT<StringT>,
+    ArrayT<TimeT>, ArrayT<TimeSpanT>>;
+
+template <typename T>
+ArrayT<T> decodeArray(const xml_node& root, const xml_node& node) {
+  vector<T> values;
   for (auto node_value : node.children("SimpleDatatype")) {
-    values.push_back(decodeSimpleDataValue(root, node_value,
-        toDatatype(node_value.attribute("xsi:type").as_string())));
+    values.push_back(decodeSimpleDataValue<T>(root, node_value));
   }
   // @TODO: obtain DatatypeRef as well and insert it into values
   return ArrayT(node.attribute("count").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true), move(values));
 }
 
-RecordItem decodeRecordItem(const xml_node& root, const xml_node& node) {
+ArrayValue decodeArrayValue(const xml_node& root, const xml_node& node) {
+  auto type = toDatatype(
+      node.child("SimpleDatatype").attribute("xsi:type").as_string());
+  switch (type) {
+  case Datatype::Boolean: {
+    return decodeArray<BooleanT>(root, node);
+  }
+  case Datatype::UInteger: {
+    return decodeArray<UIntegerT>(root, node);
+  }
+  case Datatype::Integer: {
+    return decodeArray<IntegerT>(root, node);
+  }
+  case Datatype::Float32: {
+    return decodeArray<FloatT>(root, node);
+  }
+  case Datatype::String: {
+    return decodeArray<StringT>(root, node);
+  }
+  case Datatype::OctetString: {
+    return decodeArray<OctetStringT>(root, node);
+  }
+  case Datatype::Time: {
+    return decodeArray<TimeT>(root, node);
+  }
+  case Datatype::TimeSpan: {
+    return decodeArray<TimeSpanT>(root, node);
+  }
+  default: {
+    throw runtime_error("Failed to decode ArrayT. " + toString(type) +
+        " is not a simple data type");
+  }
+  }
+}
+
+template <typename T>
+RecordItem<T> decodeRecordItem(const xml_node& root, const xml_node& node) {
   auto subindex = node.attribute("subindex").as_ullong();
   auto offset = node.attribute("bitOffset").as_ullong();
   auto node_value = node.child("SimpleDatatype");
-  auto type = decodeSimpleDataValue(root, node_value,
-      toDatatype(node_value.attribute("xsi:type").as_string()));
+  auto value = decodeSimpleDataValue<T>(root, node_value);
   // @TODO: obtain DatatypeRef as well and insert it into type
   auto name = decodeLocalizedText("Name", root, node).value();
   auto access = decodeAccessRights(node);
   auto desc = decodeLocalizedText("Description ", root, node);
   return RecordItem(
-      subindex, offset, move(type), move(name), move(access), move(desc));
+      subindex, offset, move(value), move(name), move(access), move(desc));
 }
 
-RecordT decodeRecord(const xml_node& root, const xml_node& node) {
-  RecordT::Records records;
-  for (auto node_value : node.children("RecordItem ")) {
-    records.emplace(decodeRecordItem(root, node_value));
+template <typename T>
+RecordT<T> decodeRecord(const xml_node& root, const xml_node& node) {
+  RecordItems<T> records;
+  for (auto node_value : node.children("RecordItem")) {
+    records.emplace(decodeRecordItem<T>(root, node_value));
   }
-  return RecordT(node.attribute("bitLength").as_llong(),
+  return RecordT<T>(node.attribute("bitLength").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true), move(records));
+}
+
+using RecordValue = variant<RecordT<BooleanT>, RecordT<UIntegerT>,
+    RecordT<IntegerT>, RecordT<FloatT>, RecordT<OctetStringT>, RecordT<StringT>,
+    RecordT<TimeT>, RecordT<TimeSpanT>>;
+
+RecordValue decodeRecordValue(const xml_node& root, const xml_node& node) {
+  auto type = toDatatype(
+      node.child("SimpleDatatype").attribute("xsi:type").as_string());
+  switch (type) {
+  case Datatype::Boolean: {
+    return decodeRecord<BooleanT>(root, node);
+  }
+  case Datatype::UInteger: {
+    return decodeRecord<UIntegerT>(root, node);
+  }
+  case Datatype::Integer: {
+    return decodeRecord<IntegerT>(root, node);
+  }
+  case Datatype::Float32: {
+    return decodeRecord<FloatT>(root, node);
+  }
+  case Datatype::String: {
+    return decodeRecord<StringT>(root, node);
+  }
+  case Datatype::OctetString: {
+    return decodeRecord<OctetStringT>(root, node);
+  }
+  case Datatype::Time: {
+    return decodeRecord<TimeT>(root, node);
+  }
+  case Datatype::TimeSpan: {
+    return decodeRecord<TimeSpanT>(root, node);
+  }
+  default: {
+    throw runtime_error("Failed to decode RecordT. " + toString(type) +
+        " is not a simple data type");
+  }
+  }
 }
 
 template <class... Args> struct VariantCaster {
@@ -324,10 +457,10 @@ DataValue decodeDataValue(
     const xml_node& root, const xml_node& node, Datatype type) {
   switch (type) {
   case Datatype::Array: {
-    return decodeArray(root, node);
+    return variantCast(decodeArrayValue(root, node));
   }
   case Datatype::Record: {
-    return decodeRecord(root, node);
+    return variantCast(decodeRecordValue(root, node));
   }
   case Datatype::ProcessDataIn: {
     throw logic_error("Failed to decoded ProcessDataIn DataType Values");
@@ -352,6 +485,7 @@ pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
         decodeDataValue(xml, datatype,
             toDatatype(datatype.attribute("xsi:type").as_string())));
   }
+
   auto variable_collection = xml.child("VariableCollection");
   Repository::VariablesMap variables;
   for (auto variable : variable_collection.children("Variable")) {
@@ -366,6 +500,7 @@ pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
             variable.attribute("modifiesOtherVariables").as_bool(false),
             variable.attribute("excludedFromDataStorage").as_bool(false)));
   }
+
   return make_pair(move(datatypes), move(variables));
 }
 
