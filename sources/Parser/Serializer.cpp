@@ -331,43 +331,57 @@ using ArrayValue = variant<ArrayT<BooleanT>, ArrayT<UIntegerT>,
     ArrayT<TimeT>, ArrayT<TimeSpanT>>;
 
 template <typename T>
-ArrayT<T> decodeArray(const xml_node& root, const xml_node& node) {
+ArrayT<T> decodeArray(const xml_node& root, const xml_node& node,
+    const Repository::DatatypesMap& datatypes_map) {
   vector<T> values;
-  for (auto node_value : node.children("SimpleDatatype")) {
-    values.push_back(decodeSimpleDataValue<T>(root, node_value));
+
+  if (node.child("SimpleDatatype").hash_value()) {
+    for (auto node_value : node.children("SimpleDatatype")) {
+      values.push_back(decodeSimpleDataValue<T>(root, node_value));
+    }
+  } else if (node.child("DatatypeRef").hash_value()) {
+    for (auto node_value : node.children("DatatypeRef")) {
+      string id = node_value.attribute("datatypeId").as_string();
+      if (auto it = datatypes_map.find(id); it != datatypes_map.end()) {
+        values.push_back(get<T>(it->second));
+      }
+    }
+  } else {
+    throw runtime_error("Array has no specified data type");
   }
-  // @TODO: obtain DatatypeRef as well and insert it into values
+
   return ArrayT(node.attribute("count").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true), move(values));
 }
 
-ArrayValue decodeArrayValue(const xml_node& root, const xml_node& node) {
+ArrayValue decodeArrayValue(const xml_node& root, const xml_node& node,
+    const Repository::DatatypesMap& datatypes_map) {
   auto type = toDatatype(
       node.child("SimpleDatatype").attribute("xsi:type").as_string());
   switch (type) {
   case Datatype::Boolean: {
-    return decodeArray<BooleanT>(root, node);
+    return decodeArray<BooleanT>(root, node, datatypes_map);
   }
   case Datatype::UInteger: {
-    return decodeArray<UIntegerT>(root, node);
+    return decodeArray<UIntegerT>(root, node, datatypes_map);
   }
   case Datatype::Integer: {
-    return decodeArray<IntegerT>(root, node);
+    return decodeArray<IntegerT>(root, node, datatypes_map);
   }
   case Datatype::Float32: {
-    return decodeArray<FloatT>(root, node);
+    return decodeArray<FloatT>(root, node, datatypes_map);
   }
   case Datatype::String: {
-    return decodeArray<StringT>(root, node);
+    return decodeArray<StringT>(root, node, datatypes_map);
   }
   case Datatype::OctetString: {
-    return decodeArray<OctetStringT>(root, node);
+    return decodeArray<OctetStringT>(root, node, datatypes_map);
   }
   case Datatype::Time: {
-    return decodeArray<TimeT>(root, node);
+    return decodeArray<TimeT>(root, node, datatypes_map);
   }
   case Datatype::TimeSpan: {
-    return decodeArray<TimeSpanT>(root, node);
+    return decodeArray<TimeSpanT>(root, node, datatypes_map);
   }
   default: {
     throw runtime_error("Failed to decode ArrayT. " + toString(type) +
@@ -377,24 +391,41 @@ ArrayValue decodeArrayValue(const xml_node& root, const xml_node& node) {
 }
 
 template <typename T>
-RecordItem<T> decodeRecordItem(const xml_node& root, const xml_node& node) {
+RecordItem<T> decodeRecordItem(const xml_node& root, const xml_node& node,
+    const Repository::DatatypesMap& datatypes_map) {
+  T value;
+
+  if (auto node_value = node.child("SimpleDatatype"); node_value.hash_value()) {
+    value = decodeSimpleDataValue<T>(root, node_value);
+  } else if (auto node_value = node.child("DatatypeRef");
+             node_value.hash_value()) {
+    string id = node_value.attribute("datatypeId").as_string();
+    if (auto it = datatypes_map.find(id); it != datatypes_map.end()) {
+      value = get<T>(it->second);
+    } else {
+      throw runtime_error("Datatype Reference " + id +
+          " not found in given datatypes collection");
+    }
+  } else {
+    throw runtime_error("Record item has no specified data type");
+  }
+
   auto subindex = node.attribute("subindex").as_ullong();
   auto offset = node.attribute("bitOffset").as_ullong();
-  auto node_value = node.child("SimpleDatatype");
-  auto value = decodeSimpleDataValue<T>(root, node_value);
-  // @TODO: obtain DatatypeRef as well and insert it into type
   auto name = decodeLocalizedText("Name", root, node).value();
   auto access = decodeAccessRights(node);
   auto desc = decodeLocalizedText("Description ", root, node);
+
   return RecordItem(
       subindex, offset, move(value), move(name), access, move(desc));
 }
 
 template <typename T>
-RecordT<T> decodeRecord(const xml_node& root, const xml_node& node) {
+RecordT<T> decodeRecord(const xml_node& root, const xml_node& node,
+    const Repository::DatatypesMap& datatypes_map) {
   RecordItems<T> records;
   for (auto node_value : node.children("RecordItem")) {
-    records.emplace(decodeRecordItem<T>(root, node_value));
+    records.emplace(decodeRecordItem<T>(root, node_value, datatypes_map));
   }
   return RecordT<T>(node.attribute("bitLength").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true), move(records));
@@ -404,33 +435,34 @@ using RecordValue = variant<RecordT<BooleanT>, RecordT<UIntegerT>,
     RecordT<IntegerT>, RecordT<FloatT>, RecordT<OctetStringT>, RecordT<StringT>,
     RecordT<TimeT>, RecordT<TimeSpanT>>;
 
-RecordValue decodeRecordValue(const xml_node& root, const xml_node& node) {
+RecordValue decodeRecordValue(const xml_node& root, const xml_node& node,
+    const Repository::DatatypesMap& datatypes_map) {
   auto type = toDatatype(
       node.child("SimpleDatatype").attribute("xsi:type").as_string());
   switch (type) {
   case Datatype::Boolean: {
-    return decodeRecord<BooleanT>(root, node);
+    return decodeRecord<BooleanT>(root, node, datatypes_map);
   }
   case Datatype::UInteger: {
-    return decodeRecord<UIntegerT>(root, node);
+    return decodeRecord<UIntegerT>(root, node, datatypes_map);
   }
   case Datatype::Integer: {
-    return decodeRecord<IntegerT>(root, node);
+    return decodeRecord<IntegerT>(root, node, datatypes_map);
   }
   case Datatype::Float32: {
-    return decodeRecord<FloatT>(root, node);
+    return decodeRecord<FloatT>(root, node, datatypes_map);
   }
   case Datatype::String: {
-    return decodeRecord<StringT>(root, node);
+    return decodeRecord<StringT>(root, node, datatypes_map);
   }
   case Datatype::OctetString: {
-    return decodeRecord<OctetStringT>(root, node);
+    return decodeRecord<OctetStringT>(root, node, datatypes_map);
   }
   case Datatype::Time: {
-    return decodeRecord<TimeT>(root, node);
+    return decodeRecord<TimeT>(root, node, datatypes_map);
   }
   case Datatype::TimeSpan: {
-    return decodeRecord<TimeSpanT>(root, node);
+    return decodeRecord<TimeSpanT>(root, node, datatypes_map);
   }
   default: {
     throw runtime_error("Failed to decode RecordT. " + toString(type) +
@@ -453,14 +485,14 @@ auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
   return {v};
 }
 
-DataValue decodeDataValue(
-    const xml_node& root, const xml_node& node, Datatype type) {
+DataValue decodeDataValue(const xml_node& root, const xml_node& node,
+    Datatype type, const Repository::DatatypesMap& datatypes_map = {}) {
   switch (type) {
   case Datatype::Array: {
-    return variantCast(decodeArrayValue(root, node));
+    return variantCast(decodeArrayValue(root, node, datatypes_map));
   }
   case Datatype::Record: {
-    return variantCast(decodeRecordValue(root, node));
+    return variantCast(decodeRecordValue(root, node, datatypes_map));
   }
   case Datatype::ProcessDataIn: {
     throw logic_error("Failed to decoded ProcessDataIn DataType Values");
@@ -494,7 +526,8 @@ pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
             decodeLocalizedText("Name", xml, variable).value(),
             decodeAccessRights(variable).value(),
             decodeDataValue(xml, variable,
-                toDatatype(variable.attribute("xsi:type").as_string())),
+                toDatatype(variable.attribute("xsi:type").as_string()),
+                datatypes),
             decodeLocalizedText("Description", xml, variable).value(),
             variable.attribute("dynamic").as_bool(false),
             variable.attribute("modifiesOtherVariables").as_bool(false),
