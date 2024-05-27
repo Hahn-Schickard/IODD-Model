@@ -387,7 +387,7 @@ RecordItem<T> decodeRecordItem(const xml_node& root, const xml_node& node) {
   auto access = decodeAccessRights(node);
   auto desc = decodeLocalizedText("Description ", root, node);
   return RecordItem(
-      subindex, offset, move(value), move(name), move(access), move(desc));
+      subindex, offset, move(value), move(name), access, move(desc));
 }
 
 template <typename T>

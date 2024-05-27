@@ -321,7 +321,7 @@ template <typename T> struct RecordItem {
   RecordItem() = default;
 
   RecordItem(uint8_t subindex, uint16_t offset, T&& value, TextID&& name,
-      std::optional<AccessRights>&& access = std::nullopt,
+      std::optional<AccessRights> access = std::nullopt,
       std::optional<TextID>&& desc = std::nullopt)
       : subindex_(subindex),
         offset_(FixedBitLength<0, 1855>(offset).bitLength()),
