@@ -90,6 +90,14 @@ struct BooleanT {
     throw std::out_of_range(
         std::string(value ? "True" : "False") + " value has no assigned named");
   }
+
+  size_t hash() const noexcept {
+    size_t result;
+    for (const auto& value : values) {
+      result += value->hash();
+    }
+    return result;
+  }
 };
 
 template <typename T> struct NumberT {
@@ -122,6 +130,17 @@ template <typename T> struct NumberT {
     }
     throw std::out_of_range(
         std::to_string(value) + " value has no assigned named");
+  }
+
+  size_t hash() const noexcept {
+    size_t result;
+    for (const auto& value : single_values) {
+      result += value->hash();
+    }
+    for (const auto& value : value_ranges) {
+      result += value->hash();
+    }
+    return result;
   }
 };
 
@@ -187,6 +206,8 @@ struct OctetStringT {
   const size_t fixed_len;
 
   OctetStringT(size_t length) : fixed_len(length) {}
+
+  size_t hash() const noexcept { return fixed_len; }
 };
 
 struct StringT : public OctetStringT {
@@ -194,11 +215,17 @@ struct StringT : public OctetStringT {
 
   StringT(size_t length, bool utf = true)
       : OctetStringT(length), utf_encoding(utf) {}
+
+  size_t hash() const noexcept { return (fixed_len < 1) | utf_encoding; }
 };
 
-struct TimeT {};
+struct TimeT {
+  size_t hash() const noexcept { return -1; }
+};
 
-struct TimeSpanT {};
+struct TimeSpanT {
+  size_t hash() const noexcept { return -2; }
+};
 
 using SimpleDatatype = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
     OctetStringT, StringT, TimeT, TimeSpanT>;
