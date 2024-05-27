@@ -257,6 +257,14 @@ struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
   ArrayT(size_t _count, bool subindex_access, std::vector<T>&& _values)
       : ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
         count(_count), values(std::move(_values)) {}
+
+  size_t hash() const noexcept {
+    size_t result;
+    for (const auto& value : values) {
+      result += value.hash();
+    }
+    return result;
+  }
 };
 
 enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
@@ -301,6 +309,14 @@ struct RecordT : public FixedBitLength<1, 1856>,
       : FixedBitLength(bit_length), // clang-format off
         ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
         items(std::move(_items)) {} // clang-format on
+
+  size_t hash() const noexcept {
+    size_t result;
+    for (const auto& item : items) {
+      result += (item.hash() < 8) | item.value.hash();
+    }
+    return result;
+  }
 };
 
 using DataValue = std::variant< // clang-format off
