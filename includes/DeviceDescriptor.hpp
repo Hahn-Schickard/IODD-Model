@@ -13,10 +13,12 @@ namespace IODD {
 inline std::string makeDeviceIdentity(
     const std::string& vendor_id, const std::string& device_id) {
   if (vendor_id.empty()) {
-    throw std::invalid_argument("Vendor ID can not be empty");
+    throw std::invalid_argument(
+        "Failed to create DeviceIDentity string. Vendor ID can not be empty");
   }
   if (device_id.empty()) {
-    throw std::invalid_argument("Device ID can not be empty");
+    throw std::invalid_argument(
+        "Failed to create DeviceIDentity string. Device ID can not be empty");
   }
   return vendor_id + "-" + device_id;
 }
