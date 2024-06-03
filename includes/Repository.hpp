@@ -1,7 +1,7 @@
 #ifndef __IODD_LOCAL_DESCRIPTOR_REPOSITORY_HPP
 #define __IODD_LOCAL_DESCRIPTOR_REPOSITORY_HPP
 
-#include "IODeviceDescriptor.hpp"
+#include "DeviceDescriptor.hpp"
 
 #include <string>
 #include <unordered_map>
@@ -14,7 +14,7 @@ struct Repository {
   using DatatypesMapPtr = std::shared_ptr<DatatypesMap>;
   using VariablesMap = std::unordered_map<std::string, Variable>;
   using VariablesMapPtr = std::shared_ptr<VariablesMap>;
-  using DescriptorsMap = std::unordered_map<std::string, IODeviceDescriptorPtr>;
+  using DescriptorsMap = std::unordered_map<std::string, DeviceDescriptorPtr>;
 
   Repository(UnitsMap&& units, DatatypesMap&& datatypes,
       VariablesMap&& std_variables, DescriptorsMap&& descriptors);
@@ -23,7 +23,7 @@ struct Repository {
       std::pair<DatatypesMap, VariablesMap> std_defines,
       DescriptorsMap&& descriptors);
 
-  IODeviceDescriptorPtr getDescriptor(
+  DeviceDescriptorPtr getDescriptor(
       const std::string& vendor_id, const std::string& device_id);
 
 private:

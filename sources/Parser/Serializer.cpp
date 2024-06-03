@@ -11,8 +11,6 @@ using namespace pugi;
 
 namespace IODD {
 
-IODeviceDescriptorPtr decode(const xml_document& xml) {}
-
 xml_document getXML(const filesystem::path& path) {
   if (!filesystem::exists(path)) {
     throw runtime_error(path.string() + " does not exists");
@@ -537,7 +535,17 @@ pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
   return make_pair(move(datatypes), move(variables));
 }
 
-Repository::DescriptorsMap decodeDescriptors(const filesystem::path& path) {
+DeviceDescriptorPtr decode(const Repository::UnitsMap& units,
+    const Repository::DatatypesMap& datatypes,
+    const Repository::VariablesMap& variables, const xml_document& xml) {
+  auto device_xml = xml.child("IODevice");
+  auto locales_xml = device_xml.child("ExternalTextCollection");
+  auto profile_xml = device_xml.child("ProfileBody");
+}
+
+Repository::DescriptorsMap decodeDescriptors(const Repository::UnitsMap& units,
+    const pair<Repository::DatatypesMap, Repository::VariablesMap>& variables,
+    const filesystem::path& path) {
   Repository::DescriptorsMap descriptors;
 
   for (const auto& entry : filesystem::directory_iterator(path)) {
