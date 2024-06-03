@@ -14,7 +14,16 @@ namespace IODD {
 
 struct TextID {
   TextID(const std::string& id, const std::string& locale)
-      : id_(id), locale_(locale) {}
+      : id_(id), locale_(locale) {
+    if (id_.empty()) {
+      throw std::invalid_argument(
+          "Failed to create TextID. ID argument can not be empty");
+    }
+    if (locale_.empty()) {
+      throw std::invalid_argument(
+          "Failed to create TextID. locale argument can not be empty");
+    }
+  }
 
   std::string id() const { return id_; }
 
