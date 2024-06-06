@@ -510,6 +510,8 @@ private:
   bool excluded_;
 };
 
+using VariablePtr = std::shared_ptr<Variable>;
+
 // Comparator functions
 inline bool operator==(const TextID& lhs, const TextID& rhs) {
   return lhs.id() == rhs.id();
