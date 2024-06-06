@@ -421,7 +421,8 @@ RecordT<T> decodeRecord(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node, const xml_node& locales) {
   RecordItems<T> records;
   for (auto node_value : node.children("RecordItem")) {
-    records.emplace(decodeRecordItem<T>(datatypes_map, node_value, locales));
+    auto record = decodeRecordItem<T>(datatypes_map, node_value, locales);
+    records.emplace(record.subindex(), move(record));
   }
   return RecordT<T>(node.attribute("bitLength").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true), move(records));

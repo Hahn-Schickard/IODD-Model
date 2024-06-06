@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
@@ -389,7 +390,7 @@ struct Hash {
 };
 
 template <typename T>
-using RecordItems = std::unordered_set<RecordItem<T>, Hash>;
+using RecordItems = std::unordered_map<uint8_t, RecordItem<T>>;
 
 template <typename T>
 struct RecordT : public FixedBitLength<1, 1856>,
@@ -407,7 +408,7 @@ struct RecordT : public FixedBitLength<1, 1856>,
   size_t hash() const noexcept {
     size_t result;
     for (const auto& item : items_) {
-      result += (item.hash() < 8) | item.value.hash();
+      result += (item.second.hash() < 8) | item.second.value.hash();
     }
     return result;
   }
