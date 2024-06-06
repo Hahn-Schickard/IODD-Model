@@ -37,15 +37,15 @@ TextID decodeLocalization(const xml_node& locales, const string& text_id) {
   return TextID(text_id, localization);
 }
 
-Repository::UnitsMap decodeUnits(const filesystem::path& path) {
-  Repository::UnitsMap result;
+Repository::UnitsMapPtr decodeUnits(const filesystem::path& path) {
+  auto result = make_shared<Repository::UnitsMap>();
   auto xml = getXML(path).child("IODDStandardUnitDefinitions");
   auto units_collection = xml.child("UnitCollection");
   for (auto unit : units_collection.children("Unit")) {
     auto code = unit.attribute("code").as_uint();
     const auto* abbr = unit.attribute("abbr").as_string();
     const auto* text_id = unit.attribute("textId").as_string();
-    result.emplace(code, Unit(code, abbr, decodeLocalization(xml, text_id)));
+    result->emplace(code, Unit(code, abbr, decodeLocalization(xml, text_id)));
   }
   return result;
 }
@@ -504,56 +504,99 @@ DataValue decodeDataValue(const xml_node& node, const xml_node& locales,
 }
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
-pair<Repository::DatatypesMap, Repository::VariablesMap> decodeStdDefinitions(
-    const filesystem::path& path) {
-  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
-  auto locales_xml =
-      xml.child("ExternalTextCollection").child("PrimaryLanguage");
-  auto datatype_collection = xml.child("DatatypeCollection");
-  Repository::DatatypesMap datatypes;
-  for (auto datatype : datatype_collection.children("Datatype")) {
+Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
+    const xml_node& locales,
+    const Repository::DatatypesMap& std_datatypes = {}) {
+  Repository::DatatypesMap datatypes = std_datatypes;
+  for (auto datatype : xml.children("Datatype")) {
     datatypes.emplace(datatype.attribute("id").as_string(),
-        decodeDataValue(datatype, locales_xml,
+        decodeDataValue(datatype, locales,
             toDatatype(datatype.attribute("xsi:type").as_string())));
   }
+  return datatypes;
+}
 
-  auto variable_collection = xml.child("VariableCollection");
-  Repository::VariablesMap variables;
-  for (auto variable : variable_collection.children("Variable")) {
+Repository::VariablesMap decodeVariables(const xml_node& xml,
+    const xml_node& locales, const Repository::DatatypesMap& datatypes,
+    const Repository::VariablesMap& std_variables = {}) {
+  Repository::VariablesMap variables = std_variables;
+  for (auto variable : xml.children("Variable")) {
     variables.emplace(variable.attribute("id").as_string(),
-        Variable(variable.attribute("index").as_ullong(),
-            decodeLocalizedText("Name", variable, locales_xml).value(),
+        make_shared<Variable>(variable.attribute("index").as_ullong(),
+            decodeLocalizedText("Name", variable, locales).value(),
             decodeAccessRights(variable).value(),
-            decodeDataValue(variable, locales_xml,
+            decodeDataValue(variable, locales,
                 toDatatype(variable.attribute("xsi:type").as_string()),
                 datatypes),
-            decodeLocalizedText("Description", variable, locales_xml).value(),
+            decodeLocalizedText("Description", variable, locales).value(),
             variable.attribute("dynamic").as_bool(false),
             variable.attribute("modifiesOtherVariables").as_bool(false),
             variable.attribute("excludedFromDataStorage").as_bool(false)));
   }
-
-  return make_pair(move(datatypes), move(variables));
+  return variables;
 }
 
-DeviceDescriptorPtr decode(const Repository::UnitsMap& units,
-    const Repository::DatatypesMap& datatypes,
-    const Repository::VariablesMap& variables, const xml_document& xml) {
+pair<Repository::DatatypesMapPtr, Repository::VariablesMapPtr>
+decodeStdDefinitions(const filesystem::path& path) {
+  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
+  auto locales_xml =
+      xml.child("ExternalTextCollection").child("PrimaryLanguage");
+
+  auto datatypes =
+      decodeDatatypes(xml.child("DatatypeCollection"), locales_xml);
+  auto variables =
+      decodeVariables(xml.child("VariableCollection"), locales_xml, datatypes);
+
+  return make_pair(make_shared<Repository::DatatypesMap>(datatypes),
+      make_shared<Repository::VariablesMap>(variables));
+}
+
+DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
+  if (auto identity_xml = node.child("DeviceIdentity"); !identity_xml.empty()) {
+    auto vendor_id = identity_xml.attribute("vendorId").as_uint();
+    string vendor_name = identity_xml.attribute("vendorName").as_string();
+    auto device_id = identity_xml.attribute("vendorId").as_uint();
+    auto device_name = decodeLocalization(
+        locales, node.child("DeviceName").attribute("textId").as_string());
+    return DeviceIdentity(vendor_id, vendor_name, device_id, device_name);
+  } else {
+    throw runtime_error(
+        "DeviceIdentity node not found in a given XML structure");
+  }
+}
+
+Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
+    const xml_node& locales, const Repository::DatatypesMap& datatypes) {}
+
+DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
+    const Repository::DatatypesMapPtr& std_datatypes,
+    const Repository::VariablesMapPtr& std_variables, const xml_document& xml) {
   auto device_xml = xml.child("IODevice");
-  auto locales_xml = device_xml.child("ExternalTextCollection");
+  auto locales_xml =
+      device_xml.child("ExternalTextCollection").child("PrimaryLanguage");
   auto profile_xml = device_xml.child("ProfileBody");
+  auto identity = decodeIdentity(profile_xml, locales_xml);
+  auto function_xml = device_xml.child("DeviceFunction");
+  auto variables = decodeVariables(
+      function_xml.child("VariableCollection"), locales_xml, *std_datatypes);
+
+  return make_shared<DeviceDescriptor>(
+      move(identity), units, std_variables, move(variables));
 }
 
-Repository::DescriptorsMap decodeDescriptors(const Repository::UnitsMap& units,
-    const pair<Repository::DatatypesMap, Repository::VariablesMap>& variables,
+Repository::DescriptorsMap decodeDescriptors(
+    const Repository::UnitsMapPtr& units,
+    const pair<Repository::DatatypesMapPtr, Repository::VariablesMapPtr>&
+        variables,
     const filesystem::path& path) {
   Repository::DescriptorsMap descriptors;
 
   for (const auto& entry : filesystem::directory_iterator(path)) {
     if (entry.path().extension() == ".xml") {
       xml_document descriptor_xml = getXML(entry.path());
-      auto descriptor = decode(descriptor_xml);
-      descriptors.emplace(descriptor->getDeviceIdentity(), descriptor);
+      auto descriptor =
+          decode(units, variables.first, variables.second, descriptor_xml);
+      descriptors.emplace(descriptor->getIdentifier(), move(descriptor));
     }
   }
   return descriptors;
@@ -566,12 +609,13 @@ Repository deserializeModel(const string& config_directory_path) {
     throw invalid_argument(config_dir.string() + " is not a directory");
   }
 
-  auto std_units_filepath = config_dir / "IODD-StandardDefinitions1.1.xml";
-  auto std_variables_filepath =
-      config_dir / "IODD-StandardUnitDefinitions1.1.1.xml";
-  auto descriptors_dir = config_dir / "descriptors";
-  return Repository(decodeUnits(std_units_filepath),
-      decodeStdDefinitions(std_variables_filepath),
-      decodeDescriptors(descriptors_dir));
+  auto std_units_map =
+      decodeUnits(config_dir / "IODD-StandardUnitDefinitions1.1.1.xml");
+  auto std_variables_map =
+      decodeStdDefinitions(config_dir / "IODD-StandardDefinitions1.1.xml");
+  auto descriptors = decodeDescriptors(
+      std_units_map, std_variables_map, config_dir / "descriptors");
+  return Repository(
+      move(std_units_map), move(std_variables_map), move(descriptors));
 }
 } // namespace IODD

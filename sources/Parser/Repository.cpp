@@ -6,15 +6,13 @@ using namespace std;
 
 namespace IODD {
 
-Repository::Repository(UnitsMap&& units, DatatypesMap&& datatypes,
-    VariablesMap&& std_variables, DescriptorsMap&& descriptors)
-    : units_(make_shared<UnitsMap>(units)),
-      datatypes_(make_shared<DatatypesMap>(datatypes)),
-      std_variables_(make_shared<VariablesMap>(std_variables)),
-      descriptors_(descriptors) {}
+Repository::Repository(UnitsMapPtr&& units, DatatypesMapPtr&& datatypes,
+    VariablesMapPtr&& std_variables, DescriptorsMap&& descriptors)
+    : units_(move(units)), datatypes_(move(datatypes)),
+      std_variables_(move(std_variables)), descriptors_(descriptors) {}
 
-Repository::Repository(UnitsMap&& units,
-    std::pair<DatatypesMap, VariablesMap> std_defines,
+Repository::Repository(UnitsMapPtr&& units,
+    std::pair<DatatypesMapPtr, VariablesMapPtr> std_defines,
     DescriptorsMap&& descriptors)
     : Repository(move(units), move(std_defines.first), move(std_defines.second),
           move(descriptors)) {}
