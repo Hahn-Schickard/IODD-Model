@@ -26,6 +26,7 @@ target_sources(${MODULE}
 target_link_libraries(${MODULE}
                       PRIVATE #Private dependencies
                       pugixml::pugixml
+                      Variant_Visitor::Variant_Visitor
                       PUBLIC  #Public dependencies
 )
 #@- =========================== END OF USER CONFIGURATION ===============================
