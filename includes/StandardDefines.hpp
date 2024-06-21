@@ -1,6 +1,8 @@
 #ifndef __IODD_STANDARD_DEFINES_HPP
 #define __IODD_STANDARD_DEFINES_HPP
 
+#include "Variant_Visitor.hpp"
+
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -427,6 +429,111 @@ private:
   RecordItems<T> items_;
 };
 
+using SimpleDatatype = std::variant<BooleanT,
+    UIntegerT,
+    IntegerT,
+    FloatT,
+    OctetStringT,
+    StringT,
+    TimeT,
+    TimeSpanT>;
+
+enum class Datatype {
+  Boolean,
+  UInteger,
+  Integer,
+  Float32,
+  String,
+  OctetString,
+  Time,
+  TimeSpan,
+  Array,
+  Record,
+  ProcessDataIn,
+  ProcessDataOut
+};
+
+inline std::string toString(Datatype type) {
+  switch (type) {
+  case Datatype::Boolean: {
+    return "Boolean";
+  }
+  case Datatype::UInteger: {
+    return "UInteger";
+  }
+  case Datatype::Integer: {
+    return "Integer";
+  }
+  case Datatype::Float32: {
+    return "Float32";
+  }
+  case Datatype::String: {
+    return "String";
+  }
+  case Datatype::OctetString: {
+    return "OctetString";
+  }
+  case Datatype::Time: {
+    return "Time";
+  }
+  case Datatype::TimeSpan: {
+    return "TimeSpan";
+  }
+  case Datatype::Array: {
+    return "Array";
+  }
+  case Datatype::Record: {
+    return "Record";
+  }
+  case Datatype::ProcessDataIn: {
+    return "ProcessDataIn";
+  }
+  case Datatype::ProcessDataOut: {
+    return "ProcessDataOut";
+  }
+  default: {
+    throw std::runtime_error("Unhandled Datatype enum value");
+  }
+  }
+}
+
+inline Datatype toDatatype(const std::string& value) {
+  const std::unordered_map<std::string, Datatype> data_types = {
+      {"BooleanT", Datatype::Boolean},
+      {"UIntegerT", Datatype::UInteger},
+      {"IntegerT", Datatype::Integer},
+      {"Float32T", Datatype::Float32},
+      {"StringT", Datatype::String},
+      {"OctetStringT", Datatype::OctetString},
+      {"TimeT", Datatype::Time},
+      {"TimeSpanT", Datatype::TimeSpan},
+      {"ArrayT", Datatype::Array},
+      {"RecordT", Datatype::Record},
+      {"ProcessDataInUnionT", Datatype::ProcessDataIn},
+      {"ProcessDataOutUnionT", Datatype::ProcessDataOut}};
+
+  if (auto it = data_types.find(value); it != data_types.end()) {
+    return it->second;
+  }
+  throw std::invalid_argument("String value: " + value +
+      " can not be converted into IODD::Datatype enumeration");
+}
+
+inline Datatype toDatatype(const SimpleDatatype& variant) {
+  Datatype result;
+  match(
+      variant,
+      [&](const BooleanT&) { result = Datatype::Boolean; },
+      [&](const UIntegerT&) { result = Datatype::UInteger; },
+      [&](const IntegerT&) { result = Datatype::Integer; },
+      [&](const FloatT&) { result = Datatype::Float32; },
+      [&](const OctetStringT&) { result = Datatype::OctetString; },
+      [&](const StringT&) { result = Datatype::String; },
+      [&](const TimeT&) { result = Datatype::Time; },
+      [&](const TimeSpanT&) { result = Datatype::TimeSpan; });
+  return result;
+}
+
 using DataValue = std::variant< // clang-format off
         BooleanT, 
         UIntegerT, 
@@ -453,6 +560,39 @@ using DataValue = std::variant< // clang-format off
         RecordT<TimeT>, 
         RecordT<TimeSpanT>
 >; // clang-format on
+
+inline Datatype toDatatype(const DataValue& variant) {
+  Datatype result;
+  match(
+      variant,
+      [&](const BooleanT&) { result = Datatype::Boolean; },
+      [&](const UIntegerT&) { result = Datatype::UInteger; },
+      [&](const IntegerT&) { result = Datatype::Integer; },
+      [&](const FloatT&) { result = Datatype::Float32; },
+      [&](const OctetStringT&) { result = Datatype::OctetString; },
+      [&](const StringT&) { result = Datatype::String; },
+      [&](const TimeT&) { result = Datatype::Time; },
+      [&](const TimeSpanT&) { result = Datatype::TimeSpan; },
+      // array types
+      [&](const ArrayT<BooleanT>&) { result = Datatype::Array; },
+      [&](const ArrayT<UIntegerT>&) { result = Datatype::Array; },
+      [&](const ArrayT<IntegerT>&) { result = Datatype::Array; },
+      [&](const ArrayT<FloatT>&) { result = Datatype::Array; },
+      [&](const ArrayT<OctetStringT>&) { result = Datatype::Array; },
+      [&](const ArrayT<StringT>&) { result = Datatype::Array; },
+      [&](const ArrayT<TimeT>&) { result = Datatype::Array; },
+      [&](const ArrayT<TimeSpanT>&) { result = Datatype::Array; },
+      // record types
+      [&](const RecordT<BooleanT>&) { result = Datatype::Record; },
+      [&](const RecordT<UIntegerT>&) { result = Datatype::Record; },
+      [&](const RecordT<IntegerT>&) { result = Datatype::Record; },
+      [&](const RecordT<FloatT>&) { result = Datatype::Record; },
+      [&](const RecordT<OctetStringT>&) { result = Datatype::Record; },
+      [&](const RecordT<StringT>&) { result = Datatype::Record; },
+      [&](const RecordT<TimeT>&) { result = Datatype::Record; },
+      [&](const RecordT<TimeSpanT>&) { result = Datatype::Record; });
+  return result;
+}
 
 struct Unit : public NamedAttribute {
   Unit() = default;

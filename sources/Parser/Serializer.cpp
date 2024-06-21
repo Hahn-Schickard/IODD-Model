@@ -50,82 +50,6 @@ Repository::UnitsMapPtr decodeUnits(const filesystem::path& path) {
   return result;
 }
 
-enum class Datatype {
-  Boolean,
-  UInteger,
-  Integer,
-  Float32,
-  String,
-  OctetString,
-  Time,
-  TimeSpan,
-  Array,
-  Record,
-  ProcessDataIn,
-  ProcessDataOut
-};
-
-string toString(Datatype type) {
-  switch (type) {
-  case Datatype::Boolean: {
-    return "Boolean";
-  }
-  case Datatype::UInteger: {
-    return "UInteger";
-  }
-  case Datatype::Integer: {
-    return "Integer";
-  }
-  case Datatype::Float32: {
-    return "Float32";
-  }
-  case Datatype::String: {
-    return "String";
-  }
-  case Datatype::OctetString: {
-    return "OctetString";
-  }
-  case Datatype::Time: {
-    return "Time";
-  }
-  case Datatype::TimeSpan: {
-    return "TimeSpan";
-  }
-  case Datatype::Array: {
-    return "Array";
-  }
-  case Datatype::Record: {
-    return "Record";
-  }
-  case Datatype::ProcessDataIn: {
-    return "ProcessDataIn";
-  }
-  case Datatype::ProcessDataOut: {
-    return "ProcessDataOut";
-  }
-  default: {
-    throw runtime_error("Unhandled Datatype enum value");
-  }
-  }
-}
-
-Datatype toDatatype(const string& value) {
-  const unordered_map<string, Datatype> data_types = {
-      {"BooleanT", Datatype::Boolean}, {"UIntegerT", Datatype::UInteger},
-      {"IntegerT", Datatype::Integer}, {"Float32T", Datatype::Float32},
-      {"StringT", Datatype::String}, {"OctetStringT", Datatype::OctetString},
-      {"TimeT", Datatype::Time}, {"TimeSpanT", Datatype::TimeSpan},
-      {"ArrayT", Datatype::Array}, {"RecordT", Datatype::Record},
-      {"ProcessDataInUnionT", Datatype::ProcessDataIn},
-      {"ProcessDataOutUnionT", Datatype::ProcessDataOut}};
-
-  if (auto it = data_types.find(value); it != data_types.end()) {
-    return it->second;
-  }
-  throw invalid_argument("String value: " + value +
-      " can not be converted into IODD::Datatype enumeration");
-}
-
 optional<AccessRights> decodeAccessRights(const xml_node& node) {
   string access_string = node.attribute("accessRights").as_string();
   if (!access_string.empty()) {
@@ -286,9 +210,6 @@ TimeSpanT decodeSimpleDataValue(
     const xml_node& /* node */, const xml_node& /* locales */) {
   return TimeSpanT();
 }
-
-using SimpleDatatype = std::variant<BooleanT, UIntegerT, IntegerT, FloatT,
-    OctetStringT, StringT, TimeT, TimeSpanT>;
 
 SimpleDatatype decodeSimpleDataValue(
     Datatype type, const xml_node& node, const xml_node& locales) {
