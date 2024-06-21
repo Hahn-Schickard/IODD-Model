@@ -170,14 +170,16 @@ BooleanT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
 template <>
 UIntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
   auto length = node.attribute("bitLength").as_uint();
-  return UIntegerT(length, decodeUintSingleValues(node, locales),
+  return UIntegerT(length,
+      decodeUintSingleValues(node, locales),
       decodeUintValueRanges(node, locales));
 }
 
 template <>
 IntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
   auto length = node.attribute("bitLength").as_uint();
-  return IntegerT(length, decodeIntSingleValues(node, locales),
+  return IntegerT(length,
+      decodeIntSingleValues(node, locales),
       decodeIntValueRanges(node, locales));
 }
 
@@ -245,13 +247,19 @@ SimpleDatatype decodeSimpleDataValue(
   }
 }
 
-using ArrayValue = variant<ArrayT<BooleanT>, ArrayT<UIntegerT>,
-    ArrayT<IntegerT>, ArrayT<FloatT>, ArrayT<OctetStringT>, ArrayT<StringT>,
-    ArrayT<TimeT>, ArrayT<TimeSpanT>>;
+using ArrayValue = variant<ArrayT<BooleanT>,
+    ArrayT<UIntegerT>,
+    ArrayT<IntegerT>,
+    ArrayT<FloatT>,
+    ArrayT<OctetStringT>,
+    ArrayT<StringT>,
+    ArrayT<TimeT>,
+    ArrayT<TimeSpanT>>;
 
 template <typename T>
 ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
-    const xml_node& node, const xml_node& locale) {
+    const xml_node& node,
+    const xml_node& locale) {
   vector<T> values;
 
   if (!node.child("SimpleDatatype").empty()) {
@@ -270,11 +278,13 @@ ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
   }
 
   return ArrayT(node.attribute("count").as_llong(),
-      node.attribute("subindexAccessSupported").as_bool(true), move(values));
+      node.attribute("subindexAccessSupported").as_bool(true),
+      move(values));
 }
 
 ArrayValue decodeArrayValue(const Repository::DatatypesMap& datatypes_map,
-    const xml_node& node, const xml_node& locale) {
+    const xml_node& node,
+    const xml_node& locale) {
   auto type = toDatatype(
       node.child("SimpleDatatype").attribute("xsi:type").as_string());
   switch (type) {
@@ -311,7 +321,8 @@ ArrayValue decodeArrayValue(const Repository::DatatypesMap& datatypes_map,
 
 template <typename T>
 RecordItem<T> decodeRecordItem(const Repository::DatatypesMap& datatypes_map,
-    const xml_node& node, const xml_node& locales) {
+    const xml_node& node,
+    const xml_node& locales) {
   T value;
 
   if (auto node_value = node.child("SimpleDatatype"); !node_value.empty()) {
@@ -340,22 +351,30 @@ RecordItem<T> decodeRecordItem(const Repository::DatatypesMap& datatypes_map,
 
 template <typename T>
 RecordT<T> decodeRecord(const Repository::DatatypesMap& datatypes_map,
-    const xml_node& node, const xml_node& locales) {
+    const xml_node& node,
+    const xml_node& locales) {
   RecordItems<T> records;
   for (auto node_value : node.children("RecordItem")) {
     auto record = decodeRecordItem<T>(datatypes_map, node_value, locales);
     records.emplace(record.subindex(), move(record));
   }
   return RecordT<T>(node.attribute("bitLength").as_llong(),
-      node.attribute("subindexAccessSupported").as_bool(true), move(records));
+      node.attribute("subindexAccessSupported").as_bool(true),
+      move(records));
 }
 
-using RecordValue = variant<RecordT<BooleanT>, RecordT<UIntegerT>,
-    RecordT<IntegerT>, RecordT<FloatT>, RecordT<OctetStringT>, RecordT<StringT>,
-    RecordT<TimeT>, RecordT<TimeSpanT>>;
+using RecordValue = variant<RecordT<BooleanT>,
+    RecordT<UIntegerT>,
+    RecordT<IntegerT>,
+    RecordT<FloatT>,
+    RecordT<OctetStringT>,
+    RecordT<StringT>,
+    RecordT<TimeT>,
+    RecordT<TimeSpanT>>;
 
 RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
-    const xml_node& node, const xml_node& locales) {
+    const xml_node& node,
+    const xml_node& locales) {
   auto type = toDatatype(
       node.child("SimpleDatatype").attribute("xsi:type").as_string());
   switch (type) {
@@ -404,8 +423,10 @@ auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
   return {v};
 }
 
-DataValue decodeDataValue(const xml_node& node, const xml_node& locales,
-    Datatype type, const Repository::DatatypesMap& datatypes_map = {}) {
+DataValue decodeDataValue(const xml_node& node,
+    const xml_node& locales,
+    Datatype type,
+    const Repository::DatatypesMap& datatypes_map = {}) {
   switch (type) {
   case Datatype::Array: {
     return variantCast(decodeArrayValue(datatypes_map, node, locales));
@@ -432,14 +453,16 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
   Repository::DatatypesMap datatypes = std_datatypes;
   for (auto datatype : xml.children("Datatype")) {
     datatypes.emplace(datatype.attribute("id").as_string(),
-        decodeDataValue(datatype, locales,
+        decodeDataValue(datatype,
+            locales,
             toDatatype(datatype.attribute("xsi:type").as_string())));
   }
   return datatypes;
 }
 
 Repository::VariablesMap decodeVariables(const xml_node& xml,
-    const xml_node& locales, const Repository::DatatypesMap& datatypes,
+    const xml_node& locales,
+    const Repository::DatatypesMap& datatypes,
     const Repository::VariablesMap& std_variables = {}) {
   Repository::VariablesMap variables = std_variables;
   for (auto variable : xml.children("Variable")) {
@@ -447,7 +470,8 @@ Repository::VariablesMap decodeVariables(const xml_node& xml,
         make_shared<Variable>(variable.attribute("index").as_ullong(),
             decodeLocalizedText("Name", variable, locales).value(),
             decodeAccessRights(variable).value(),
-            decodeDataValue(variable, locales,
+            decodeDataValue(variable,
+                locales,
                 toDatatype(variable.attribute("xsi:type").as_string()),
                 datatypes),
             decodeLocalizedText("Description", variable, locales).value(),
@@ -585,7 +609,8 @@ Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
 
 DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
-    const Repository::VariablesMapPtr& std_variables, const xml_document& xml) {
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_document& xml) {
   auto device_xml = xml.child("IODevice");
   auto locales_xml =
       device_xml.child("ExternalTextCollection").child("PrimaryLanguage");

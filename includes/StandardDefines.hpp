@@ -335,7 +335,10 @@ enum class AccessRights { READ_ONLY, WRITE_ONLY, READ_WRITE };
 template <typename T> struct RecordItem {
   RecordItem() = default;
 
-  RecordItem(uint8_t subindex, uint16_t offset, T&& value, TextID&& name,
+  RecordItem(uint8_t subindex,
+      uint16_t offset,
+      T&& value,
+      TextID&& name,
       std::optional<AccessRights> access = std::nullopt,
       std::optional<TextID>&& desc = std::nullopt)
       : subindex_(subindex),
@@ -621,9 +624,15 @@ using SimpleDatatypeValue =
 struct Variable {
   Variable() = default;
 
-  Variable(size_t index, TextID&& name, AccessRights access, DataValue&& value,
-      std::optional<TextID>&& desc = std::nullopt, bool dynamic = false,
-      bool modifies_others = false, bool excluded = false)
+  Variable(size_t index,
+      TextID&& name,
+      AccessRights access,
+      DataValue&& value,
+      std::optional<TextID>&& desc = std::nullopt,
+      std::optional<SimpleDatatype> default_value = std::nullopt,
+      bool dynamic = false,
+      bool modifies_others = false,
+      bool excluded = false)
       : index_(index), name_(std::move(name)), access_(access),
         value_(std::move(value)), desc_(std::move(desc)),
         default_(std::move(default_value)), dynamic_(dynamic),
