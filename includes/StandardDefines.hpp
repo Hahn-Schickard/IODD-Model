@@ -613,6 +613,10 @@ private:
   std::string abbr_;
 };
 
+using DateTime = date::local_time<std::chrono::milliseconds>;
+using SimpleDatatypeValue =
+    std::variant<bool, uint64_t, int64_t, float, std::string, DateTime>;
+
 struct Variable {
   Variable() = default;
 
@@ -620,8 +624,27 @@ struct Variable {
       std::optional<TextID>&& desc = std::nullopt, bool dynamic = false,
       bool modifies_others = false, bool excluded = false)
       : index_(index), name_(std::move(name)), access_(access),
-        value_(std::move(value)), desc_(std::move(desc)), dynamic_(dynamic),
+        value_(std::move(value)), desc_(std::move(desc)),
+        default_(std::move(default_value)), dynamic_(dynamic),
         modifies_others_(modifies_others), excluded_(excluded) {}
+
+  Variable(const Variable& other,
+      std::optional<SimpleDatatype> default_value,
+      std::optional<bool> excluded,
+      std::optional<DataValue> value)
+      : index_(other.index_), name_(other.name_), access_(other.access_),
+        value_(other.value_), desc_(other.desc_),
+        default_((default_value ? default_value.value() : other.default_)),
+        dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
+        excluded_((excluded ? excluded.value() : other.excluded_)) {
+    if (value.has_value()) {
+      if (value_.index() != value->index()) {
+        throw std::logic_error(
+            "Expanded data type does not match variable datatype");
+      }
+      // value_ = expand(value_, *value);
+    }
+  }
 
   size_t index() const { return index_; }
 
@@ -630,6 +653,16 @@ struct Variable {
   AccessRights access() const { return access_; }
 
   DataValue value() const { return value_; }
+
+  Datatype type() const { return toDatatype(value_); }
+
+  SimpleDatatype defaultValue() const {
+    if (default_.has_value()) {
+      return default_.value();
+    } else {
+      throw std::runtime_error(name_.id() + " Variable has no default value");
+    }
+  }
 
   std::optional<TextID> description() const { return desc_; }
 
@@ -645,6 +678,7 @@ private:
   AccessRights access_;
   DataValue value_;
   std::optional<TextID> desc_;
+  std::optional<SimpleDatatype> default_;
   bool dynamic_;
   bool modifies_others_;
   bool excluded_;
