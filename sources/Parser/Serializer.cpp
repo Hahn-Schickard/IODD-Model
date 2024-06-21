@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <filesystem>
+#include <sstream>
 #include <stdexcept>
 
 using namespace std;
@@ -486,8 +487,101 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   }
 }
 
+Repository::VariablesMap operator+=(
+    Repository::VariablesMap lhs, const Repository::VariablesMap& rhs) {
+  lhs.insert(rhs.begin(), rhs.end());
+  return lhs;
+}
+
+SimpleDatatypeValue decodeDefaultValue(
+    Datatype type, const xml_attribute& attribute) {
+  switch (type) {
+  case Datatype::Boolean: {
+    return attribute.as_bool();
+  }
+  case Datatype::UInteger: {
+    return attribute.as_ullong();
+  }
+  case Datatype::Integer: {
+    return attribute.as_llong();
+  }
+  case Datatype::Float32: {
+    return attribute.as_float();
+  }
+  case Datatype::String: {
+    [[fallthrough]]
+  }
+  case Datatype::OctetString: {
+    return attribute.as_string();
+  }
+  case Datatype::Time: {
+    DateTime result;
+    istringstream in(attribute.as_string());
+    in >> date::parse("%FT%TZ", result);
+    if (in.fail()) {
+      in.clear();
+      in.exceptions(ios::failbit);
+      in.str(attribute.as_string());
+      in >> date::parse("%FT%T%Ez", result);
+    }
+    return result;
+  }
+  case Datatype::TimeSpan: {
+    throw runtime_error("Timespan handling is not supported");
+  }
+  default: {
+    throw invalid_argument(toString(type) + " is not a simple data type");
+  }
+  }
+}
+
 Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
-    const xml_node& locales, const Repository::DatatypesMap& datatypes) {}
+    const xml_node& locales,
+    const Repository::DatatypesMapPtr& datatypes,
+    const Repository::VariablesMapPtr& std_variables) {
+  Repository::VariablesMap variables = *std_variables;
+  for (auto variable : xml.children("StdVariableRef")) {
+    string id = variable.attribute("id").as_string();
+    // ignore parameter overlays
+    if (id != "V_DirectParameters_1" || id != "V_DirectParameters_2") {
+      if (auto std_variable = variables.find(id);
+          std_variable != variables.end()) {
+        optional<SimpleDatatypeValue> default_value = nullopt;
+        if (auto node_value = variable.attribute("defaultValue");
+            !node_value.empty()) {
+          default_value =
+              decodeDefaultValue(std_variable->second->type(), node_value);
+        }
+        optional<bool> excluded = nullopt;
+        if (auto historized = variable.attribute("excludedFromDataStorage");
+            !historized.empty()) {
+          excluded = historized.as_bool();
+        }
+        optional<DataValue> possible_value = nullopt;
+        for (auto values : variable.children()) {
+          // expand possible variable values
+          // possible types:
+          // StdSingleValueRef
+          // SingleValue
+          // ValueRange
+          // StdRecordItemRef
+          //  |_ StdSingleValueRef
+          //  |_ SingleValue
+          //  |_ ValueRange
+        }
+        // check if variable needs to be updated
+        if (default_value.has_value() || excluded.has_value() ||
+            possible_value.has_value()) {
+          std_variable->second = make_shared<Variable>(
+              *std_variable->second, default_value, excluded, possible_value);
+        }
+      } else {
+        throw runtime_error(id + " is not defined in standard variables");
+      }
+    }
+  }
+  return variables;
+}
 
 DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
@@ -498,8 +592,10 @@ DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
   auto profile_xml = device_xml.child("ProfileBody");
   auto identity = decodeIdentity(profile_xml, locales_xml);
   auto function_xml = device_xml.child("DeviceFunction");
-  auto variables = decodeVariables(
-      function_xml.child("VariableCollection"), locales_xml, *std_datatypes);
+  auto variables_xml = function_xml.child("VariableCollection");
+  auto variables = decodeStdVariableRef(
+      variables_xml, locales_xml, std_datatypes, std_variables);
+  variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
 
   return make_shared<DeviceDescriptor>(
       move(identity), units, std_variables, move(variables));
