@@ -475,6 +475,7 @@ Repository::VariablesMap decodeVariables(const xml_node& xml,
                 toDatatype(variable.attribute("xsi:type").as_string()),
                 datatypes),
             decodeLocalizedText("Description", variable, locales).value(),
+            nullopt,
             variable.attribute("dynamic").as_bool(false),
             variable.attribute("modifiesOtherVariables").as_bool(false),
             variable.attribute("excludedFromDataStorage").as_bool(false)));
