@@ -82,7 +82,6 @@ include(compiler_settings)
 
 #@+ ======================== User PACKAGES configuration ===========================
 find_package(Variant_Visitor REQUIRED)
-find_package(date REQUIRED)
 #@- ========================= END OF USER CONFIGURATION ============================
 
 add_subdirectory(sources)

@@ -2,7 +2,6 @@
 #define __IODD_STANDARD_DEFINES_HPP
 
 #include "Variant_Visitor.hpp"
-#include "date/date.h"
 
 #include <memory>
 #include <optional>
@@ -617,9 +616,8 @@ private:
   std::string abbr_;
 };
 
-using DateTime = date::local_time<std::chrono::milliseconds>;
-using SimpleDatatypeValue =
-    std::variant<bool, uint64_t, int64_t, float, std::string, DateTime>;
+using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
+    std::variant<bool, uint64_t, int64_t, float, std::string>;
 
 struct Variable {
   Variable() = default;

@@ -52,7 +52,6 @@ class PackageConan(ConanFile):
     def requirements(self):
         # @+ START USER REQUIREMENTS
         self.requires("pugixml/1.14")
-        self.requires("date/3.0.1", headers=True, transitive_headers=True)
         self.requires(
             "variant_visitor/[~0.1]@hahn-schickard/stable", headers=True, transitive_headers=True)
         # @- END USER REQUIREMENTS
@@ -62,7 +61,7 @@ class PackageConan(ConanFile):
 
     def configure(self):
         # @+ START USER REQUIREMENTS OPTION CONFIGURATION
-        self.options["date"].header_only = True
+        pass
         # @- END USER REQUIREMENTS OPTION CONFIGURATION
 
     def layout(self):

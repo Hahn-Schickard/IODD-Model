@@ -536,23 +536,14 @@ SimpleDatatypeValue decodeDefaultValue(
   case Datatype::String: {
     [[fallthrough]];
   }
-  case Datatype::OctetString: {
-    return attribute.as_string();
-  }
   case Datatype::Time: {
-    DateTime result;
-    istringstream in(attribute.as_string());
-    in >> date::parse("%FT%TZ", result);
-    if (in.fail()) {
-      in.clear();
-      in.exceptions(ios::failbit);
-      in.str(attribute.as_string());
-      in >> date::parse("%FT%T%Ez", result);
-    }
-    return result;
+    [[fallthrough]];
   }
   case Datatype::TimeSpan: {
-    throw runtime_error("Timespan handling is not supported");
+    [[fallthrough]];
+  }
+  case Datatype::OctetString: {
+    return attribute.as_string();
   }
   default: {
     throw invalid_argument(toString(type) + " is not a simple data type");
