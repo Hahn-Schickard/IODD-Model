@@ -629,7 +629,7 @@ struct Variable {
       AccessRights access,
       DataValue&& value,
       std::optional<TextID>&& desc = std::nullopt,
-      std::optional<SimpleDatatype> default_value = std::nullopt,
+      std::optional<SimpleDatatypeValue> default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
       bool excluded = false)
@@ -639,7 +639,7 @@ struct Variable {
         modifies_others_(modifies_others), excluded_(excluded) {}
 
   Variable(const Variable& other,
-      std::optional<SimpleDatatype> default_value,
+      std::optional<SimpleDatatypeValue> default_value,
       std::optional<bool> excluded,
       std::optional<DataValue> value)
       : index_(other.index_), name_(other.name_), access_(other.access_),
@@ -666,7 +666,7 @@ struct Variable {
 
   Datatype type() const { return toDatatype(value_); }
 
-  SimpleDatatype defaultValue() const {
+  SimpleDatatypeValue defaultValue() const {
     if (default_.has_value()) {
       return default_.value();
     } else {
@@ -688,7 +688,7 @@ private:
   AccessRights access_;
   DataValue value_;
   std::optional<TextID> desc_;
-  std::optional<SimpleDatatype> default_;
+  std::optional<SimpleDatatypeValue> default_;
   bool dynamic_;
   bool modifies_others_;
   bool excluded_;
