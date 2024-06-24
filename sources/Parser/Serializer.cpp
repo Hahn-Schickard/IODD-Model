@@ -534,7 +534,7 @@ SimpleDatatypeValue decodeDefaultValue(
     return attribute.as_float();
   }
   case Datatype::String: {
-    [[fallthrough]]
+    [[fallthrough]];
   }
   case Datatype::OctetString: {
     return attribute.as_string();
