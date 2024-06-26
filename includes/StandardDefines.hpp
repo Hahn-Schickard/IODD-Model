@@ -112,6 +112,14 @@ struct BooleanT {
   BooleanT(std::unordered_set<SingleValuePtr<bool>>&& values)
       : values_(std::move(values)) {}
 
+  void expand(const BooleanT& other) {
+    for (const auto& value : other.values_) {
+      if (values_.find(value) == values_.end()) {
+        values_.insert(value);
+      }
+    }
+  }
+
   NamedAttributePtr getName(bool value) const {
     if (auto it = values_.find(std::make_shared<SingleValue<bool>>(value));
         it != values_.end()) {
@@ -161,6 +169,19 @@ template <typename T> struct NumberT {
     }
     throw std::out_of_range(
         std::to_string(value) + " value has no assigned named");
+  }
+
+  void expand(const NumberT& other) {
+    for (const auto& value : other.values_) {
+      if (values_.find(value) == values_.end()) {
+        values_.insert(value);
+      }
+    }
+    for (const auto& range : other.ranges_) {
+      if (ranges_.find(range) == ranges_.end()) {
+        ranges_.insert(range);
+      }
+    }
   }
 
   size_t hash() const noexcept {
@@ -312,6 +333,10 @@ struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
       : ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
         count_(count), values_(std::move(values)) {}
 
+  void expand(const ArrayT& other) {
+    values_.insert(values_.end(), other.values_.begin(), other.values_.end());
+  }
+
   size_t hash() const noexcept {
     size_t result;
     for (const auto& value : values_) {
@@ -409,6 +434,11 @@ struct RecordT : public FixedBitLength<1, 1856>,
       : FixedBitLength(bit_length), // clang-format off
         ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
         items_(std::move(items)) {} // clang-format on
+
+  void expand(const RecordT& other) {
+    // existing key values should NOT be updated
+    items_.insert(other.items_.begin(), other.items_.end());
+  }
 
   size_t hash() const noexcept {
     size_t result;
@@ -619,6 +649,72 @@ private:
 using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
     std::variant<bool, uint64_t, int64_t, float, std::string>;
 
+inline void expand(DataValue& lhs, const DataValue& rhs) {
+  if (lhs.index() != rhs.index()) {
+    throw std::logic_error(
+        "Expanded data type does not match variable datatype");
+  }
+  match(
+      lhs,
+      [&rhs](BooleanT value) { value.expand(std::get<BooleanT>(rhs)); },
+      [&rhs](UIntegerT value) { value.expand(std::get<UIntegerT>(rhs)); },
+      [&rhs](IntegerT value) { value.expand(std::get<IntegerT>(rhs)); },
+      [&rhs](FloatT value) { value.expand(std::get<FloatT>(rhs)); },
+      [&rhs](OctetStringT value) { /* no expansion for OctetStringT */ },
+      [&rhs](StringT value) { /* no expansion for StringT */ },
+      [&rhs](TimeT value) { /* no expansion for TimeT */ },
+      [&rhs](TimeSpanT value) { /* no expansion for TimeSpanT */ },
+      // array types
+      [&rhs](ArrayT<BooleanT> value) {
+        value.expand(std::get<ArrayT<BooleanT>>(rhs));
+      },
+      [&rhs](ArrayT<UIntegerT> value) {
+        value.expand(std::get<ArrayT<UIntegerT>>(rhs));
+      },
+      [&rhs](ArrayT<IntegerT> value) {
+        value.expand(std::get<ArrayT<IntegerT>>(rhs));
+      },
+      [&rhs](ArrayT<FloatT> value) {
+        value.expand(std::get<ArrayT<FloatT>>(rhs));
+      },
+      [&rhs](ArrayT<OctetStringT> value) {
+        value.expand(std::get<ArrayT<OctetStringT>>(rhs));
+      },
+      [&rhs](ArrayT<StringT> value) {
+        value.expand(std::get<ArrayT<StringT>>(rhs));
+      },
+      [&rhs](
+          ArrayT<TimeT> value) { value.expand(std::get<ArrayT<TimeT>>(rhs)); },
+      [&rhs](ArrayT<TimeSpanT> value) {
+        value.expand(std::get<ArrayT<TimeSpanT>>(rhs));
+      },
+      // record types
+      [&rhs](RecordT<BooleanT> value) {
+        value.expand(std::get<RecordT<BooleanT>>(rhs));
+      },
+      [&rhs](RecordT<UIntegerT> value) {
+        value.expand(std::get<RecordT<UIntegerT>>(rhs));
+      },
+      [&rhs](RecordT<IntegerT> value) {
+        value.expand(std::get<RecordT<IntegerT>>(rhs));
+      },
+      [&rhs](RecordT<FloatT> value) {
+        value.expand(std::get<RecordT<FloatT>>(rhs));
+      },
+      [&rhs](RecordT<OctetStringT> value) {
+        value.expand(std::get<RecordT<OctetStringT>>(rhs));
+      },
+      [&rhs](RecordT<StringT> value) {
+        value.expand(std::get<RecordT<StringT>>(rhs));
+      },
+      [&rhs](RecordT<TimeT> value) {
+        value.expand(std::get<RecordT<TimeT>>(rhs));
+      },
+      [&rhs](RecordT<TimeSpanT> value) {
+        value.expand(std::get<RecordT<TimeSpanT>>(rhs));
+      });
+}
+
 struct Variable {
   Variable() = default;
 
@@ -646,11 +742,7 @@ struct Variable {
         dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
         excluded_((excluded ? excluded.value() : other.excluded_)) {
     if (value.has_value()) {
-      if (value_.index() != value->index()) {
-        throw std::logic_error(
-            "Expanded data type does not match variable datatype");
-      }
-      // value_ = expand(value_, *value);
+      expand(value_, *value);
     }
   }
 
