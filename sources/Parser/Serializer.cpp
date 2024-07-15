@@ -551,6 +551,19 @@ SimpleDatatypeValue decodeDefaultValue(
   }
 }
 
+optional<DataValue> getUpdatedValues(IODD::Datatype type,
+    const Repository::DatatypesMapPtr& datatypes,
+    const xml_node& node,
+    const xml_node& locales) {
+  try {
+    auto simple_value = decodeSimpleDataValue(type, node, locales);
+    return variantCast(simple_value);
+  } catch (const invalid_argument& ex) {
+    // TODO: decode StdRecordItemRef
+  }
+  return nullopt;
+}
+
 Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
     const xml_node& locales,
     const Repository::DatatypesMapPtr& datatypes,
@@ -573,18 +586,8 @@ Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
             !historized.empty()) {
           excluded = historized.as_bool();
         }
-        optional<DataValue> possible_value = nullopt;
-        for (auto values : variable.children()) {
-          // expand possible variable values
-          // possible types:
-          // StdSingleValueRef
-          // SingleValue
-          // ValueRange
-          // StdRecordItemRef
-          //  |_ StdSingleValueRef
-          //  |_ SingleValue
-          //  |_ ValueRange
-        }
+        auto possible_value = getUpdatedValues(
+            std_variable->second->type(), datatypes, variable, locales);
         // check if variable needs to be updated
         if (default_value.has_value() || excluded.has_value() ||
             possible_value.has_value()) {
