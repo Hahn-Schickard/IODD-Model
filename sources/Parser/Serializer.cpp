@@ -92,8 +92,7 @@ NumberT<uint64_t>::SingleValues decodeUintSingleValues(
   NumberT<uint64_t>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
     result.emplace(make_shared<SingleValue<uint64_t>>(
-        SimpleDatatypeValue(
-            (uint64_t)node_value.attribute("value").as_ullong()),
+        (uint64_t)node_value.attribute("value").as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -104,10 +103,8 @@ NumberT<uint64_t>::ValueRanges decodeUintValueRanges(
   NumberT<uint64_t>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
     result.emplace(make_shared<ValueRange<uint64_t>>(
-        SimpleDatatypeValue(
-            (uint64_t)node_value.attribute("lowerValue").as_ullong()),
-        SimpleDatatypeValue(
-            (uint64_t)node_value.attribute("upperValue").as_ullong()),
+        (uint64_t)node_value.attribute("lowerValue").as_ullong(),
+        (uint64_t)node_value.attribute("upperValue").as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
