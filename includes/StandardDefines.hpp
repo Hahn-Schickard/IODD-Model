@@ -830,6 +830,64 @@ struct Variable {
 
   DataValue value() const { return value_; }
 
+  NamedAttributePtr valueName(const SimpleValue& value,
+      std::optional<uint8_t> subindex = std::nullopt) const {
+    // use raw pointer to avoid shared_ptr memory leak in lambda capture
+    NamedAttribute* result = nullptr;
+    match(
+        value_,
+        // Simple Types
+        [&result, &value](const BooleanT& value_type) {
+          auto ptr = std::move(getValueName<BooleanT>(value_type, value));
+          result = ptr.get();
+        },
+        [&result, &value](const UIntegerT& value_type) {
+          auto ptr = std::move(getValueName<UIntegerT>(value_type, value));
+          result = ptr.get();
+        },
+        [&result, &value](const IntegerT& value_type) {
+          auto ptr = std::move(getValueName<IntegerT>(value_type, value));
+          result = ptr.get();
+        },
+        [&result, &value](const FloatT& value_type) {
+          auto ptr = std::move(getValueName<FloatT>(value_type, value));
+          result = ptr.get();
+        },
+        // Record Types
+        [&result, &value, subindex](const RecordT<BooleanT>& value_type) {
+          auto ptr =
+              std::move(getValueName<BooleanT>(value_type, subindex, value));
+          result = ptr.get();
+        },
+        [&result, &value, subindex](const RecordT<UIntegerT>& value_type) {
+          auto ptr =
+              std::move(getValueName<UIntegerT>(value_type, subindex, value));
+          result = ptr.get();
+        },
+        [&result, &value, subindex](const RecordT<IntegerT>& value_type) {
+          auto ptr =
+              std::move(getValueName<IntegerT>(value_type, subindex, value));
+          result = ptr.get();
+        },
+        [&result, &value, subindex](const RecordT<FloatT>& value_type) {
+          auto ptr =
+              std::move(getValueName<FloatT>(value_type, subindex, value));
+          result = ptr.get();
+        },
+        // rest of types
+        [&](auto) {
+          throw std::logic_error(toString(type()) +
+              " does not support named value attribute lookup");
+        });
+    if (result != nullptr) {
+      // TODO: Does this cause seg faults?
+      return std::shared_ptr<NamedAttribute>(result);
+    } else {
+      throw std::runtime_error(
+          "Given simple value does not have a matching name");
+    }
+  }
+
   Datatype type() const { return toDatatype(value_); }
 
   SimpleDatatypeValue defaultValue() const {
