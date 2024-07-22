@@ -38,6 +38,7 @@ target_include_directories(${MODULE} INTERFACE
 )
 
 set_target_properties(${MODULE} PROPERTIES CXX_STANDARD 17)
+add_compile_definitions(PUGIXML_HAS_LONG_LONG)
 target_compile_features(${MODULE} PUBLIC cxx_std_17)
 
 PRINT_TARGET_PROPERTIES(${MODULE})
