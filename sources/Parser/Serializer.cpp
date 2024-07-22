@@ -46,7 +46,8 @@ Repository::UnitsMapPtr decodeUnits(const filesystem::path& path) {
     auto code = unit.attribute("code").as_uint();
     const auto* abbr = unit.attribute("abbr").as_string();
     const auto* text_id = unit.attribute("textId").as_string();
-    result->emplace(code, Unit(code, abbr, decodeLocalization(xml, text_id)));
+    result->emplace(
+        code, make_shared<Unit>(code, abbr, decodeLocalization(xml, text_id)));
   }
   return result;
 }

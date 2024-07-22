@@ -62,7 +62,7 @@ private:
 };
 
 struct DeviceDescriptor : public DeviceIdentity {
-  using UnitsMap = std::unordered_map<uint16_t, Unit>;
+  using UnitsMap = std::unordered_map<uint16_t, UnitPtr>;
   using UnitsMapPtr = std::shared_ptr<UnitsMap>;
   using VariablesMap = std::unordered_map<std::string, VariablePtr>;
   using VariablesMapPtr = std::shared_ptr<VariablesMap>;
