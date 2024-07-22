@@ -471,19 +471,19 @@ using SimpleDatatype = std::variant<BooleanT,
     TimeT,
     TimeSpanT>;
 
-enum class Datatype {
-  Boolean,
-  UInteger,
-  Integer,
-  Float32,
-  String,
-  OctetString,
-  Time,
-  TimeSpan,
-  Array,
-  Record,
-  ProcessDataIn,
-  ProcessDataOut
+enum class Datatype : uint8_t {
+  UInteger = 0,
+  Integer = 1,
+  Float32 = 2,
+  Boolean = 3,
+  String = 4,
+  OctetString = 5,
+  Time = 6,
+  TimeSpan = 7,
+  Array = 8,
+  Record = 9,
+  ProcessDataIn = 10,
+  ProcessDataOut = 11
 };
 
 inline std::string toString(Datatype type) {
