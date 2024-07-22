@@ -161,9 +161,9 @@ template <typename T> struct NumberT {
         it != values_.end()) {
       return *it;
     } else {
-      for (auto it : ranges_) {
-        if (it->inRange(value)) {
-          return *it;
+      for (auto range : ranges_) {
+        if (range->inRange(value)) {
+          return range;
         }
       }
     }
