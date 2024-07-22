@@ -486,6 +486,23 @@ enum class Datatype : uint8_t {
   ProcessDataOut = 11
 };
 
+inline bool isNumericData(Datatype type) {
+  return static_cast<uint8_t>(type) < 3;
+}
+
+inline bool isSimpleData(Datatype type) {
+  return static_cast<uint8_t>(type) < 8;
+}
+
+inline bool isComplexData(Datatype type) {
+  auto type_v = static_cast<uint8_t>(type);
+  return (type_v > 7 && type_v < 10);
+}
+
+inline bool isProcessData(Datatype type) {
+  return static_cast<uint8_t>(type) > 9;
+}
+
 inline std::string toString(Datatype type) {
   switch (type) {
   case Datatype::Boolean: {
