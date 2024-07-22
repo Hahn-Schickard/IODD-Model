@@ -87,47 +87,47 @@ unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
   return result;
 }
 
-NumberT<size_t>::SingleValues decodeUintSingleValues(
+NumberT<uint64_t>::SingleValues decodeUintSingleValues(
     const xml_node& node, const xml_node& locales) {
-  NumberT<size_t>::SingleValues result;
+  NumberT<uint64_t>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
-    result.emplace(make_shared<SingleValue<size_t>>(
-        node_value.attribute("value").as_ullong(),
+    result.emplace(make_shared<SingleValue<uint64_t>>(
+        (uint64_t)node_value.attribute("value").as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
 }
 
-NumberT<size_t>::ValueRanges decodeUintValueRanges(
+NumberT<uint64_t>::ValueRanges decodeUintValueRanges(
     const xml_node& node, const xml_node& locales) {
-  NumberT<size_t>::ValueRanges result;
+  NumberT<uint64_t>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
-    result.emplace(make_shared<ValueRange<size_t>>(
-        node_value.attribute("lowerValue").as_ullong(),
-        node_value.attribute("upperValue").as_ullong(),
+    result.emplace(make_shared<ValueRange<uint64_t>>(
+        (uint64_t)node_value.attribute("lowerValue").as_ullong(),
+        (uint64_t)node_value.attribute("upperValue").as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
 }
 
-NumberT<intmax_t>::SingleValues decodeIntSingleValues(
+NumberT<int64_t>::SingleValues decodeIntSingleValues(
     const xml_node& node, const xml_node& locales) {
-  NumberT<intmax_t>::SingleValues result;
+  NumberT<int64_t>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
-    result.emplace(make_shared<SingleValue<intmax_t>>(
-        node_value.attribute("value").as_llong(),
+    result.emplace(make_shared<SingleValue<int64_t>>(
+        (int64_t)node_value.attribute("value").as_llong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
 }
 
-NumberT<intmax_t>::ValueRanges decodeIntValueRanges(
+NumberT<int64_t>::ValueRanges decodeIntValueRanges(
     const xml_node& node, const xml_node& locales) {
-  NumberT<intmax_t>::ValueRanges result;
+  NumberT<int64_t>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
-    result.emplace(make_shared<ValueRange<intmax_t>>(
-        node_value.attribute("lowerValue").as_llong(),
-        node_value.attribute("upperValue").as_llong(),
+    result.emplace(make_shared<ValueRange<int64_t>>(
+        (int64_t)node_value.attribute("lowerValue").as_llong(),
+        (int64_t)node_value.attribute("upperValue").as_llong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
