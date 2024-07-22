@@ -734,6 +734,63 @@ inline void expand(DataValue& lhs, const DataValue& rhs) {
       });
 }
 
+using SimpleValue = std::variant<bool, uint64_t, int64_t, float, std::string>;
+
+template <typename T> T getSimpleValue(const SimpleValue& variant) {
+  if (auto* value = std::get_if<T>(&variant)) {
+    return *value;
+  } else {
+    throw std::invalid_argument(
+        "Simple value variant does not hold the requested type");
+  }
+}
+
+template <typename T>
+NamedAttributePtr getValueName(T value_type, const SimpleValue& value) {
+  throw std::runtime_error(
+      "Given value type does not support named value attribute");
+}
+
+template <>
+inline NamedAttributePtr getValueName<BooleanT>(
+    BooleanT value_type, const SimpleValue& value) {
+  return value_type.getName(getSimpleValue<bool>(value));
+}
+
+template <>
+inline NamedAttributePtr getValueName<UIntegerT>(
+    UIntegerT value_type, const SimpleValue& value) {
+  return value_type.getName(getSimpleValue<uint64_t>(value));
+}
+
+template <>
+inline NamedAttributePtr getValueName<IntegerT>(
+    IntegerT value_type, const SimpleValue& value) {
+  return value_type.getName(getSimpleValue<int64_t>(value));
+}
+
+template <>
+inline NamedAttributePtr getValueName<FloatT>(
+    FloatT value_type, const SimpleValue& value) {
+  return value_type.getName(getSimpleValue<float>(value));
+}
+
+template <typename T>
+NamedAttributePtr getValueName(RecordT<T> record,
+    std::optional<uint8_t> subindex,
+    const SimpleValue& value) {
+  if (record.subindexAccess()) {
+    if (subindex.has_value()) {
+      auto item = record.item(subindex.value());
+      return getValueName<T>(item.value(), value);
+    } else {
+      throw std::invalid_argument("No subindex provided for record access");
+    }
+  } else {
+    throw std::logic_error("Given record does not support subindex access");
+  }
+}
+
 struct Variable {
   Variable() = default;
 
