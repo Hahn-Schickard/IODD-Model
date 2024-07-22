@@ -526,10 +526,10 @@ SimpleDatatypeValue decodeDefaultValue(
     return attribute.as_bool();
   }
   case Datatype::UInteger: {
-    return attribute.as_ullong();
+    return (uint64_t)attribute.as_ullong();
   }
   case Datatype::Integer: {
-    return attribute.as_llong();
+    return (int64_t)attribute.as_llong();
   }
   case Datatype::Float32: {
     return attribute.as_float();
