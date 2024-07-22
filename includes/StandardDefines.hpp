@@ -663,6 +663,8 @@ private:
   std::string abbr_;
 };
 
+using UnitPtr = std::shared_ptr<Unit>;
+
 using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
     std::variant<bool, uint64_t, int64_t, float, std::string>;
 
