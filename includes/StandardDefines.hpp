@@ -219,7 +219,7 @@ private:
   size_t bit_length_;
 };
 
-struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<size_t> {
+struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<uint64_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
@@ -237,7 +237,7 @@ struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<size_t> {
         NumberT(std::move(single_values), std::move(value_ranges)) {}
 };
 
-struct IntegerT : public FixedBitLength<2, 64>, public NumberT<intmax_t> {
+struct IntegerT : public FixedBitLength<2, 64>, public NumberT<int64_t> {
   using NumberT::SingleValues;
   using NumberT::ValueRanges;
 
