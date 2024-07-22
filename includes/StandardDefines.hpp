@@ -452,7 +452,7 @@ struct RecordT : public FixedBitLength<1, 1856>,
 
   RecordItem<T> item(uint8_t subindex) const {
     if (auto it = items_.find(subindex); it != items_.end()) {
-      return it.second;
+      return it->second;
     }
     throw std::out_of_range(
         "Record " + std::to_string(subindex) + " does not exits");
