@@ -37,8 +37,6 @@ target_include_directories(${MODULE} INTERFACE
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
 )
 
-set_target_properties(${MODULE} PROPERTIES CXX_STANDARD 17)
-target_compile_definitions(${MODULE} PRIVATE PUGIXML_HAS_LONG_LONG)
 target_compile_features(${MODULE} PUBLIC cxx_std_17)
 
 PRINT_TARGET_PROPERTIES(${MODULE})

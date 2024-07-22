@@ -1,5 +1,3 @@
-#define PUGIXML_HAS_LONG_LONG
-
 #include "Serializer.hpp"
 
 #include <pugixml.hpp>
