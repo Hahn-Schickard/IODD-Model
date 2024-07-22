@@ -24,8 +24,10 @@ inline std::string makeDeviceIdentity(
 }
 
 struct DeviceIdentity {
-  DeviceIdentity(uint16_t vendor_id, const std::string& vendor_name,
-      uint32_t device_id, const TextID& device_name)
+  DeviceIdentity(uint16_t vendor_id,
+      const std::string& vendor_name,
+      uint32_t device_id,
+      const TextID& device_name)
       : vendor_id_(vendor_id), vendor_name_(vendor_name), device_id_(device_id),
         device_name_(device_name) {
     if (vendor_id_ != 0) {
@@ -67,15 +69,23 @@ struct DeviceDescriptor : public DeviceIdentity {
   using VariablesMap = std::unordered_map<std::string, VariablePtr>;
   using VariablesMapPtr = std::shared_ptr<VariablesMap>;
 
-  DeviceDescriptor(uint16_t vendor_id, const std::string& vendor_name,
-      uint32_t device_id, const TextID& device_name, const UnitsMapPtr& units,
-      const VariablesMapPtr& std_variables, VariablesMap&& variables)
+  DeviceDescriptor(uint16_t vendor_id,
+      const std::string& vendor_name,
+      uint32_t device_id,
+      const TextID& device_name,
+      const UnitsMapPtr& units,
+      const VariablesMapPtr& std_variables,
+      VariablesMap&& variables)
       : DeviceDescriptor(
             DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
-            units, std_variables, std::move(variables)) {}
+            units,
+            std_variables,
+            std::move(variables)) {}
 
-  DeviceDescriptor(DeviceIdentity&& identity, const UnitsMapPtr units,
-      const VariablesMapPtr& std_variables, VariablesMap&& variables)
+  DeviceDescriptor(DeviceIdentity&& identity,
+      const UnitsMapPtr units,
+      const VariablesMapPtr& std_variables,
+      VariablesMap&& variables)
       : DeviceIdentity(std::move(identity)), units_(units),
         std_variables_(std_variables), variables_(std::move(variables)) {
     if (units_->empty()) {
