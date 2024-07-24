@@ -16,8 +16,10 @@ struct Repository {
   using VariablesMapPtr = DeviceDescriptor::VariablesMapPtr;
   using DescriptorsMap = std::unordered_map<std::string, DeviceDescriptorPtr>;
 
-  Repository(UnitsMapPtr&& units, DatatypesMapPtr&& datatypes,
-      VariablesMapPtr&& std_variables, DescriptorsMap&& descriptors);
+  Repository(UnitsMapPtr&& units,
+      DatatypesMapPtr&& datatypes,
+      VariablesMapPtr&& std_variables,
+      DescriptorsMap&& descriptors);
 
   Repository(UnitsMapPtr&& units,
       std::pair<DatatypesMapPtr, VariablesMapPtr> std_defines,

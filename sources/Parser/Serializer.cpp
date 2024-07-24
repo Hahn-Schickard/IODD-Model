@@ -56,11 +56,11 @@ optional<AccessRights> decodeAccessRights(const xml_node& node) {
   string access_string = node.attribute("accessRights").as_string();
   if (!access_string.empty()) {
     if (access_string == "ro") {
-      return AccessRights::READ_ONLY;
+      return AccessRights::ReadOnly;
     } else if (access_string == "wo") {
-      return AccessRights::WRITE_ONLY;
+      return AccessRights::WriteOnly;
     } else if (access_string == "rw") {
-      return AccessRights::READ_WRITE;
+      return AccessRights::ReadWrite;
     }
   }
   return nullopt;

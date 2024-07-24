@@ -1,12 +1,8 @@
 #ifndef __IODD_IO_DEVICE_DESCRIPTOR_HPP
 #define __IODD_IO_DEVICE_DESCRIPTOR_HPP
 
-#include "StandardDefines.hpp"
-
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <unordered_map>
+#include "Standard/Unit.hpp"
+#include "Standard/Variable.hpp"
 
 namespace IODD {
 

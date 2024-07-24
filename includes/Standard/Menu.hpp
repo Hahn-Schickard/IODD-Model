@@ -1,7 +1,9 @@
 #ifndef __IODD_DEVICE_MENU_DESCRIPTION
 #define __IODD_DEVICE_MENU_DESCRIPTION
 
-#include "StandardDefines.hpp"
+#include "Unit.hpp"
+#include "Variable.hpp"
+
 #include "Variant_Visitor.hpp"
 
 #include <cstdint>
