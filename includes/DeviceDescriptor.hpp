@@ -1,5 +1,5 @@
-#ifndef __IODD_IO_DEVICE_DESCRIPTOR_HPP
-#define __IODD_IO_DEVICE_DESCRIPTOR_HPP
+#ifndef __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
+#define __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 
 #include "Standard/Unit.hpp"
 #include "Standard/Variable.hpp"
@@ -132,4 +132,4 @@ private:
 using DeviceDescriptorPtr = std::shared_ptr<DeviceDescriptor>;
 } // namespace IODD
 
-#endif // __IODD_IO_DEVICE_DESCRIPTOR_HPP
+#endif // __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP

@@ -1,5 +1,5 @@
-#ifndef __IODD_DEVICE_MENU_DESCRIPTION
-#define __IODD_DEVICE_MENU_DESCRIPTION
+#ifndef __IODD_STANDARD_DEFINES_MENU_HPP
+#define __IODD_STANDARD_DEFINES_MENU_HPP
 
 #include "Unit.hpp"
 #include "Variable.hpp"
@@ -216,4 +216,4 @@ private:
   AccessRights access_; // defaults to be same as variable
 };
 } // namespace IODD
-#endif //__IODD_DEVICE_MENU_DESCRIPTION
+#endif //__IODD_STANDARD_DEFINES_MENU_HPP
