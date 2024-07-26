@@ -31,13 +31,15 @@ enum class DisplayFormat : uint8_t {
   Dec9 = 9 /*!< Decimal notation with 9 digits after the decimal point */
 };
 
-bool isDecimal(DisplayFormat format) {
+inline bool isDecimal(DisplayFormat format) {
   return static_cast<uint8_t>(format) < 10;
 }
 
-bool isBinary(DisplayFormat format) { return format == DisplayFormat::Bin; }
+inline bool isBinary(DisplayFormat format) {
+  return format == DisplayFormat::Bin;
+}
 
-bool isHexadecimal(DisplayFormat format) {
+inline bool isHexadecimal(DisplayFormat format) {
   return format == DisplayFormat::Hex;
 }
 

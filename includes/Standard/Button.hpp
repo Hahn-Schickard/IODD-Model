@@ -12,7 +12,7 @@ namespace IODD {
 
 using ButtonValue = std::variant<bool, uint64_t, int64_t>;
 
-Datatype toDatatype(ButtonValue value) {
+inline Datatype toDatatype(ButtonValue value) {
   Datatype result;
   match(
       value,
