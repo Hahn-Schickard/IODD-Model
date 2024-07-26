@@ -446,7 +446,6 @@ DataValue decodeDataValue(const xml_node& node,
   }
   }
 }
-// NOLINTEND(bugprone-easily-swappable-parameters)
 
 Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
     const xml_node& locales,
@@ -602,6 +601,7 @@ Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
   }
   return variables;
 }
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
 DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
