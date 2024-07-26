@@ -109,7 +109,7 @@ struct Menu {
     return value;
   }
 
-  NamedAttributePtr valueName(const SimpleValue& value) {
+  const NamedAttributePtr valueName(const SimpleValue& value) {
     return variable_->valueName(value);
   }
 
@@ -117,7 +117,7 @@ struct Menu {
 
   AccessRights accessRestriction() const { return access_; }
 
-  const std::optional<uint16_t> subindex() const { return subindex_; }
+  std::optional<uint16_t> subindex() const { return subindex_; }
 
   const UnitPtr unit() const { return unit_; }
 
