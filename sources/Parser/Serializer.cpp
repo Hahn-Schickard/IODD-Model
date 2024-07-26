@@ -534,7 +534,7 @@ SimpleDatatypeValue decodeDefaultValue(
   case Datatype::Float32: {
     return attribute.as_float();
   }
-  case Datatype::String: {
+  case Datatype::String: { // NOLINT(bugprone-branch-clone)
     [[fallthrough]];
   }
   case Datatype::Time: {
