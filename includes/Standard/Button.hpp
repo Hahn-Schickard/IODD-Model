@@ -55,6 +55,8 @@ private:
   std::optional<TextID> desc_ = std::nullopt;
   std::optional<TextID> action_msg_ = std::nullopt;
 };
+
+using ButtonPtr = std::shared_ptr<Button>;
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_BUTTON_HPP

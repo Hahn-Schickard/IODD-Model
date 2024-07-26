@@ -217,5 +217,7 @@ private:
   DisplayFormat format_ = DisplayFormat::None;
   AccessRights access_; // defaults to be same as variable
 };
+
+using MenuPtr = std::shared_ptr<Menu>;
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_MENU_HPP
