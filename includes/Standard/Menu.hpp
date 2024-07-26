@@ -139,6 +139,10 @@ private:
           throw std::logic_error(
               "Decoded result can not be represented as string");
         },
+        [](const std::vector<uint8_t>&) {
+          throw std::logic_error(
+              "Decoded result can not be represented as a byte array");
+        },
         [&f_value](uint64_t number) { f_value = number; },
         [&f_value](int64_t number) { f_value = number; },
         [&f_value](float number) { f_value = number; });
