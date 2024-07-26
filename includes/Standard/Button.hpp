@@ -25,8 +25,8 @@ Datatype toDatatype(ButtonValue value) {
 struct Button {
   Button(const VariablePtr& variable,
       ButtonValue value,
-      std::optional<TextID> description = std::nullptr,
-      std::optional<TextID> action_started_msg = std::nullptr)
+      std::optional<TextID> description = std::nullopt,
+      std::optional<TextID> action_started_msg = std::nullopt)
       : variable_(variable), value_(value), desc_(description),
         action_msg_(action_started_msg) {
     if (variable_->type() != Datatype::Boolean ||
@@ -52,8 +52,8 @@ struct Button {
 private:
   VariablePtr variable_;
   ButtonValue value_;
-  std::optional<TextID> desc_ = std::nullptr;
-  std::optional<TextID> action_msg_ = std::nullptr;
+  std::optional<TextID> desc_ = std::nullopt;
+  std::optional<TextID> action_msg_ = std::nullopt;
 };
 } // namespace IODD
 
