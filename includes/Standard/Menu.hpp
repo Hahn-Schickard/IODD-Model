@@ -131,11 +131,11 @@ private:
     float f_value;
     match(
         value,
-        [&f_value](bool) {
+        [](bool) {
           throw std::logic_error(
               "Decoded result can not be represented as boolean");
         },
-        [&f_value](const std::string&) {
+        [](const std::string&) {
           throw std::logic_error(
               "Decoded result can not be represented as string");
         },
