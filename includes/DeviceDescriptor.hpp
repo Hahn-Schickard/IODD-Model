@@ -98,7 +98,7 @@ struct DeviceDescriptor : public DeviceIdentity {
     }
   }
 
-  VariablePtr getVariable(const std::string& id) {
+  VariablePtr getVariable(const std::string& id) const {
     if (auto iter = variables_.find(id); iter != variables_.end()) {
       return iter->second;
     } else if (auto iter = std_variables_->find(id);
@@ -108,20 +108,12 @@ struct DeviceDescriptor : public DeviceIdentity {
     throw std::out_of_range("Variable with id " + id + " does not exists");
   }
 
-  NamedAttributePtr getVariableValueName(const std::string& id, bool value) {}
-
-  NamedAttributePtr getVariableValueName(const std::string& id, size_t value) {}
-
-  NamedAttributePtr getVariableValueName(const std::string& id, float value) {}
-
-  NamedAttributePtr getVariableValueName(
-      const std::string& id, uint8_t subindex, bool value) {}
-
-  NamedAttributePtr getVariableValueName(
-      const std::string& id, uint8_t subindex, size_t value) {}
-
-  NamedAttributePtr getVariableValueName(
-      const std::string& id, uint8_t subindex, float value) {}
+  NamedAttributePtr getVariableValueName(const std::string& id,
+      const SimpleDatatypeValue& value,
+      std::optional<uint8_t> subindex = std::nullopt) const {
+    auto variable = getVariable(id);
+    return variable->valueName(value, subindex);
+  }
 
 private:
   UnitsMapPtr units_;
