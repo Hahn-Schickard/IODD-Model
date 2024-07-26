@@ -212,10 +212,10 @@ inline void expand(DataValue& lhs, const DataValue& rhs) {
       [&rhs](UIntegerT value) { value.expand(std::get<UIntegerT>(rhs)); },
       [&rhs](IntegerT value) { value.expand(std::get<IntegerT>(rhs)); },
       [&rhs](FloatT value) { value.expand(std::get<FloatT>(rhs)); },
-      [&rhs](OctetStringT value) { /* no expansion for OctetStringT */ },
-      [&rhs](StringT value) { /* no expansion for StringT */ },
-      [&rhs](TimeT value) { /* no expansion for TimeT */ },
-      [&rhs](TimeSpanT value) { /* no expansion for TimeSpanT */ },
+      [&rhs](OctetStringT) { /* no expansion for OctetStringT */ },
+      [&rhs](StringT) { /* no expansion for StringT */ },
+      [&rhs](TimeT) { /* no expansion for TimeT */ },
+      [&rhs](TimeSpanT) { /* no expansion for TimeSpanT */ },
       // array types
       [&rhs](ArrayT<BooleanT> value) {
         value.expand(std::get<ArrayT<BooleanT>>(rhs));
