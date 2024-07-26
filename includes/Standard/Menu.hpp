@@ -111,8 +111,9 @@ struct Menu {
     return value;
   }
 
-  const NamedAttributePtr valueName(const SimpleValue& value) {
-    return variable_->valueName(value);
+  const NamedAttributePtr valueName(const SimpleDatatypeValue& value,
+      std::optional<uint8_t> subindex = std::nullopt) const {
+    return variable_->valueName(value, subindex);
   }
 
   DisplayFormat displayFormat() const { return format_; }
