@@ -1,6 +1,8 @@
 #ifndef __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 #define __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 
+#include "Standard/Button.hpp"
+#include "Standard/Menu.hpp"
 #include "Standard/Unit.hpp"
 #include "Standard/Variable.hpp"
 
@@ -57,6 +59,56 @@ private:
   std::string vendor_name_;
   uint32_t device_id_;
   TextID device_name_;
+};
+
+struct UserInterface {
+  using UI = std::variant<MenuPtr, ButtonPtr>;
+  using UIMap = std::unordered_map<std::string, UI>; // key is the variable id
+
+  UserInterface(UIMap identification_menus,
+      UIMap parameter_menus = UIMap(),
+      UIMap observation_menus = UIMap(),
+      UIMap diagnosis_menus = UIMap())
+      : identification_(identification_menus), parameter_(parameter_menus),
+        observation_(observation_menus), diagnosis_(diagnosis_menus) {}
+
+  UI getIdentificationUI(const std::string& variable_id) const {
+    return getUI(variable_id, identification_);
+  }
+
+  const UIMap getIdentificationMenus() const { return identification_; }
+
+  UI getParameterUI(const std::string& variable_id) const {
+    return getUI(variable_id, parameter_);
+  }
+
+  const UIMap getParameterMenus() const { return parameter_; }
+
+  UI getObserverUI(const std::string& variable_id) const {
+    return getUI(variable_id, observation_);
+  }
+
+  const UIMap getObserverMenus() const { return observation_; }
+
+  UI getDiagnosisUI(const std::string& variable_id) const {
+    return getUI(variable_id, diagnosis_);
+  }
+
+  const UIMap getDiagnosisMenus() const { return diagnosis_; }
+
+private:
+  UI getUI(const std::string& id, const UIMap& map) const {
+    if (auto iter = map.find(id); iter != map.end()) {
+      return iter->second;
+    } else {
+      throw std::out_of_range("No menu for variable with id " + id + " exists");
+    }
+  }
+
+  UIMap identification_;
+  UIMap parameter_;
+  UIMap observation_;
+  UIMap diagnosis_;
 };
 
 struct DeviceDescriptor : public DeviceIdentity {
