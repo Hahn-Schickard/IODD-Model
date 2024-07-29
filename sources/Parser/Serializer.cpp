@@ -377,8 +377,9 @@ using RecordValue = variant<RecordT<BooleanT>,
 RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locales) {
-  auto type = toDatatype(
-      node.child("SimpleDatatype").attribute("xsi:type").as_string());
+  string type_string =
+      node.child("SimpleDatatype").attribute("xsi:type").as_string();
+  auto type = toDatatype(type_string);
   switch (type) {
   case Datatype::Boolean: {
     return decodeRecord<BooleanT>(datatypes_map, node, locales);
@@ -456,7 +457,7 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
     datatypes.emplace(datatype.attribute("id").as_string(),
         decodeDataValue(datatype,
             locales,
-            toDatatype(datatype.attribute("xsi:type").as_string())));
+            toDatatype(string(datatype.attribute("xsi:type").as_string()))));
   }
   return datatypes;
 }
@@ -473,7 +474,7 @@ Repository::VariablesMap decodeVariables(const xml_node& xml,
             decodeAccessRights(variable).value(),
             decodeDataValue(variable,
                 locales,
-                toDatatype(variable.attribute("xsi:type").as_string()),
+                toDatatype(string(variable.attribute("xsi:type").as_string())),
                 datatypes),
             decodeLocalizedText("Description", variable, locales).value(),
             nullopt,
