@@ -286,8 +286,9 @@ ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
 ArrayValue decodeArrayValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locale) {
-  auto type = toDatatype(
-      node.child("SimpleDatatype").attribute("xsi:type").as_string());
+  string type_string =
+      node.child("SimpleDatatype").attribute("xsi:type").as_string();
+  auto type = toDatatype(type_string);
   switch (type) {
   case Datatype::Boolean: {
     return decodeArray<BooleanT>(datatypes_map, node, locale);
