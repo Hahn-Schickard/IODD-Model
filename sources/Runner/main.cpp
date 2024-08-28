@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int main(int argc, const char* argv[]) {
+int main() {
   cout << "Hello world" << endl;
 
   exit(EXIT_SUCCESS);

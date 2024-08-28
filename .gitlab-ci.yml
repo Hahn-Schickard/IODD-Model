@@ -3,11 +3,7 @@ include:
  - local: ".gitlab-ci-templates.yml"
 
 variables:
-  IMAGE_VER: "6.2.1"
-
-build:debian-buster:
-  extends: .build
-  image: ${DOCKER_REGISTRY}/hs-conan-debian-buster-slim:${IMAGE_VER}
+  IMAGE_VER: "6.4.0"
 
 build:debian-bullseye:
   extends: .build
@@ -17,189 +13,140 @@ build:debian-bookworm:
   extends: .build
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
 
-build:ubuntu-18.04:
-  extends: .build
-  image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-18.04:${IMAGE_VER}
-
 build:ubuntu-20.04:
   extends: .build
   image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-20.04:${IMAGE_VER}
 
-build:fedora-32:
+build:fedora-latest:
   extends: .build
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-32:${IMAGE_VER}
+    name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
 
-build:fedora-34:
+build:windows-ltsc2019:
   extends: .build
+  tags:
+    - windows-docker
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-34:${IMAGE_VER}
-    entrypoint: ["/bin/sh", "-c"]
-
-test:debian-buster:
-  extends: .test
-  image: ${DOCKER_REGISTRY}/hs-conan-debian-buster-slim:${IMAGE_VER}
-  dependencies: 
-    - build:debian-buster
+    name: ${DOCKER_REGISTRY}/hs-conan-windows-ltsc2019:${IMAGE_VER}
 
 test:debian-bullseye:
   extends: .test
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bullseye-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bullseye
 
 test:debian-bookworm:
   extends: .test
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
-
-test:ubuntu-18.04:
-  extends: .test
-  image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-18.04:${IMAGE_VER}
-  dependencies: 
-    - build:ubuntu-18.04
 
 test:ubuntu-20.04:
   extends: .test
   image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-20.04:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:ubuntu-20.04
 
-test:fedora-32:
+test:fedora-latest:
   extends: .test
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-32:${IMAGE_VER}
+    name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
-  dependencies: 
-    - build:fedora-32
+  dependencies:
+    - build:fedora-latest
 
-test:fedora-34:
+test:windows-ltsc2019:
   extends: .test
+  tags:
+    - windows-docker
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-34:${IMAGE_VER}
-    entrypoint: ["/bin/sh", "-c"]
-  dependencies: 
-    - build:fedora-34
-
-analyze_exe_memory:debian-buster:
-  extends: .analyze_exe_memory
-  image: ${DOCKER_REGISTRY}/hs-conan-debian-buster-slim:${IMAGE_VER}
-  dependencies: 
-    - build:debian-buster
+    name: ${DOCKER_REGISTRY}/hs-conan-windows-ltsc2019:${IMAGE_VER}
+  dependencies:
+    - build:windows-ltsc2019
 
 analyze_exe_memory:debian-bullseye:
   extends: .analyze_exe_memory
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bullseye-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bullseye
 
 analyze_exe_memory:debian-bookworm:
   extends: .analyze_exe_memory
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
-
-analyze_exe_memory:ubuntu-18.04:
-  extends: .analyze_exe_memory
-  image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-18.04:${IMAGE_VER}
-  dependencies: 
-    - build:ubuntu-18.04
 
 analyze_exe_memory:ubuntu-20.04:
   extends: .analyze_exe_memory
   image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-20.04:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:ubuntu-20.04
 
-analyze_exe_memory:fedora-32:
+analyze_exe_memory:fedora-latest:
   extends: .analyze_exe_memory
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-32:${IMAGE_VER}
+    name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
-  dependencies: ["build:fedora-32"]
-
-analyze_exe_memory:fedora-34:
-  extends: .analyze_exe_memory
-  image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-34:${IMAGE_VER}
-    entrypoint: ["/bin/sh", "-c"]
-  dependencies: 
-    - build:fedora-34
-
-analyze_test_runner_memory:debian-buster:
-  extends: .analyze_test_runner_memory
-  image: ${DOCKER_REGISTRY}/hs-conan-debian-buster-slim:${IMAGE_VER}
-  dependencies: 
-    - build:debian-buster
+  dependencies: ["build:fedora-latest"]
 
 analyze_test_runner_memory:debian-bullseye:
   extends: .analyze_test_runner_memory
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bullseye-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bullseye
 
 analyze_test_runner_memory:debian-bookworm:
   extends: .analyze_test_runner_memory
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
-
-analyze_test_runner_memory:ubuntu-18.04:
-  extends: .analyze_test_runner_memory
-  image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-18.04:${IMAGE_VER}
-  dependencies: 
-    - build:ubuntu-18.04
 
 analyze_test_runner_memory:ubuntu-20.04:
   extends: .analyze_test_runner_memory
   image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-20.04:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:ubuntu-20.04
 
-analyze_test_runner_memory:fedora-32:
+analyze_test_runner_memory:fedora-latest:
   extends: .analyze_test_runner_memory
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-32:${IMAGE_VER}
+    name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
-  dependencies: 
-    - build:fedora-32
-
-analyze_test_runner_memory:fedora-34:
-  extends: .analyze_test_runner_memory
-  image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-34:${IMAGE_VER}
-    entrypoint: ["/bin/sh", "-c"]
-  dependencies: 
-    - build:fedora-34
+  dependencies:
+    - build:fedora-latest
 
 test_coverage:
   extends: .test_coverage
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
     - test:debian-bookworm
+
+static_analysis:
+  extends: .static_analysis
+  image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
+  dependencies:
+    - build:debian-bookworm
+    - test:debian-bookworm
+    - analyze_exe_memory:debian-bookworm
+    - test_coverage
 
 format:
   extends: .format
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
 
 lint:
   extends: .lint
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - build:debian-bookworm
 
 document:
   extends: .document
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-
-package:debian-buster:
-  extends: .package
-  image: ${DOCKER_REGISTRY}/hs-conan-debian-buster-slim:${IMAGE_VER}
 
 package:debian-bullseye:
   extends: .package
@@ -209,29 +156,29 @@ package:debian-bookworm:
   extends: .package
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
 
-package:ubuntu-18.04:
-  extends: .package
-  image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-18.04:${IMAGE_VER}
-
 package:ubuntu-20.04:
   extends: .package
   image: ${DOCKER_REGISTRY}/hs-conan-ubuntu-20.04:${IMAGE_VER}
 
-package:fedora-32:
+package:fedora-latest:
   extends: .package
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-32:${IMAGE_VER}
+    name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
 
-package:fedora-34:
+package:windows-ltsc2019:
   extends: .package
+  tags:
+    - windows-docker
   image:
-    name: ${DOCKER_REGISTRY}/hs-conan-fedora-34:${IMAGE_VER}
-    entrypoint: ["/bin/sh", "-c"]
+    name: ${DOCKER_REGISTRY}/hs-conan-windows-ltsc2019:${IMAGE_VER}
+  before_script:
+    - $PROJECT_NAME=python3 ./utility/.getProjectName.py
+    - $VERSION=python3 ./utility/.getVersionFromTag.py
 
 pages:
   extends: .pages
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
-  dependencies: 
+  dependencies:
     - test_coverage
     - document

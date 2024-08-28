@@ -21,16 +21,17 @@ This will generate html like documentation at `[PROJECT_ROOT]/docs/code_document
 * compiler with C++17 support
 * cmake 3.24.0 >= - build system generator, used by package generator as well
 * python3 - used by utilities and package generator
-* conan 2.0.10 - dependency handler/package generator, see [SSO Wiki](https://ssowiki.hsg.privat/en/Softwareentwicklung/Cpp/Conan_Package_Manager) for installation 
+* conan 2.4.0 >= - dependency handler/package generator, see [SSO Wiki](https://ssowiki.hsg.privat/en/Softwareentwicklung/Cpp/Conan_Package_Manager) for installation
 
 ### Optional
 
+* ninja - build system (alternative to `make`)
 * clang-format 15.0.7 - to use formatting tools
 * clang-tidy 15.0.7 - to use static code analysis
 * lcov - to generate code coverage reports
 * valgrind - to run memory analysis
-* doxygen 1.9.8 - to generate documentation from code
-* plantuml 1.2023.10 - to generate UML diagrams in doxygen
+* doxygen 1.9.8 >= - to generate documentation from code
+* plantuml 1.2023.10 >= - to generate UML diagrams in doxygen
 
 ## Visual Studio Code Support
 
@@ -82,10 +83,10 @@ ctest --verbose
 
 ## Creating local conan package
 
-To create a custom local package first define `VERSION`, `USER` and `CHANEL` environmental variables. These variables will tell conan how to name the package. 
+To create a custom local package first define `VERSION`, `USER` and `CHANEL` environmental variables. These variables will tell conan how to name the package.
 
 - `VERSION` variable specifies package version number in the following format `${MAJOR}.${MINOR}.${PATCH}`. For more information see [Release versioning schema](CONTRIBUTING.md#release-versioning-schema)
-- `USER` variable specifies the name of release community (for example `hahn-schickard`, `bincrafters`, etc.), it is used to showcase that this package is outside of [conan-center-index](https://conan.io/center/) repository 
+- `USER` variable specifies the name of release community (for example `hahn-schickard`, `bincrafters`, etc.), it is used to showcase that this package is outside of [conan-center-index](https://conan.io/center/) repository
 - `CHANEL` variable specifies the package type, i.e. if it is a stable, development or nightly release
 
 ### Conan v1
@@ -103,7 +104,7 @@ To create local conan packages run the following command in project root directo
 conan create . --version=${VERSION} --user=${USER} --channel=${CHANEL} --build=missing
 ```
 
-In case you need to specify C++ standard, run the following command in project root directory: 
+In case you need to specify C++ standard, run the following command in project root directory:
 
 ```bash
 conan create . --version=${VERSION} --user=${USER} --channel=${CHANEL} --build=missing -s:h compiler.cppstd=17 -s:b compiler.cppstd=17

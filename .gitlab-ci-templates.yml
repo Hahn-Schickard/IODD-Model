@@ -9,6 +9,8 @@ stages:
 
 variables:
   CONAN_HOME: "${CI_PROJECT_DIR}/.conan2"
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 
 .build:
   stage: build
@@ -19,13 +21,15 @@ variables:
     - conan profile detect --force
     - sed -i 's/^compiler.cppstd=.*/compiler.cppstd=17/' $(conan profile path default)
   script:
-    - mkdir build && cd build
-    - cmake ${CMAKE_VARIABLES} -DCMAKE_BUILD_TYPE=Release -DSTATIC_CODE_ANALYSIS=Off ..
-    - cmake --build . --target all --config Release --
+    - mkdir build
+    - cd build
+    - cmake ${CMAKE_VARIABLES} -DCMAKE_BUILD_TYPE=Release -DSTATIC_CODE_ANALYSIS=Off -G Ninja .. | tee cmake_config.log
+    - cmake --build . --target all --config Release -- | tee cmake_build.log
   artifacts:
+    when: always
     paths:
       - build/
-      - ${CI_PROJECT_DIR}/.conan2
+      - ${CONAN_HOME}
     expire_in: 1 day
 
 .test:
@@ -40,6 +44,7 @@ variables:
   artifacts:
     paths:
       - build/
+    when: always
     expire_in: 1 day
 
 .analyze_exe_memory:
@@ -52,6 +57,9 @@ variables:
     name: "Commit:${CI_COMMIT_SHORT_SHA}_Executable_Valgrind_Results"
     paths:
       - valgrind.log
+      - valgrind.xml
+      - ${EXE_DIR}
+    when: always
     expire_in: 1 day
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -69,6 +77,7 @@ variables:
     name: "Commit:${CI_COMMIT_SHORT_SHA}_Test_Runner_Valgrind_Results"
     paths:
       - valgrind.log
+      - valgrind.xml
     expire_in: 1 day
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -88,6 +97,24 @@ variables:
     paths:
       - code_coverage_report/
     expire_in: 1 day
+
+.static_analysis:
+  stage: check
+  tags:
+    - conan
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - gcovr --sonarqube --exclude-directories ${CONAN_HOME} > sonarqube_coverage.xml
+    - sonar-scanner -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.projectKey=${SONAR_PROJECT_KEY} -Dsonar.token=${SONAR_TOKEN} -Dsonar.coverageReportPaths=sonarqube_coverage.xml
+  artifacts:
+    name: "Commit:${CI_COMMIT_SHORT_SHA}_Code_Coverage_Results"
+    paths:
+      - sonarqube_coverage.xml
+    expire_in: 1 day
+  allow_failure: true
 
 .lint:
   stage: check
@@ -136,10 +163,10 @@ variables:
   tags:
     - conan
   before_script:
-    - conan remote add --insecure upload_repo ${CONAN_REMOTE}
+    - VERSION=$(python3 ./utility/.getVersionFromTag.py)
     - PROJECT_NAME=$(python3 ./utility/.getProjectName.py)
   script:
-    - VERSION=${CI_COMMIT_TAG##*v}
+    - conan remote add upload_repo ${CONAN_REMOTE}
     - conan profile detect --force
     - conan create . --version=${VERSION} --user=hahn-schickard --channel=stable --build=missing -s:h compiler.cppstd=17 -s:b compiler.cppstd=17
     - conan upload -r upload_repo --confirm ${PROJECT_NAME}/${VERSION}@hahn-schickard/stable
