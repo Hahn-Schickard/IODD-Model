@@ -1,6 +1,6 @@
 variables:
- RUN_EXE_COVERAGE: "False"
+ RUN_EXE_COVERAGE: "True"
  EXE_DIR: "build/sources/Example"
- EXE_TARGET: "${EXE_DIR}/Runner"
+ EXE_TARGET: "${EXE_DIR}/IODD_Model_Runner"
  EXE_TARGET_ARGS: ""
  TEST_RUNNER_TARGET: "build/unit_tests/Unit_Tests_Runner"
