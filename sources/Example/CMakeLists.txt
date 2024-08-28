@@ -25,10 +25,10 @@ target_link_libraries(${MODULE}
 target_compile_features(${MODULE} PUBLIC cxx_std_17)
 
 if(WIN32)
-    add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+    add_custom_command(TARGET ${MODULE} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy 
-                        -t $<TARGET_FILE_DIR:${MODULE_NAME}> 
-                        $<TARGET_RUNTIME_DLLS:${MODULE_NAME}>
+                        -t $<TARGET_FILE_DIR:${MODULE}> 
+                        $<TARGET_RUNTIME_DLLS:${MODULE}>
                         COMMAND_EXPAND_LISTS
     )
     # Workaround to get conan .dll files into build
@@ -38,9 +38,9 @@ if(WIN32)
             list(APPEND dependencies "${dir_dependencies}")
         endif()
     endforeach()
-    add_custom_command(TARGET ${MODULE_NAME} POST_BUILD
+    add_custom_command(TARGET ${MODULE} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy 
-                        -t $<TARGET_FILE_DIR:${MODULE_NAME}> 
+                        -t $<TARGET_FILE_DIR:${MODULE}> 
                         ${dependencies}
                         COMMAND_EXPAND_LISTS
     )
