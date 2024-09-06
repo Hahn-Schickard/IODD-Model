@@ -687,10 +687,10 @@ VariableRef::ButtonValue decodeButtonValue(
     return xml.as_bool();
   }
   case Datatype::Integer: {
-    return xml.as_llong();
+    return (int64_t)xml.as_llong();
   }
   case Datatype::UInteger: {
-    return xml.as_ullong();
+    return (uint64_t)xml.as_ullong();
   }
   default: {
     throw invalid_argument(toString(type) + " can not be used as button value");
