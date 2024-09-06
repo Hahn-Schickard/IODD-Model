@@ -1,9 +1,8 @@
 #ifndef __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 #define __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 
-#include "Standard/Button.hpp"
-#include "Standard/Menu.hpp"
 #include "Standard/Unit.hpp"
+#include "Standard/UserInterface.hpp"
 #include "Standard/Variable.hpp"
 
 namespace IODD {
@@ -61,61 +60,12 @@ private:
   TextID device_name_;
 };
 
-struct UserInterface {
-  using UI = std::variant<MenuPtr, ButtonPtr>;
-  using UIMap = std::unordered_map<std::string, UI>; // key is the variable id
-
-  UserInterface(UIMap identification_menus,
-      UIMap parameter_menus = UIMap(),
-      UIMap observation_menus = UIMap(),
-      UIMap diagnosis_menus = UIMap())
-      : identification_(identification_menus), parameter_(parameter_menus),
-        observation_(observation_menus), diagnosis_(diagnosis_menus) {}
-
-  UI getIdentificationUI(const std::string& variable_id) const {
-    return getUI(variable_id, identification_);
-  }
-
-  const UIMap getIdentificationMenus() const { return identification_; }
-
-  UI getParameterUI(const std::string& variable_id) const {
-    return getUI(variable_id, parameter_);
-  }
-
-  const UIMap getParameterMenus() const { return parameter_; }
-
-  UI getObserverUI(const std::string& variable_id) const {
-    return getUI(variable_id, observation_);
-  }
-
-  const UIMap getObserverMenus() const { return observation_; }
-
-  UI getDiagnosisUI(const std::string& variable_id) const {
-    return getUI(variable_id, diagnosis_);
-  }
-
-  const UIMap getDiagnosisMenus() const { return diagnosis_; }
-
-private:
-  UI getUI(const std::string& id, const UIMap& map) const {
-    if (auto iter = map.find(id); iter != map.end()) {
-      return iter->second;
-    } else {
-      throw std::out_of_range("No menu for variable with id " + id + " exists");
-    }
-  }
-
-  UIMap identification_;
-  UIMap parameter_;
-  UIMap observation_;
-  UIMap diagnosis_;
-};
-
 struct DeviceDescriptor : public DeviceIdentity {
   using UnitsMap = std::unordered_map<uint16_t, UnitPtr>;
   using UnitsMapPtr = std::shared_ptr<UnitsMap>;
   using VariablesMap = std::unordered_map<std::string, VariablePtr>;
   using VariablesMapPtr = std::shared_ptr<VariablesMap>;
+  using UserInterfaces = std::unordered_map<UserRole, UserInterfacePtr>;
 
   DeviceDescriptor(uint16_t vendor_id,
       const std::string& vendor_name,
@@ -123,19 +73,23 @@ struct DeviceDescriptor : public DeviceIdentity {
       const TextID& device_name,
       const UnitsMapPtr& units,
       const VariablesMapPtr& std_variables,
-      VariablesMap&& variables)
+      VariablesMapPtr&& variables,
+      UserInterfaces&& interfaces)
       : DeviceDescriptor(
             DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
             units,
             std_variables,
-            std::move(variables)) {}
+            std::move(variables),
+            std::move(interfaces)) {}
 
   DeviceDescriptor(DeviceIdentity&& identity,
       const UnitsMapPtr units,
       const VariablesMapPtr& std_variables,
-      VariablesMap&& variables)
+      VariablesMapPtr&& variables,
+      UserInterfaces&& interfaces)
       : DeviceIdentity(std::move(identity)), units_(units),
-        std_variables_(std_variables), variables_(std::move(variables)) {
+        std_variables_(std_variables), variables_(std::move(variables)),
+        interfaces_(std::move(interfaces)) {
     if (units_->empty()) {
       throw std::invalid_argument(
           "Failed to create DeviceDescriptor. Units can not be empty");
@@ -144,14 +98,18 @@ struct DeviceDescriptor : public DeviceIdentity {
       throw std::invalid_argument("Failed to create DeviceDescriptor. Standard "
                                   "Variables can not be empty");
     }
-    if (variables_.empty()) {
+    if (variables_->empty()) {
       throw std::invalid_argument(
           "Failed to create DeviceDescriptor. Variables can not be empty");
+    }
+    if (interfaces_.empty()) {
+      throw std::invalid_argument(
+          "Failed to create DeviceDescriptor. UserInterfaces can not be empty");
     }
   }
 
   VariablePtr getVariable(const std::string& id) const {
-    if (auto iter = variables_.find(id); iter != variables_.end()) {
+    if (auto iter = variables_->find(id); iter != variables_->end()) {
       return iter->second;
     } else if (auto iter = std_variables_->find(id);
                iter != std_variables_->end()) {
@@ -167,10 +125,25 @@ struct DeviceDescriptor : public DeviceIdentity {
     return variable->valueName(value, subindex);
   }
 
+  UserInterfaces getUIs() { return interfaces_; }
+
+  UserInterfacePtr getObserverUI() {
+    return interfaces_.at(UserRole::ObservationRole);
+  }
+
+  UserInterfacePtr getMaintainenceUI() {
+    return interfaces_.at(UserRole::MaintenanceRole);
+  }
+
+  UserInterfacePtr getSpecialistUI() {
+    return interfaces_.at(UserRole::SpecialistRole);
+  }
+
 private:
   UnitsMapPtr units_;
   VariablesMapPtr std_variables_;
-  VariablesMap variables_;
+  VariablesMapPtr variables_;
+  UserInterfaces interfaces_;
 };
 
 using DeviceDescriptorPtr = std::shared_ptr<DeviceDescriptor>;

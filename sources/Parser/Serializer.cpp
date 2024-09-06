@@ -54,6 +54,9 @@ Repository::UnitsMapPtr decodeUnits(const filesystem::path& path) {
 
 optional<AccessRights> decodeAccessRights(const xml_node& node) {
   string access_string = node.attribute("accessRights").as_string();
+  if (access_string.empty()) {
+    access_string = node.attribute("accessRightRestriction").as_string();
+  }
   if (!access_string.empty()) {
     if (access_string == "ro") {
       return AccessRights::ReadOnly;
@@ -566,7 +569,7 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
   return nullopt;
 }
 
-Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
+Repository::VariablesMap decodeStdVariables(const xml_node& xml,
     const xml_node& locales,
     const Repository::DatatypesMapPtr& datatypes,
     const Repository::VariablesMapPtr& std_variables) {
@@ -603,6 +606,301 @@ Repository::VariablesMap decodeStdVariableRef(const xml_node& xml,
   }
   return variables;
 }
+
+unordered_map<string, string> decodeMenuIDs(const xml_node& xml) {
+  unordered_map<string, string> result;
+  for (const auto& child : xml.children()) {
+    if (!child.attribute("menuId").empty()) {
+      result.emplace(child.name(), child.attribute("menuId").as_string());
+    }
+  }
+  return result;
+}
+
+VariablePtr findVariable(const string& id,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables) {
+  auto it = variables->find(id);
+  if (it != variables->end()) {
+    return it->second;
+  }
+
+  it = std_variables->find(id);
+  if (it != std_variables->end()) {
+    return it->second;
+  }
+
+  throw out_of_range(id + " variable does not exist");
+}
+
+UnitPtr findUnit(uint16_t id, const Repository::UnitsMapPtr& units) {
+  auto it = units->find(id);
+  if (it != units->end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
+optional<float> decodeFloatAttribute(const xml_node& xml, const string& name) {
+  auto attribute = xml.attribute(name.c_str());
+  if (!attribute.empty()) {
+    return attribute.as_float();
+  }
+  return nullopt;
+}
+
+UnitPtr decodeUnitPtr(
+    const Repository::UnitsMapPtr& units, const xml_node& xml) {
+  auto unit_attribute = xml.attribute("unitCode");
+  if (!unit_attribute.empty()) {
+    auto unit_id = unit_attribute.as_uint();
+    return findUnit(unit_id, units);
+  }
+  return nullptr;
+}
+
+DisplayFormat decodeDisplayFormat(const xml_node& xml) {
+  auto format_attribute = xml.attribute("displayFormat");
+  if (!format_attribute.empty()) {
+    unordered_map<string, DisplayFormat> format_types{
+        {"Dec.0", DisplayFormat::Dec0},
+        {"Dec.1", DisplayFormat::Dec1},
+        {"Dec.2", DisplayFormat::Dec2},
+        {"Dec.3", DisplayFormat::Dec3},
+        {"Dec.4", DisplayFormat::Dec4},
+        {"Dec.5", DisplayFormat::Dec5},
+        {"Dec.6", DisplayFormat::Dec6},
+        {"Dec.7", DisplayFormat::Dec7},
+        {"Dec.8", DisplayFormat::Dec8},
+        {"Dec.9", DisplayFormat::Dec9},
+        {"Bin", DisplayFormat::Bin},
+        {"Hex", DisplayFormat::Hex}};
+    return format_types.at(format_attribute.as_string());
+  }
+  return DisplayFormat::None;
+}
+
+VariableRef::ButtonValue decodeButtonValue(
+    Datatype type, const xml_attribute& xml) {
+  switch (type) {
+  case Datatype::Boolean: {
+    return xml.as_bool();
+  }
+  case Datatype::Integer: {
+    return xml.as_llong();
+  }
+  case Datatype::UInteger: {
+    return xml.as_ullong();
+  }
+  default: {
+    throw invalid_argument(toString(type) + " can not be used as button value");
+  }
+  }
+}
+
+VariableRefPtr decodeVariableRef(const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_node& xml,
+    const xml_node& locales) {
+  auto variable = findVariable(
+      xml.attribute("variableId").as_string(), variables, std_variables);
+
+  auto button_xml = xml.child("Button");
+  if (!button_xml.empty()) {
+    auto button_value = decodeButtonValue(
+        variable->type(), button_xml.attribute("buttonValue"));
+    auto description = decodeLocalizedText("Description", button_xml, locales);
+    auto action_msg =
+        decodeLocalizedText("ActionStartedMessage", button_xml, locales);
+    return make_shared<VariableRef>(
+        variable, button_value, description, action_msg);
+  }
+
+  auto gradient = decodeFloatAttribute(xml, "gradient");
+  auto offset = decodeFloatAttribute(xml, "offset");
+  auto unit = decodeUnitPtr(units, xml);
+  auto format = decodeDisplayFormat(xml);
+  auto access = decodeAccessRights(xml);
+
+  return make_shared<VariableRef>(
+      variable, gradient, offset, unit, format, access);
+}
+
+RecordRefPtr decodeRecordRef(const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_node& xml,
+    const xml_node& locales) {
+  auto variable = findVariable(
+      xml.attribute("variableId").as_string(), variables, std_variables);
+  auto subindex = xml.attribute("subindex").as_uint();
+
+  auto button_xml = xml.child("Button");
+  if (!button_xml.empty()) {
+    auto button_value = decodeButtonValue(
+        variable->type(), button_xml.attribute("buttonValue"));
+    auto description = decodeLocalizedText("Description", button_xml, locales);
+    auto action_msg =
+        decodeLocalizedText("ActionStartedMessage", button_xml, locales);
+    return make_shared<RecordRef>(
+        variable, button_value, description, action_msg, subindex);
+  }
+
+  auto gradient = decodeFloatAttribute(xml, "gradient");
+  auto offset = decodeFloatAttribute(xml, "offset");
+  auto unit = decodeUnitPtr(units, xml);
+  auto format = decodeDisplayFormat(xml);
+  auto access = decodeAccessRights(xml);
+
+  return make_shared<RecordRef>(
+      variable, gradient, offset, unit, format, access, subindex);
+}
+
+MenuPtr decodeMenu(const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const string& menu_id,
+    const xml_node& xml,
+    const xml_node& locales,
+    const optional<Condition>& condition = nullopt) {
+  if (strcmp(xml.name(), "Menu ") != 0) {
+    throw logic_error("Can not decode non Menu element as a menu");
+  }
+
+  std::vector<Menu::Ref> refs;
+  optional<TextID> name = decodeLocalizedText("Name", xml, locales);
+
+  for (const auto& child : xml.children()) {
+    if (strcmp(child.name(), "VariableRef") == 0) {
+      refs.emplace_back(
+          decodeVariableRef(units, variables, std_variables, child, locales));
+    }
+    if (strcmp(child.name(), "RecordItemRef") == 0) {
+      refs.emplace_back(
+          decodeRecordRef(units, variables, std_variables, child, locales));
+    }
+    if (strcmp(child.name(), "MenuRef") == 0) {
+      string ref_id = child.attribute("menuId").as_string();
+      optional<Condition> ref_condition = nullopt;
+      auto child_condition = child.child("Condition");
+      if (!child_condition.empty()) {
+        VariablePtr condition_variable =
+            findVariable(child_condition.attribute("variableId").as_string(),
+                variables,
+                std_variables);
+
+        std::optional<uint8_t> condition_subindex = nullopt;
+        auto subindex_attribute = child_condition.attribute("subindex");
+        if (subindex_attribute.empty()) {
+          condition_subindex = subindex_attribute.as_uint();
+        }
+
+        uint8_t condition_value = child_condition.attribute("value").as_uint();
+
+        ref_condition =
+            Condition(condition_variable, condition_subindex, condition_value);
+      }
+      refs.emplace_back(decodeMenu(units,
+          variables,
+          std_variables,
+          ref_id,
+          xml,
+          locales,
+          ref_condition));
+    }
+  }
+  return make_shared<Menu>(menu_id, refs, name, condition);
+}
+
+MenuPtr decodeOptionalMenu(const string& menu_name,
+    unordered_map<string, string> menu_ids,
+    const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_node& xml,
+    const xml_node& locales) {
+  try {
+    return decodeMenu(
+        units, variables, std_variables, menu_ids.at(menu_name), xml, locales);
+  } catch (const out_of_range& ex) {
+    return nullptr;
+  }
+}
+
+UserInterfacePtr decodeRoleUI(UserRole role,
+    unordered_map<string, string> menu_ids,
+    const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_node& xml,
+    const xml_node& locales) {
+  auto ident_menu = decodeMenu(units,
+      variables,
+      std_variables,
+      menu_ids.at("IdentificationMenu"),
+      xml,
+      locales);
+  auto param_menu = decodeOptionalMenu(
+      "ParameterMenu", menu_ids, units, variables, std_variables, xml, locales);
+  auto observe_menu = decodeOptionalMenu("ObservationMenu",
+      menu_ids,
+      units,
+      variables,
+      std_variables,
+      xml,
+      locales);
+  auto diag_menu = decodeOptionalMenu(
+      "DiagnosisMenu", menu_ids, units, variables, std_variables, xml, locales);
+
+  return make_shared<UserInterface>(
+      role, ident_menu, param_menu, observe_menu, diag_menu);
+}
+
+unordered_map<UserRole, UserInterfacePtr> decodeUI(
+    const Repository::UnitsMapPtr& units,
+    const Repository::VariablesMapPtr& variables,
+    const Repository::VariablesMapPtr& std_variables,
+    const xml_node& xml,
+    const xml_node& locales) {
+  unordered_map<UserRole, UserInterfacePtr> result;
+
+  auto menus_xml = xml.child("MenuCollection");
+
+  auto observer_menu_ids = decodeMenuIDs(xml.child("ObserverRoleMenuSet"));
+  result.emplace(UserRole::ObservationRole,
+      decodeRoleUI(UserRole::ObservationRole,
+          observer_menu_ids,
+          units,
+          variables,
+          std_variables,
+          menus_xml,
+          locales));
+
+  auto maintainence_menu_ids =
+      decodeMenuIDs(xml.child("MaintenanceRoleMenuSet"));
+  result.emplace(UserRole::MaintenanceRole,
+      decodeRoleUI(UserRole::MaintenanceRole,
+          maintainence_menu_ids,
+          units,
+          variables,
+          std_variables,
+          menus_xml,
+          locales));
+
+  auto specialist_menu_ids = decodeMenuIDs(xml.child("SpecialistRoleMenuSet"));
+  result.emplace(UserRole::SpecialistRole,
+      decodeRoleUI(UserRole::SpecialistRole,
+          specialist_menu_ids,
+          units,
+          variables,
+          std_variables,
+          menus_xml,
+          locales));
+
+  return result;
+}
+
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
 DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
@@ -616,12 +914,15 @@ DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
   auto identity = decodeIdentity(profile_xml, locales_xml);
   auto function_xml = device_xml.child("DeviceFunction");
   auto variables_xml = function_xml.child("VariableCollection");
-  auto variables = decodeStdVariableRef(
+  auto variables = decodeStdVariables(
       variables_xml, locales_xml, std_datatypes, std_variables);
   variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
+  auto variables_map = make_shared<Repository::VariablesMap>(variables);
+  auto ui_xml = xml.child("UserInterface");
+  auto uis = decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
 
   return make_shared<DeviceDescriptor>(
-      move(identity), units, std_variables, move(variables));
+      move(identity), units, std_variables, move(variables_map), move(uis));
 }
 
 Repository::DescriptorsMap decodeDescriptors(
