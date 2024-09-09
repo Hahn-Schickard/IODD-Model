@@ -14,8 +14,8 @@ struct TextID {
           "Failed to create TextID. ID argument can not be empty");
     }
     if (locale_.empty()) {
-      throw std::invalid_argument(
-          "Failed to create TextID. locale argument can not be empty");
+      throw std::invalid_argument("Failed to create TextID " + id_ +
+          ". Locale argument can not be empty");
     }
   }
 
