@@ -490,14 +490,35 @@ VariablesMap decodeVariables(const xml_node& xml,
 
 pair<Repository::DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
     const filesystem::path& path) {
-  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
+  auto doc = getXML(path);
+
+  auto xml = doc.child("IODDStandardDefinitions");
+  if (xml.empty()) {
+    throw runtime_error(
+        path.string() + " does not contain IODDStandardDefinitions structure");
+  }
+
   auto locales_xml =
       xml.child("ExternalTextCollection").child("PrimaryLanguage");
+  if (locales_xml.empty()) {
+    throw runtime_error(path.string() +
+        " does not contain ExternalTextCollection PrimaryLanguage structure");
+  }
 
-  auto datatypes =
-      decodeDatatypes(xml.child("DatatypeCollection"), locales_xml);
+  auto datatype_collection_xml = xml.child("DatatypeCollection");
+  if (datatype_collection_xml.empty()) {
+    throw runtime_error(
+        path.string() + " does not contain DatatypeCollection structure");
+  }
+  auto datatypes = decodeDatatypes(datatype_collection_xml, locales_xml);
+
+  auto variable_collection_xml = xml.child("VariableCollection");
+  if (variable_collection_xml.empty()) {
+    throw runtime_error(
+        path.string() + " does not contain VariableCollection structure");
+  }
   auto variables =
-      decodeVariables(xml.child("VariableCollection"), locales_xml, datatypes);
+      decodeVariables(variable_collection_xml, locales_xml, datatypes);
 
   return make_pair(make_shared<Repository::DatatypesMap>(datatypes),
       make_shared<VariablesMap>(variables));
