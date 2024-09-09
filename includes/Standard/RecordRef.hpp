@@ -10,9 +10,7 @@ struct RecordRef : public VariableRef {
       ButtonValue value,
       const std::optional<TextID>& description,
       const std::optional<TextID>& action_started_msg,
-      uint8_t subindex)
-      : VariableRef(variable, value, description, action_started_msg),
-        subindex_(subindex) {}
+      uint8_t subindex);
 
   RecordRef(const VariablePtr& variable,
       std::optional<float> gradient,
@@ -20,15 +18,11 @@ struct RecordRef : public VariableRef {
       UnitPtr unit,
       DisplayFormat format,
       std::optional<AccessRights> access,
-      uint8_t subindex)
-      : VariableRef(variable, gradient, offset, unit, format, access),
-        subindex_(subindex) {}
+      uint8_t subindex);
 
-  uint8_t subindex() const { return subindex_; }
+  uint8_t subindex() const;
 
-  const NamedAttributePtr valueName(const SimpleDatatypeValue& value) const {
-    return variable_->valueName(value, subindex_);
-  }
+  NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
 private:
   uint8_t subindex_;
