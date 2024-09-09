@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -13,16 +14,15 @@ namespace IODD {
 struct Unit : public NamedAttribute {
   Unit() = default;
 
-  Unit(uint16_t code, const std::string& abbr) : code_(code), abbr_(abbr) {}
+  Unit(uint16_t code, const std::string& abbr);
 
-  Unit(uint16_t code, const std::string& abbr, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), code_(code), abbr_(abbr) {}
+  Unit(uint16_t code, const std::string& abbr, std::optional<TextID>&& name);
 
-  size_t hash() const noexcept { return std::hash<uint16_t>{}(code_); }
+  size_t hash() const noexcept;
 
-  uint16_t code() const { return code_; }
+  uint16_t code() const;
 
-  std::string abbr() const { return abbr_; }
+  std::string abbr() const;
 
 private:
   uint16_t code_;
@@ -33,35 +33,21 @@ using UnitPtr = std::shared_ptr<Unit>;
 using UnitsMap = std::unordered_map<uint16_t, UnitPtr>;
 using UnitsMapPtr = std::shared_ptr<UnitsMap>;
 
-inline bool operator==(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() == rhs.code();
-}
+bool operator==(const Unit& lhs, const Unit& rhs);
 
-inline bool operator!=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() != rhs.code();
-}
+bool operator!=(const Unit& lhs, const Unit& rhs);
 
-inline bool operator<=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() <= rhs.code();
-}
+bool operator<=(const Unit& lhs, const Unit& rhs);
 
-inline bool operator>=(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() >= rhs.code();
-}
+bool operator>=(const Unit& lhs, const Unit& rhs);
 
-inline bool operator<(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() < rhs.code();
-}
+bool operator<(const Unit& lhs, const Unit& rhs);
 
-inline bool operator>(const Unit& lhs, const Unit& rhs) {
-  return lhs.code() > rhs.code();
-}
+bool operator>(const Unit& lhs, const Unit& rhs);
 
 } // namespace IODD
 
 template <> struct std::hash<IODD::Unit> {
-  std::size_t operator()(const IODD::Unit& object) const noexcept {
-    return object.hash();
-  }
+  std::size_t operator()(const IODD::Unit& object) const noexcept;
 };
 #endif //__IODD_STANDARD_DEFINES_UNIT_HPP
