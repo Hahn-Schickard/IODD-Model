@@ -12,22 +12,19 @@
 namespace IODD {
 
 struct Condition {
-  Condition(const VariablePtr& variable, uint8_t value)
-      : variable_(variable), value_(value) {}
+  Condition(const VariablePtr& variable, uint8_t value);
 
-  Condition(const VariablePtr& variable, uint8_t subindex, uint8_t value)
-      : variable_(variable), subindex_(subindex), value_(value) {}
+  Condition(const VariablePtr& variable, uint8_t subindex, uint8_t value);
 
   Condition(const VariablePtr& variable,
       std::optional<uint8_t> subindex,
-      uint8_t value)
-      : variable_(variable), subindex_(subindex), value_(value) {}
+      uint8_t value);
 
-  VariablePtr variable() { return variable_; }
+  VariablePtr variable() const;
 
-  std::optional<uint8_t> subindex() { return subindex_; }
+  std::optional<uint8_t> subindex() const;
 
-  uint8_t value() { return value_; }
+  uint8_t value() const;
 
 private:
   VariablePtr variable_;
@@ -41,8 +38,7 @@ struct Menu {
   Menu(const std::string& _id,
       const std::vector<Ref>& _references,
       const std::optional<TextID>& _name = std::nullopt,
-      const std::optional<Condition> _condition = std::nullopt)
-      : id(_id), references(_references), name(_name), condition(_condition) {}
+      const std::optional<Condition> _condition = std::nullopt);
 
   const std::string id;
   const std::vector<Ref> references;
