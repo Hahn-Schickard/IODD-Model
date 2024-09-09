@@ -10,11 +10,11 @@ DeviceIdentity::DeviceIdentity(uint16_t vendor_id,
     const TextID& device_name)
     : vendor_id_(vendor_id), vendor_name_(vendor_name), device_id_(device_id),
       device_name_(device_name) {
-  if (vendor_id_ != 0) {
+  if (vendor_id_ == 0) {
     throw invalid_argument(
         "Failed to create DeviceIdentity. Vendor ID can not be empty");
   }
-  if (device_id_ != 0) {
+  if (device_id_ == 0) {
     throw invalid_argument(
         "Failed to create DeviceIdentity. Device ID can not be empty");
   }
