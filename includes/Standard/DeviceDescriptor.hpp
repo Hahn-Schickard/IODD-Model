@@ -1,9 +1,9 @@
 #ifndef __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 #define __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 
-#include "Standard/Unit.hpp"
-#include "Standard/UserInterface.hpp"
-#include "Standard/Variable.hpp"
+#include "Unit.hpp"
+#include "UserInterface.hpp"
+#include "Variable.hpp"
 
 namespace IODD {
 

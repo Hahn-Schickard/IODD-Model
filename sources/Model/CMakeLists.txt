@@ -7,7 +7,7 @@ set(THIS Model)
 set(MODULE ${PROJECT_NAME}_${THIS})
 
 list(APPEND THIS_INCLUDES_DIRS
-            ${INCLUDES_DIR}
+            ${INCLUDES_DIR}/Standard
 )
 
 file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
@@ -32,6 +32,7 @@ target_link_libraries(${MODULE}
 
 target_include_directories(${MODULE} INTERFACE
                            $<BUILD_INTERFACE:${INCLUDES_DIR}>
+                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Standard>
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
 )

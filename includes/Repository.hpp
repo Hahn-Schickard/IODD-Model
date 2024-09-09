@@ -1,7 +1,7 @@
 #ifndef __IODD_DESCRIPTOR_REPOSITORY_HPP
 #define __IODD_DESCRIPTOR_REPOSITORY_HPP
 
-#include "DeviceDescriptor.hpp"
+#include "Standard/DeviceDescriptor.hpp"
 
 #include <string>
 #include <unordered_map>
