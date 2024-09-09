@@ -7,9 +7,6 @@
 
 namespace IODD {
 
-std::string makeDeviceIdentity(
-    const std::string& vendor_id, const std::string& device_id);
-
 struct DeviceIdentity {
   DeviceIdentity(uint16_t vendor_id,
       const std::string& vendor_name,

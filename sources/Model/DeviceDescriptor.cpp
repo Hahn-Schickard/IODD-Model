@@ -4,18 +4,6 @@ using namespace std;
 
 namespace IODD {
 
-string makeDeviceIdentity(const string& vendor_id, const string& device_id) {
-  if (vendor_id.empty()) {
-    throw invalid_argument(
-        "Failed to create DeviceIDentity string. Vendor ID can not be empty");
-  }
-  if (device_id.empty()) {
-    throw invalid_argument(
-        "Failed to create DeviceIDentity string. Device ID can not be empty");
-  }
-  return vendor_id + "-" + device_id;
-}
-
 DeviceIdentity::DeviceIdentity(uint16_t vendor_id,
     const string& vendor_name,
     uint32_t device_id,
