@@ -63,8 +63,8 @@ AccessRights Variable::access() const { return access_; }
 
 DataValue Variable::value() const { return value_; }
 
-NamedAttributePtr Variable::valueName(const SimpleDatatypeValue& value,
-    optional<uint8_t> subindex = nullopt) const {
+NamedAttributePtr Variable::valueName(
+    const SimpleDatatypeValue& value, optional<uint8_t> subindex) const {
   // use raw pointer to avoid shared_ptr memory leak in lambda capture
   NamedAttribute* result = nullptr;
   match(

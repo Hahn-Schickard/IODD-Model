@@ -83,7 +83,7 @@ struct Variable {
   DataValue value() const;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value,
-      std::optional<uint8_t> subindex = std::nullopt);
+      std::optional<uint8_t> subindex = std::nullopt) const;
 
   Datatype type() const;
 
