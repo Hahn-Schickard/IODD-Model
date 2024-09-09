@@ -8,54 +8,6 @@ namespace IODD {
 using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
     std::variant<bool, uint64_t, int64_t, float, std::string>;
 
-template <typename T>
-T getSimpleDatatypeValue(const SimpleDatatypeValue& variant) {
-  if (auto* value = std::get_if<T>(&variant)) {
-    return *value;
-  } else {
-    throw std::invalid_argument(
-        "Simple value variant does not hold the requested type");
-  }
-}
-
-template <typename T>
-NamedAttributePtr getValueName(T value_type, const SimpleDatatypeValue& value) {
-  throw std::runtime_error(
-      "Given value type does not support named value attribute");
-}
-
-template <>
-NamedAttributePtr getValueName<BooleanT>(
-    BooleanT value_type, const SimpleDatatypeValue& value);
-
-template <>
-NamedAttributePtr getValueName<UIntegerT>(
-    UIntegerT value_type, const SimpleDatatypeValue& value);
-
-template <>
-NamedAttributePtr getValueName<IntegerT>(
-    IntegerT value_type, const SimpleDatatypeValue& value);
-
-template <>
-NamedAttributePtr getValueName<FloatT>(
-    FloatT value_type, const SimpleDatatypeValue& value);
-
-template <typename T>
-NamedAttributePtr getValueName(RecordT<T> record,
-    std::optional<uint8_t> subindex,
-    const SimpleDatatypeValue& value) {
-  if (record.subindexAccess()) {
-    if (subindex.has_value()) {
-      auto item = record.item(subindex.value());
-      return getValueName<T>(item.value(), value);
-    } else {
-      throw std::invalid_argument("No subindex provided for record access");
-    }
-  } else {
-    throw std::logic_error("Given record does not support subindex access");
-  }
-}
-
 struct Variable {
   Variable() = default;
 
