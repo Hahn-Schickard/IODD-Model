@@ -907,17 +907,43 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
   auto xml = getXML(doc);
 
   auto device_xml = xml.child("IODevice");
+  if (device_xml.empty()) {
+    throw runtime_error(doc.string() + " does not contain IODevice structure");
+  }
+
   auto locales_xml =
       device_xml.child("ExternalTextCollection").child("PrimaryLanguage");
+  if (locales_xml.empty()) {
+    throw runtime_error(doc.string() +
+        " does not contain ExternalTextCollection PrimaryLanguage structure");
+  }
+
   auto profile_xml = device_xml.child("ProfileBody");
   auto identity = decodeIdentity(profile_xml, locales_xml);
-  auto function_xml = device_xml.child("DeviceFunction");
+
+  auto function_xml = profile_xml.child("DeviceFunction");
+  if (function_xml.empty()) {
+    throw runtime_error(
+        doc.string() + " does not contain DeviceFunction structure");
+  }
+
   auto variables_xml = function_xml.child("VariableCollection");
+  if (variables_xml.empty()) {
+    throw runtime_error(
+        doc.string() + " does not contain VariableCollection structure");
+  }
+
   auto variables = decodeStdVariables(
       variables_xml, locales_xml, std_datatypes, std_variables);
   variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
   auto variables_map = make_shared<VariablesMap>(variables);
-  auto ui_xml = xml.child("UserInterface");
+
+  auto ui_xml = function_xml.child("UserInterface");
+  if (ui_xml.empty()) {
+    throw runtime_error(
+        doc.string() + " does not contain UserInterface structure");
+  }
+
   auto uis = decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
 
   return make_shared<DeviceDescriptor>(
