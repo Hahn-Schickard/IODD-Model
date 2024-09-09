@@ -7,51 +7,24 @@
 
 namespace IODD {
 
-inline std::string makeDeviceIdentity(
-    const std::string& vendor_id, const std::string& device_id) {
-  if (vendor_id.empty()) {
-    throw std::invalid_argument(
-        "Failed to create DeviceIDentity string. Vendor ID can not be empty");
-  }
-  if (device_id.empty()) {
-    throw std::invalid_argument(
-        "Failed to create DeviceIDentity string. Device ID can not be empty");
-  }
-  return vendor_id + "-" + device_id;
-}
+std::string makeDeviceIdentity(
+    const std::string& vendor_id, const std::string& device_id);
 
 struct DeviceIdentity {
   DeviceIdentity(uint16_t vendor_id,
       const std::string& vendor_name,
       uint32_t device_id,
-      const TextID& device_name)
-      : vendor_id_(vendor_id), vendor_name_(vendor_name), device_id_(device_id),
-        device_name_(device_name) {
-    if (vendor_id_ != 0) {
-      throw std::invalid_argument(
-          "Failed to create DeviceIdentity. Vendor ID can not be empty");
-    }
-    if (device_id_ != 0) {
-      throw std::invalid_argument(
-          "Failed to create DeviceIdentity. Device ID can not be empty");
-    }
-    if (!device_name_) {
-      throw std::invalid_argument(
-          "Failed to create DeviceIdentity. Device name can not be empty");
-    }
-  }
+      const TextID& device_name);
 
-  std::string getIdentifier() const {
-    return std::to_string(vendor_id_) + "-" + std::to_string(device_id_);
-  }
+  std::string getIdentifier() const;
 
-  uint16_t getVendorId() const { return vendor_id_; }
+  uint16_t getVendorId() const;
 
-  std::string getVendorName() const { return vendor_name_; }
+  std::string getVendorName() const;
 
-  uint32_t getDeviceId() const { return device_id_; }
+  uint32_t getDeviceId() const;
 
-  TextID getDeviceName() const { return device_name_; }
+  TextID getDeviceName() const;
 
 private:
   uint16_t vendor_id_;
@@ -70,70 +43,27 @@ struct DeviceDescriptor : public DeviceIdentity {
       const UnitsMapPtr& units,
       const VariablesMapPtr& std_variables,
       VariablesMapPtr&& variables,
-      UserInterfaces&& interfaces)
-      : DeviceDescriptor(
-            DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
-            units,
-            std_variables,
-            std::move(variables),
-            std::move(interfaces)) {}
+      UserInterfaces&& interfaces);
 
   DeviceDescriptor(DeviceIdentity&& identity,
       const UnitsMapPtr units,
       const VariablesMapPtr& std_variables,
       VariablesMapPtr&& variables,
-      UserInterfaces&& interfaces)
-      : DeviceIdentity(std::move(identity)), units_(units),
-        std_variables_(std_variables), variables_(std::move(variables)),
-        interfaces_(std::move(interfaces)) {
-    if (units_->empty()) {
-      throw std::invalid_argument(
-          "Failed to create DeviceDescriptor. Units can not be empty");
-    }
-    if (std_variables_->empty()) {
-      throw std::invalid_argument("Failed to create DeviceDescriptor. Standard "
-                                  "Variables can not be empty");
-    }
-    if (variables_->empty()) {
-      throw std::invalid_argument(
-          "Failed to create DeviceDescriptor. Variables can not be empty");
-    }
-    if (interfaces_.empty()) {
-      throw std::invalid_argument(
-          "Failed to create DeviceDescriptor. UserInterfaces can not be empty");
-    }
-  }
+      UserInterfaces&& interfaces);
 
-  VariablePtr getVariable(const std::string& id) const {
-    if (auto iter = variables_->find(id); iter != variables_->end()) {
-      return iter->second;
-    } else if (auto iter = std_variables_->find(id);
-               iter != std_variables_->end()) {
-      return iter->second;
-    }
-    throw std::out_of_range("Variable with id " + id + " does not exists");
-  }
+  VariablePtr getVariable(const std::string& id) const;
 
   NamedAttributePtr getVariableValueName(const std::string& id,
       const SimpleDatatypeValue& value,
-      std::optional<uint8_t> subindex = std::nullopt) const {
-    auto variable = getVariable(id);
-    return variable->valueName(value, subindex);
-  }
+      std::optional<uint8_t> subindex = std::nullopt) const;
 
-  UserInterfaces getUIs() { return interfaces_; }
+  UserInterfaces getUIs() const;
 
-  UserInterfacePtr getObserverUI() {
-    return interfaces_.at(UserRole::ObservationRole);
-  }
+  UserInterfacePtr getObserverUI() const;
 
-  UserInterfacePtr getMaintainenceUI() {
-    return interfaces_.at(UserRole::MaintenanceRole);
-  }
+  UserInterfacePtr getMaintainenceUI() const;
 
-  UserInterfacePtr getSpecialistUI() {
-    return interfaces_.at(UserRole::SpecialistRole);
-  }
+  UserInterfacePtr getSpecialistUI() const;
 
 private:
   UnitsMapPtr units_;
