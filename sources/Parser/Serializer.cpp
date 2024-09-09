@@ -903,7 +903,9 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
 DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
     const VariablesMapPtr& std_variables,
-    const xml_document& xml) {
+    const filesystem::path& doc) {
+  auto xml = getXML(doc);
+
   auto device_xml = xml.child("IODevice");
   auto locales_xml =
       device_xml.child("ExternalTextCollection").child("PrimaryLanguage");
@@ -929,9 +931,8 @@ Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
 
   for (const auto& entry : filesystem::directory_iterator(path)) {
     if (entry.path().extension() == ".xml") {
-      xml_document descriptor_xml = getXML(entry.path());
       auto descriptor =
-          decode(units, variables.first, variables.second, descriptor_xml);
+          decode(units, variables.first, variables.second, entry.path());
       descriptors.emplace(descriptor->getIdentifier(), move(descriptor));
     }
   }
