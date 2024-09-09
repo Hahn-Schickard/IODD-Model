@@ -946,9 +946,9 @@ Repository deserializeModel(const string& config_directory_path) {
   }
 
   auto std_units_map =
-      decodeUnits(config_dir / "IODD-StandardUnitDefinitions1.1.1.xml");
+      decodeUnits(config_dir / "IODD-StandardUnitDefinitions.xml");
   auto std_variables_map =
-      decodeStdDefinitions(config_dir / "IODD-StandardDefinitions1.1.xml");
+      decodeStdDefinitions(config_dir / "IODD-StandardDefinitions.xml");
   auto descriptors = decodeDescriptors(
       std_units_map, std_variables_map, config_dir / "descriptors");
   return Repository(
