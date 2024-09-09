@@ -30,17 +30,11 @@ enum class DisplayFormat : uint8_t {
   Dec9 = 9 /*!< Decimal notation with 9 digits after the decimal point */
 };
 
-inline bool isDecimal(DisplayFormat format) {
-  return static_cast<uint8_t>(format) < 10;
-}
+bool isDecimal(DisplayFormat format);
 
-inline bool isBinary(DisplayFormat format) {
-  return format == DisplayFormat::Bin;
-}
+bool isBinary(DisplayFormat format);
 
-inline bool isHexadecimal(DisplayFormat format) {
-  return format == DisplayFormat::Hex;
-}
+bool isHexadecimal(DisplayFormat format);
 
 struct VariableRef {
   using Value = std::variant<bool,
@@ -53,177 +47,41 @@ struct VariableRef {
 
   VariableRef(const VariablePtr& variable,
       ButtonValue value,
-      std::optional<TextID> description,
-      std::optional<TextID> action_started_msg)
-      : variable_(variable), button_(true), value_(value), desc_(description),
-        action_msg_(action_started_msg) {
-    if (variable_->type() != Datatype::Boolean ||
-        variable_->type() != Datatype::UInteger ||
-        variable_->type() != Datatype::Integer) {
-      throw std::invalid_argument(
-          "Buttons must use BooleanT, UIntegerT or IntegerT variables");
-    }
-    if (variable_->type() != buttonValueToDatatype()) {
-      throw std::invalid_argument(
-          "Button variable type must match button value type");
-    }
-  }
+      const std::optional<TextID>& description,
+      const std::optional<TextID>& action_started_msg);
 
   VariableRef(const VariablePtr& variable,
-      std::optional<float> gradient,
-      std::optional<float> offset,
-      UnitPtr unit,
+      const std::optional<float>& gradient,
+      const std::optional<float>& offset,
+      const UnitPtr& unit,
       DisplayFormat format,
-      std::optional<AccessRights> access)
-      : variable_(variable), unit_(unit), format_(format) {
-    if (gradient.has_value()) {
-      gradient_ = gradient.value();
-    }
-    if (offset.has_value()) {
-      offset_ = offset.value();
-    }
-    if (access.has_value()) {
-      access_ = access.value();
-    }
-  }
+      const std::optional<AccessRights>& access);
 
-  Value value(const Value& value) const {
-    checkValueType(value);
-    if (isDecimal(format_)) {
-      if (isNumericData(variable_->type())) {
-        return decodeNumeric(value);
-      }
-      // TODO: add Record[subindex] decoding
-    }
-    // value does not need to be decoded, return it as is
-    return value;
-  }
+  Value value(const Value& value) const;
 
-  const NamedAttributePtr valueName(const SimpleDatatypeValue& value) const {
-    return variable_->valueName(value);
-  }
+  NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
-  DisplayFormat displayFormat() const { return format_; }
+  DisplayFormat displayFormat() const;
 
-  AccessRights accessRestriction() const { return access_; }
+  AccessRights accessRestriction() const;
 
-  const UnitPtr unit() const { return unit_; }
+  UnitPtr unit() const;
 
-  const VariablePtr variable() const { return variable_; }
+  VariablePtr variable() const;
 
-  bool isButton() const { return button_; }
+  bool isButton() const;
 
-  ButtonValue value() const { return value_; }
+  ButtonValue buttonValue() const;
 
-  std::optional<TextID> description() const { return desc_; }
+  std::optional<TextID> description() const;
 
-  std::optional<TextID> actionMessage() const { return action_msg_; }
-
-private:
-  float decodeNumeric(const Value& value) const {
-    float f_value;
-    match(
-        value,
-        [](bool) {
-          throw std::logic_error(
-              "Decoded result can not be represented as boolean");
-        },
-        [](const std::string&) {
-          throw std::logic_error(
-              "Decoded result can not be represented as string");
-        },
-        [](const std::vector<uint8_t>&) {
-          throw std::logic_error(
-              "Decoded result can not be represented as a byte array");
-        },
-        [&f_value](uint64_t number) { f_value = number; },
-        [&f_value](int64_t number) { f_value = number; },
-        [&f_value](float number) { f_value = number; });
-    return (f_value * gradient_) + offset_;
-  }
-
-  void checkValueType(const Value& value) const {
-    switch (variable_->type()) {
-    case Datatype::Boolean: {
-      if (!std::holds_alternative<bool>(value)) {
-        throw std::invalid_argument(
-            "Non bool value type passed to Boolean variable decoder");
-      }
-      break;
-    }
-    case Datatype::UInteger: {
-      if (!std::holds_alternative<uint64_t>(value)) {
-        throw std::invalid_argument(
-            "Non unsigned int value type passed to UInteger variable decoder");
-      }
-    }
-    case Datatype::Integer: {
-      if (!std::holds_alternative<int64_t>(value)) {
-        throw std::invalid_argument(
-            "Non int value type passed to Integer variable decoder");
-      }
-      break;
-    }
-    case Datatype::Float32: {
-      if (!std::holds_alternative<float>(value)) {
-        throw std::invalid_argument(
-            "Non float value type passed to Float32 variable decoder");
-      }
-      break;
-    }
-    case Datatype::String: {
-      [[fallthrough]];
-    }
-    case Datatype::OctetString: {
-      [[fallthrough]];
-    }
-    case Datatype::Time: {
-      [[fallthrough]];
-    }
-    case Datatype::TimeSpan: {
-      if (!std::holds_alternative<std::string>(value)) {
-        throw std::invalid_argument("Non string value type passed to " +
-            toString(variable_->type()) + " variable decoder");
-      }
-      break;
-    }
-    case Datatype::Array: {
-      [[fallthrough]];
-    }
-    case Datatype::Record: {
-      if (!std::holds_alternative<std::vector<uint8_t>>(value)) {
-        throw std::invalid_argument("Non byte vector value type passed to " +
-            toString(variable_->type()) + " variable decoder");
-      }
-      break;
-    }
-    case Datatype::ProcessDataIn: {
-      [[fallthrough]];
-    }
-    case Datatype::ProcessDataOut: {
-      // can be any type?
-      break;
-    }
-    }
-  }
-
-  Datatype buttonValueToDatatype() {
-    Datatype result;
-    match(
-        value_,
-        [&result](bool) { result = Datatype::Boolean; },
-        [&result](uint64_t) { result = Datatype::UInteger; },
-        [&result](int64_t) { result = Datatype::Integer; });
-    return result;
-  }
+  std::optional<TextID> actionMessage() const;
 
 protected:
   VariablePtr variable_;
 
 private:
-  bool button_ = false;
-  // used only if button_ is true
-  ButtonValue value_;
+  std::optional<ButtonValue> value_ = std::nullopt;
   std::optional<TextID> desc_ = std::nullopt;
   std::optional<TextID> action_msg_ = std::nullopt;
 

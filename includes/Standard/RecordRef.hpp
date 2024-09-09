@@ -8,8 +8,8 @@ namespace IODD {
 struct RecordRef : public VariableRef {
   RecordRef(const VariablePtr& variable,
       ButtonValue value,
-      std::optional<TextID> description,
-      std::optional<TextID> action_started_msg,
+      const std::optional<TextID>& description,
+      const std::optional<TextID>& action_started_msg,
       uint8_t subindex)
       : VariableRef(variable, value, description, action_started_msg),
         subindex_(subindex) {}
