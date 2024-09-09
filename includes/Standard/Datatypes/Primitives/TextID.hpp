@@ -25,7 +25,7 @@ struct TextID {
 
   size_t hash() const noexcept { return std::hash<std::string>{}(id_); }
 
-  explicit operator bool() const { return !id_.empty() && locale_.empty(); }
+  explicit operator bool() const { return !id_.empty() && !locale_.empty(); }
 
 private:
   std::string id_;
