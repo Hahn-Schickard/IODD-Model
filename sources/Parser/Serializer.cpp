@@ -507,9 +507,10 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   if (auto identity_xml = node.child("DeviceIdentity"); !identity_xml.empty()) {
     auto vendor_id = identity_xml.attribute("vendorId").as_uint();
     string vendor_name = identity_xml.attribute("vendorName").as_string();
-    auto device_id = identity_xml.attribute("vendorId").as_uint();
-    auto device_name = decodeLocalization(
-        locales, node.child("DeviceName").attribute("textId").as_string());
+    auto device_id = identity_xml.attribute("deviceId").as_uint();
+    string device_name_attribute =
+        identity_xml.child("DeviceName").attribute("textId").as_string();
+    auto device_name = decodeLocalization(locales, device_name_attribute);
     return DeviceIdentity(vendor_id, vendor_name, device_id, device_name);
   } else {
     throw runtime_error(
