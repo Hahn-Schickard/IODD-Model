@@ -25,28 +25,20 @@ NamedAttributePtr getValueName(T value_type, const SimpleDatatypeValue& value) {
 }
 
 template <>
-inline NamedAttributePtr getValueName<BooleanT>(
-    BooleanT value_type, const SimpleDatatypeValue& value) {
-  return value_type.getName(getSimpleDatatypeValue<bool>(value));
-}
+NamedAttributePtr getValueName<BooleanT>(
+    BooleanT value_type, const SimpleDatatypeValue& value);
 
 template <>
-inline NamedAttributePtr getValueName<UIntegerT>(
-    UIntegerT value_type, const SimpleDatatypeValue& value) {
-  return value_type.getName(getSimpleDatatypeValue<uint64_t>(value));
-}
+NamedAttributePtr getValueName<UIntegerT>(
+    UIntegerT value_type, const SimpleDatatypeValue& value);
 
 template <>
-inline NamedAttributePtr getValueName<IntegerT>(
-    IntegerT value_type, const SimpleDatatypeValue& value) {
-  return value_type.getName(getSimpleDatatypeValue<int64_t>(value));
-}
+NamedAttributePtr getValueName<IntegerT>(
+    IntegerT value_type, const SimpleDatatypeValue& value);
 
 template <>
-inline NamedAttributePtr getValueName<FloatT>(
-    FloatT value_type, const SimpleDatatypeValue& value) {
-  return value_type.getName(getSimpleDatatypeValue<float>(value));
-}
+NamedAttributePtr getValueName<FloatT>(
+    FloatT value_type, const SimpleDatatypeValue& value);
 
 template <typename T>
 NamedAttributePtr getValueName(RecordT<T> record,
@@ -75,109 +67,35 @@ struct Variable {
       std::optional<SimpleDatatypeValue> default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
-      bool excluded = false)
-      : index_(index), name_(std::move(name)), access_(access),
-        value_(std::move(value)), desc_(std::move(desc)),
-        default_(std::move(default_value)), dynamic_(dynamic),
-        modifies_others_(modifies_others), excluded_(excluded) {}
+      bool excluded = false);
 
   Variable(const Variable& other,
       std::optional<SimpleDatatypeValue> default_value,
       std::optional<bool> excluded,
-      std::optional<DataValue> value)
-      : index_(other.index_), name_(other.name_), access_(other.access_),
-        value_(other.value_), desc_(other.desc_),
-        default_((default_value ? default_value.value() : other.default_)),
-        dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
-        excluded_((excluded ? excluded.value() : other.excluded_)) {
-    if (value.has_value()) {
-      expand(value_, *value);
-    }
-  }
+      std::optional<DataValue> value);
 
-  size_t index() const { return index_; }
+  size_t index() const;
 
-  TextID name() const { return name_; }
+  TextID name() const;
 
-  AccessRights access() const { return access_; }
+  AccessRights access() const;
 
-  DataValue value() const { return value_; }
+  DataValue value() const;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value,
-      std::optional<uint8_t> subindex = std::nullopt) const {
-    // use raw pointer to avoid shared_ptr memory leak in lambda capture
-    NamedAttribute* result = nullptr;
-    match(
-        value_,
-        // Simple Types
-        [&result, &value](const BooleanT& value_type) {
-          auto ptr = std::move(getValueName<BooleanT>(value_type, value));
-          result = ptr.get();
-        },
-        [&result, &value](const UIntegerT& value_type) {
-          auto ptr = std::move(getValueName<UIntegerT>(value_type, value));
-          result = ptr.get();
-        },
-        [&result, &value](const IntegerT& value_type) {
-          auto ptr = std::move(getValueName<IntegerT>(value_type, value));
-          result = ptr.get();
-        },
-        [&result, &value](const FloatT& value_type) {
-          auto ptr = std::move(getValueName<FloatT>(value_type, value));
-          result = ptr.get();
-        },
-        // Record Types
-        [&result, &value, subindex](const RecordT<BooleanT>& value_type) {
-          auto ptr =
-              std::move(getValueName<BooleanT>(value_type, subindex, value));
-          result = ptr.get();
-        },
-        [&result, &value, subindex](const RecordT<UIntegerT>& value_type) {
-          auto ptr =
-              std::move(getValueName<UIntegerT>(value_type, subindex, value));
-          result = ptr.get();
-        },
-        [&result, &value, subindex](const RecordT<IntegerT>& value_type) {
-          auto ptr =
-              std::move(getValueName<IntegerT>(value_type, subindex, value));
-          result = ptr.get();
-        },
-        [&result, &value, subindex](const RecordT<FloatT>& value_type) {
-          auto ptr =
-              std::move(getValueName<FloatT>(value_type, subindex, value));
-          result = ptr.get();
-        },
-        // rest of types
-        [&](auto) {
-          throw std::logic_error(toString(type()) +
-              " does not support named value attribute lookup");
-        });
-    if (result != nullptr) {
-      // TODO: Does this cause seg faults?
-      return std::shared_ptr<NamedAttribute>(result);
-    } else {
-      throw std::runtime_error(
-          "Given simple value does not have a matching name");
-    }
-  }
+      std::optional<uint8_t> subindex = std::nullopt);
 
-  Datatype type() const { return toDatatype(value_); }
+  Datatype type() const;
 
-  SimpleDatatypeValue defaultValue() const {
-    if (default_.has_value()) {
-      return default_.value();
-    } else {
-      throw std::runtime_error(name_.id() + " Variable has no default value");
-    }
-  }
+  SimpleDatatypeValue defaultValue() const;
 
-  std::optional<TextID> description() const { return desc_; }
+  std::optional<TextID> description() const;
 
-  bool dynamic() const { return dynamic_; }
+  bool dynamic() const;
 
-  bool modifiesOthers() const { return modifies_others_; }
+  bool modifiesOthers() const;
 
-  bool excluded() const { return excluded_; }
+  bool excluded() const;
 
 private:
   size_t index_;
