@@ -576,7 +576,7 @@ VariablesMap decodeStdVariables(const xml_node& xml,
   for (auto variable : xml.children("StdVariableRef")) {
     string id = variable.attribute("id").as_string();
     // ignore parameter overlays
-    if (id != "V_DirectParameters_1" || id != "V_DirectParameters_2") {
+    if (id != "V_DirectParameters_1" && id != "V_DirectParameters_2") {
       if (auto std_variable = variables.find(id);
           std_variable != variables.end()) {
         optional<SimpleDatatypeValue> default_value = nullopt;
