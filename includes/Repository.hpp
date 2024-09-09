@@ -8,12 +8,8 @@
 
 namespace IODD {
 struct Repository {
-  using UnitsMap = DeviceDescriptor::UnitsMap;
-  using UnitsMapPtr = DeviceDescriptor::UnitsMapPtr;
   using DatatypesMap = std::unordered_map<std::string, DataValue>;
   using DatatypesMapPtr = std::shared_ptr<DatatypesMap>;
-  using VariablesMap = DeviceDescriptor::VariablesMap;
-  using VariablesMapPtr = DeviceDescriptor::VariablesMapPtr;
   using DescriptorsMap = std::unordered_map<std::string, DeviceDescriptorPtr>;
 
   Repository(UnitsMapPtr&& units,

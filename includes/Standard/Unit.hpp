@@ -3,6 +3,11 @@
 
 #include "Datatypes/Primitives/NamedAttribute.hpp"
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <unordered_map>
+
 namespace IODD {
 
 struct Unit : public NamedAttribute {
@@ -25,6 +30,8 @@ private:
 };
 
 using UnitPtr = std::shared_ptr<Unit>;
+using UnitsMap = std::unordered_map<uint16_t, UnitPtr>;
+using UnitsMapPtr = std::shared_ptr<UnitsMap>;
 
 inline bool operator==(const Unit& lhs, const Unit& rhs) {
   return lhs.code() == rhs.code();

@@ -38,8 +38,8 @@ TextID decodeLocalization(const xml_node& locales, const string& text_id) {
   return TextID(text_id, localization);
 }
 
-Repository::UnitsMapPtr decodeUnits(const filesystem::path& path) {
-  auto result = make_shared<Repository::UnitsMap>();
+UnitsMapPtr decodeUnits(const filesystem::path& path) {
+  auto result = make_shared<UnitsMap>();
   auto xml = getXML(path).child("IODDStandardUnitDefinitions");
   auto units_collection = xml.child("UnitCollection");
   for (auto unit : units_collection.children("Unit")) {
@@ -465,11 +465,11 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
   return datatypes;
 }
 
-Repository::VariablesMap decodeVariables(const xml_node& xml,
+VariablesMap decodeVariables(const xml_node& xml,
     const xml_node& locales,
     const Repository::DatatypesMap& datatypes,
-    const Repository::VariablesMap& std_variables = {}) {
-  Repository::VariablesMap variables = std_variables;
+    const VariablesMap& std_variables = {}) {
+  VariablesMap variables = std_variables;
   for (auto variable : xml.children("Variable")) {
     variables.emplace(variable.attribute("id").as_string(),
         make_shared<Variable>(variable.attribute("index").as_ullong(),
@@ -488,8 +488,8 @@ Repository::VariablesMap decodeVariables(const xml_node& xml,
   return variables;
 }
 
-pair<Repository::DatatypesMapPtr, Repository::VariablesMapPtr>
-decodeStdDefinitions(const filesystem::path& path) {
+pair<Repository::DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
+    const filesystem::path& path) {
   auto xml = getXML(path).child("IODDStandardUnitDefinitions");
   auto locales_xml =
       xml.child("ExternalTextCollection").child("PrimaryLanguage");
@@ -500,7 +500,7 @@ decodeStdDefinitions(const filesystem::path& path) {
       decodeVariables(xml.child("VariableCollection"), locales_xml, datatypes);
 
   return make_pair(make_shared<Repository::DatatypesMap>(datatypes),
-      make_shared<Repository::VariablesMap>(variables));
+      make_shared<VariablesMap>(variables));
 }
 
 DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
@@ -517,8 +517,7 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   }
 }
 
-Repository::VariablesMap operator+=(
-    Repository::VariablesMap lhs, const Repository::VariablesMap& rhs) {
+VariablesMap operator+=(VariablesMap lhs, const VariablesMap& rhs) {
   lhs.insert(rhs.begin(), rhs.end());
   return lhs;
 }
@@ -569,11 +568,11 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
   return nullopt;
 }
 
-Repository::VariablesMap decodeStdVariables(const xml_node& xml,
+VariablesMap decodeStdVariables(const xml_node& xml,
     const xml_node& locales,
     const Repository::DatatypesMapPtr& datatypes,
-    const Repository::VariablesMapPtr& std_variables) {
-  Repository::VariablesMap variables = *std_variables;
+    const VariablesMapPtr& std_variables) {
+  VariablesMap variables = *std_variables;
   for (auto variable : xml.children("StdVariableRef")) {
     string id = variable.attribute("id").as_string();
     // ignore parameter overlays
@@ -618,8 +617,8 @@ unordered_map<string, string> decodeMenuIDs(const xml_node& xml) {
 }
 
 VariablePtr findVariable(const string& id,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables) {
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables) {
   auto it = variables->find(id);
   if (it != variables->end()) {
     return it->second;
@@ -633,7 +632,7 @@ VariablePtr findVariable(const string& id,
   throw out_of_range(id + " variable does not exist");
 }
 
-UnitPtr findUnit(uint16_t id, const Repository::UnitsMapPtr& units) {
+UnitPtr findUnit(uint16_t id, const UnitsMapPtr& units) {
   auto it = units->find(id);
   if (it != units->end()) {
     return it->second;
@@ -649,8 +648,7 @@ optional<float> decodeFloatAttribute(const xml_node& xml, const string& name) {
   return nullopt;
 }
 
-UnitPtr decodeUnitPtr(
-    const Repository::UnitsMapPtr& units, const xml_node& xml) {
+UnitPtr decodeUnitPtr(const UnitsMapPtr& units, const xml_node& xml) {
   auto unit_attribute = xml.attribute("unitCode");
   if (!unit_attribute.empty()) {
     auto unit_id = unit_attribute.as_uint();
@@ -698,9 +696,9 @@ VariableRef::ButtonValue decodeButtonValue(
   }
 }
 
-VariableRefPtr decodeVariableRef(const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
   auto variable = findVariable(
@@ -727,9 +725,9 @@ VariableRefPtr decodeVariableRef(const Repository::UnitsMapPtr& units,
       variable, gradient, offset, unit, format, access);
 }
 
-RecordRefPtr decodeRecordRef(const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
   auto variable = findVariable(
@@ -757,9 +755,9 @@ RecordRefPtr decodeRecordRef(const Repository::UnitsMapPtr& units,
       variable, gradient, offset, unit, format, access, subindex);
 }
 
-MenuPtr decodeMenu(const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+MenuPtr decodeMenu(const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const string& menu_id,
     const xml_node& xml,
     const xml_node& locales,
@@ -815,9 +813,9 @@ MenuPtr decodeMenu(const Repository::UnitsMapPtr& units,
 
 MenuPtr decodeOptionalMenu(const string& menu_name,
     unordered_map<string, string> menu_ids,
-    const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+    const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
   try {
@@ -830,9 +828,9 @@ MenuPtr decodeOptionalMenu(const string& menu_name,
 
 UserInterfacePtr decodeRoleUI(UserRole role,
     unordered_map<string, string> menu_ids,
-    const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+    const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
   auto ident_menu = decodeMenu(units,
@@ -857,10 +855,9 @@ UserInterfacePtr decodeRoleUI(UserRole role,
       role, ident_menu, param_menu, observe_menu, diag_menu);
 }
 
-unordered_map<UserRole, UserInterfacePtr> decodeUI(
-    const Repository::UnitsMapPtr& units,
-    const Repository::VariablesMapPtr& variables,
-    const Repository::VariablesMapPtr& std_variables,
+unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
+    const VariablesMapPtr& variables,
+    const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
   unordered_map<UserRole, UserInterfacePtr> result;
@@ -903,9 +900,9 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(
 
 // NOLINTEND(bugprone-easily-swappable-parameters)
 
-DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
+DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
-    const Repository::VariablesMapPtr& std_variables,
+    const VariablesMapPtr& std_variables,
     const xml_document& xml) {
   auto device_xml = xml.child("IODevice");
   auto locales_xml =
@@ -917,7 +914,7 @@ DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
   auto variables = decodeStdVariables(
       variables_xml, locales_xml, std_datatypes, std_variables);
   variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
-  auto variables_map = make_shared<Repository::VariablesMap>(variables);
+  auto variables_map = make_shared<VariablesMap>(variables);
   auto ui_xml = xml.child("UserInterface");
   auto uis = decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
 
@@ -925,10 +922,8 @@ DeviceDescriptorPtr decode(const Repository::UnitsMapPtr& units,
       move(identity), units, std_variables, move(variables_map), move(uis));
 }
 
-Repository::DescriptorsMap decodeDescriptors(
-    const Repository::UnitsMapPtr& units,
-    const pair<Repository::DatatypesMapPtr, Repository::VariablesMapPtr>&
-        variables,
+Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
+    const pair<Repository::DatatypesMapPtr, VariablesMapPtr>& variables,
     const filesystem::path& path) {
   Repository::DescriptorsMap descriptors;
 
