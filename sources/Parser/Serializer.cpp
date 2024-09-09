@@ -380,8 +380,11 @@ using RecordValue = variant<RecordT<BooleanT>,
 RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locales) {
-  string type_string =
-      node.child("SimpleDatatype").attribute("xsi:type").as_string();
+  string type_string = node.child("Datatype")
+                           .child("RecordItem")
+                           .child("SimpleDatatype")
+                           .attribute("xsi:type")
+                           .as_string();
   auto type = toDatatype(type_string);
   switch (type) {
   case Datatype::Boolean: {
