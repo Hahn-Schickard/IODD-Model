@@ -19,10 +19,19 @@ target_link_libraries(${MODULE}
                       PRIVATE #Private dependencies
                       ${PROJECT_NAME}_Parser
                       PUBLIC  #Public dependencies
+                      ${PROJECT_NAME}_Model
 )
 #@- =========================== END OF USER CONFIGURATION ===============================
 
 target_compile_features(${MODULE} PUBLIC cxx_std_17)
+
+add_custom_command(TARGET ${MODULE} POST_BUILD 
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory
+                        ${PROJECT_SOURCE_DIR}/config
+                        $<TARGET_FILE_DIR:${MODULE}>/config 
+                    COMMENT "Copying configuration files."
+                        VERBATIM
+)
 
 if(WIN32)
     add_custom_command(TARGET ${MODULE} POST_BUILD
