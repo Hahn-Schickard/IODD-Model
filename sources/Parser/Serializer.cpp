@@ -363,7 +363,7 @@ RecordT<T> decodeRecord(const Repository::DatatypesMap& datatypes_map,
     auto record = decodeRecordItem<T>(datatypes_map, node_value, locales);
     records.emplace(record.subindex(), move(record));
   }
-  return RecordT<T>(node.attribute("bitLength").as_llong(),
+  return RecordT<T>(node.child("Datatype").attribute("bitLength").as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true),
       move(records));
 }
