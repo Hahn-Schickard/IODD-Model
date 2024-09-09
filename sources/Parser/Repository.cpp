@@ -44,4 +44,6 @@ DeviceDescriptorPtr Repository::getDescriptor(
         "Local descriptors repository has no " + identity + " descriptor");
   }
 }
+
+size_t Repository::size() const noexcept { return descriptors_.size(); }
 } // namespace IODD
