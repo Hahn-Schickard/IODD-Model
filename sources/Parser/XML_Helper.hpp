@@ -51,3 +51,8 @@ pugi::xml_node getXMLNode(const std::vector<std::string>& nodes,
 // assumes node is not empty
 pugi::xml_attribute getXMLAttribute(
     const std::string& attribute_name, const pugi::xml_node& node);
+
+// assumes parent is not empty
+pugi::xml_attribute getXMLAttribute(const std::string& attribute_name,
+    const std::vector<std::string>& nodes,
+    const pugi::xml_node& parent);

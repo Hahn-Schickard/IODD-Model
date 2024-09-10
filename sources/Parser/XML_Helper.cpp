@@ -8,7 +8,7 @@
 using namespace std;
 using namespace pugi;
 
-xml_document getXML(const std::filesystem::path& path) {
+xml_document getXML(const filesystem::path& path) {
   if (!filesystem::exists(path)) {
     throw runtime_error(path.string() + " does not exists");
   }
@@ -97,4 +97,16 @@ xml_attribute getXMLAttribute(
   } else {
     throw AttributeNotFound(node, attribute_name);
   }
+}
+
+xml_attribute getXMLAttribute(const string& attribute_name,
+    const vector<string>& nodes,
+    const xml_node& parent) {
+  if (attribute_name.empty()) {
+    throw invalid_argument("Could not get XML Node attribute " +
+        string(parent.name()) +
+        " XML node. Attribute name argument can not be empty");
+  }
+  auto node = getXMLNode(nodes, parent);
+  return getXMLAttribute(attribute_name, node);
 }
