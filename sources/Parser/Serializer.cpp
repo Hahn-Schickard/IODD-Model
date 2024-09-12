@@ -260,7 +260,7 @@ ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
     const xml_node& locale) {
   vector<T> values;
 
-  if (!node.child("SimpleDatatype").empty()) {
+  if (!node.child("Datatype").child("SimpleDatatype").empty()) {
     for (auto node_value : node.children("SimpleDatatype")) {
       values.push_back(decodeSimpleDataValue<T>(node_value, locale));
     }
