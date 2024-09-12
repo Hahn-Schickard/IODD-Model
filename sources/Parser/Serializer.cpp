@@ -503,8 +503,8 @@ VariablesMap decodeVariables(const xml_node& xml,
       string id = getXMLAttribute("id", variable).as_string();
       auto index = getXMLAttribute("index", variable).as_ullong();
       try {
-        auto type_attribute =
-            getXMLAttribute("xsi:type", getXMLNode("Datatype", variable));
+        auto type_node = getXMLNode("Datatype", variable);
+        auto type_attribute = getXMLAttribute("xsi:type", type_node);
 
         variables.emplace(id,
             make_shared<Variable>(index,
@@ -921,7 +921,7 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
     const xml_node& locales) {
   unordered_map<UserRole, UserInterfacePtr> result;
 
-  auto menus_xml = ("MenuCollection", xml);
+  auto menus_xml = getXMLNode("MenuCollection", xml);
 
   auto observer_menu_ids =
       decodeMenuIDs(getXMLNode("ObserverRoleMenuSet", xml));
