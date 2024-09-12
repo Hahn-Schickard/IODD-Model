@@ -556,21 +556,26 @@ VariablesMap decodeVariables(const xml_node& xml,
 
 pair<Repository::DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
     const filesystem::path& path) {
-  auto doc = getXML(path);
+  try {
+    auto doc = getXML(path);
 
-  auto xml = getXMLNode("IODDStandardDefinitions", doc, path);
-  auto locales_xml = getXMLNode(
-      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
+    auto xml = getXMLNode("IODDStandardDefinitions", doc, path);
+    auto locales_xml = getXMLNode(
+        vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
 
-  auto datatype_collection_xml = getXMLNode("DatatypeCollection", xml, path);
-  auto datatypes = decodeDatatypes(datatype_collection_xml, locales_xml);
+    auto datatype_collection_xml = getXMLNode("DatatypeCollection", xml, path);
+    auto datatypes = decodeDatatypes(datatype_collection_xml, locales_xml);
 
-  auto variable_collection_xml = getXMLNode("VariableCollection", xml, path);
-  auto variables =
-      decodeVariables(variable_collection_xml, locales_xml, datatypes);
+    auto variable_collection_xml = getXMLNode("VariableCollection", xml, path);
+    auto variables =
+        decodeVariables(variable_collection_xml, locales_xml, datatypes);
 
-  return make_pair(make_shared<Repository::DatatypesMap>(datatypes),
-      make_shared<VariablesMap>(variables));
+    return make_pair(make_shared<Repository::DatatypesMap>(datatypes),
+        make_shared<VariablesMap>(variables));
+  } catch (const exception& ex) {
+    throw runtime_error("Caught an exception while processing " +
+        path.string() + " Exception: " + ex.what());
+  }
 }
 
 DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
@@ -633,10 +638,12 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
     const xml_node& node,
     const xml_node& locales) {
   try {
+    // @TODO: refactor decoding for updated values
+    // (some mandatory items like bitLength) are not set
     auto simple_value = decodeSimpleDataValue(type, node, locales);
     return variantCast(simple_value);
   } catch (const invalid_argument& ex) {
-    // TODO: decode StdRecordItemRef
+    // @TODO: decode StdRecordItemRef
   }
   return nullopt;
 }
@@ -649,31 +656,36 @@ VariablesMap decodeStdVariables(const xml_node& xml,
   for (auto variable : xml.children("StdVariableRef")) {
     string id = variable.attribute("id").as_string();
     // ignore parameter overlays
-    if (id != "V_DirectParameters_1" && id != "V_DirectParameters_2") {
-      if (auto std_variable = variables.find(id);
-          std_variable != variables.end()) {
-        optional<SimpleDatatypeValue> default_value = nullopt;
-        if (auto node_value = variable.attribute("defaultValue");
-            !node_value.empty()) {
-          default_value =
-              decodeDefaultValue(std_variable->second->type(), node_value);
+    try {
+      if (id != "V_DirectParameters_1" && id != "V_DirectParameters_2") {
+        if (auto std_variable = variables.find(id);
+            std_variable != variables.end()) {
+          optional<SimpleDatatypeValue> default_value = nullopt;
+          if (auto node_value = variable.attribute("defaultValue");
+              !node_value.empty()) {
+            default_value =
+                decodeDefaultValue(std_variable->second->type(), node_value);
+          }
+          optional<bool> excluded = nullopt;
+          if (auto historized = variable.attribute("excludedFromDataStorage");
+              !historized.empty()) {
+            excluded = historized.as_bool();
+          }
+          auto possible_value = getUpdatedValues(
+              std_variable->second->type(), datatypes, variable, locales);
+          // check if variable needs to be updated
+          if (default_value.has_value() || excluded.has_value() ||
+              possible_value.has_value()) {
+            std_variable->second = make_shared<Variable>(
+                *std_variable->second, default_value, excluded, possible_value);
+          }
+        } else {
+          throw runtime_error(id + " is not defined in standard variables");
         }
-        optional<bool> excluded = nullopt;
-        if (auto historized = variable.attribute("excludedFromDataStorage");
-            !historized.empty()) {
-          excluded = historized.as_bool();
-        }
-        auto possible_value = getUpdatedValues(
-            std_variable->second->type(), datatypes, variable, locales);
-        // check if variable needs to be updated
-        if (default_value.has_value() || excluded.has_value() ||
-            possible_value.has_value()) {
-          std_variable->second = make_shared<Variable>(
-              *std_variable->second, default_value, excluded, possible_value);
-        }
-      } else {
-        throw runtime_error(id + " is not defined in standard variables");
       }
+    } catch (const exception& ex) {
+      throw runtime_error("Failed to decode StdVariableRef " + id +
+          " due to exception: " + ex.what());
     }
   }
   return variables;
@@ -982,28 +994,35 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const Repository::DatatypesMapPtr& std_datatypes,
     const VariablesMapPtr& std_variables,
     const filesystem::path& doc) {
-  auto xml = getXML(doc);
+  try {
+    auto xml = getXML(doc);
 
-  auto device_xml = getXMLNode("IODevice", xml);
-  auto locales_xml = getXMLNode(
-      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, device_xml);
+    auto device_xml = getXMLNode("IODevice", xml);
+    auto locales_xml =
+        getXMLNode(vector<string>{"ExternalTextCollection", "PrimaryLanguage"},
+            device_xml);
 
-  auto profile_xml = getXMLNode("ProfileBody", device_xml);
-  auto identity = decodeIdentity(profile_xml, locales_xml);
+    auto profile_xml = getXMLNode("ProfileBody", device_xml);
+    auto identity = decodeIdentity(profile_xml, locales_xml);
 
-  auto function_xml = getXMLNode("DeviceFunction", profile_xml);
-  auto variables_xml = getXMLNode("VariableCollection", function_xml);
+    auto function_xml = getXMLNode("DeviceFunction", profile_xml);
+    auto variables_xml = getXMLNode("VariableCollection", function_xml);
 
-  auto variables = decodeStdVariables(
-      variables_xml, locales_xml, std_datatypes, std_variables);
-  variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
-  auto variables_map = make_shared<VariablesMap>(variables);
+    auto variables = decodeStdVariables(
+        variables_xml, locales_xml, std_datatypes, std_variables);
+    variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
+    auto variables_map = make_shared<VariablesMap>(variables);
 
-  auto ui_xml = getXMLNode("UserInterface", function_xml);
-  auto uis = decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
+    auto ui_xml = getXMLNode("UserInterface", function_xml);
+    auto uis =
+        decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
 
-  return make_shared<DeviceDescriptor>(
-      move(identity), units, std_variables, move(variables_map), move(uis));
+    return make_shared<DeviceDescriptor>(
+        move(identity), units, std_variables, move(variables_map), move(uis));
+  } catch (const exception& ex) {
+    throw runtime_error("Failed to decode file " + doc.string() +
+        " due to exception: " + ex.what());
+  }
 }
 
 Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
