@@ -283,9 +283,25 @@ ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
 ArrayValue decodeArrayValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locale) {
-  string type_string =
-      node.child("SimpleDatatype").attribute("xsi:type").as_string();
-  auto type = toDatatype(type_string);
+  Datatype type;
+  try {
+    string type_string = getXMLAttribute(
+        "xsi:type", vector<string>{"Datatype", "SimpleDatatype"}, node)
+                             .as_string();
+    type = toDatatype(type_string);
+  } catch (const NodeNotFound& ex) {
+    string datatype_ref_id = getXMLAttribute(
+        "datatypeId", vector<string>{"Datatype", "DatatypeRef"}, node)
+                                 .as_string();
+    auto it = datatypes_map.find(datatype_ref_id);
+    if (it != datatypes_map.end()) {
+      type = toDatatype(it->second);
+    } else {
+      throw runtime_error("Failed to decode RecordT. Datatype " +
+          datatype_ref_id + " is not defined");
+    }
+  }
+
   switch (type) {
   case Datatype::Boolean: {
     return decodeArray<BooleanT>(datatypes_map, node, locale);
@@ -374,11 +390,27 @@ using RecordValue = variant<RecordT<BooleanT>,
 RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locales) {
-  string type_string = getXMLAttribute("xsi:type",
-      vector<string>{"Datatype", "RecordItem", "SimpleDatatype"},
-      node)
-                           .as_string();
-  auto type = toDatatype(type_string);
+  Datatype type;
+  try {
+    string type_string = getXMLAttribute("xsi:type",
+        vector<string>{"Datatype", "RecordItem", "SimpleDatatype"},
+        node)
+                             .as_string();
+    type = toDatatype(type_string);
+  } catch (const NodeNotFound& ex) {
+    string datatype_ref_id = getXMLAttribute("datatypeId",
+        vector<string>{"Datatype", "RecordItem", "DatatypeRef"},
+        node)
+                                 .as_string();
+    auto it = datatypes_map.find(datatype_ref_id);
+    if (it != datatypes_map.end()) {
+      type = toDatatype(it->second);
+    } else {
+      throw runtime_error("Failed to decode RecordT. Datatype " +
+          datatype_ref_id + " is not defined");
+    }
+  }
+
   switch (type) {
   case Datatype::Boolean: {
     return decodeRecord<BooleanT>(datatypes_map, node, locales);
