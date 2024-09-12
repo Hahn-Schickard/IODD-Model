@@ -485,10 +485,11 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
     const Repository::DatatypesMap& std_datatypes = {}) {
   Repository::DatatypesMap datatypes = std_datatypes;
   for (auto datatype : xml.children("Datatype")) {
-    datatypes.emplace(datatype.attribute("id").as_string(),
+    datatypes.emplace(getXMLAttribute("id", datatype).as_string(),
         decodeDataValue(datatype,
             locales,
-            toDatatype(string(datatype.attribute("xsi:type").as_string()))));
+            toDatatype(
+                string(getXMLAttribute("xsi:type", datatype).as_string()))));
   }
   return datatypes;
 }
