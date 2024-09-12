@@ -1,6 +1,5 @@
 #include "Serializer.hpp"
-
-#include <pugixml.hpp>
+#include "XML_Helper.hpp"
 
 #include <cstring>
 #include <filesystem>
@@ -12,24 +11,6 @@ using namespace pugi;
 
 namespace IODD {
 
-xml_document getXML(const filesystem::path& path) {
-  if (!filesystem::exists(path)) {
-    throw runtime_error(path.string() + " does not exists");
-  }
-
-  if (path.extension() != ".xml") {
-    throw invalid_argument(path.string() + " is not an XML document");
-  }
-
-  xml_document xml;
-  if (auto status = xml.load_file(path.c_str(), parse_default, encoding_utf8)) {
-    return xml;
-  } else {
-    throw runtime_error("Failed to load " + path.string() +
-        " as an XML document. " + status.description());
-  }
-}
-
 TextID decodeLocalization(const xml_node& locales, const string& text_id) {
   string localization =
       locales.find_child_by_attribute("Text", "id", text_id.c_str())
@@ -40,33 +21,46 @@ TextID decodeLocalization(const xml_node& locales, const string& text_id) {
 
 UnitsMapPtr decodeUnits(const filesystem::path& path) {
   auto result = make_shared<UnitsMap>();
-  auto xml = getXML(path).child("IODDStandardUnitDefinitions");
-  auto units_collection = xml.child("UnitCollection");
-  for (auto unit : units_collection.children("Unit")) {
-    auto code = unit.attribute("code").as_uint();
-    const auto* abbr = unit.attribute("abbr").as_string();
-    const auto* text_id = unit.attribute("textId").as_string();
-    result->emplace(
-        code, make_shared<Unit>(code, abbr, decodeLocalization(xml, text_id)));
+
+  auto doc = getXML(path);
+  auto xml = getXMLNode("IODDStandardUnitDefinitions", doc, path);
+  auto locales = getXMLNode(
+      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
+  auto units_collection = getXMLNode("UnitCollection", xml, path);
+
+  for (const auto& unit : units_collection.children("Unit")) {
+    try {
+      auto code = getXMLAttribute("code", unit).as_uint();
+      string abbr = getXMLAttribute("abbr", unit).as_string();
+      string id = getXMLAttribute("textId", unit).as_string();
+      result->emplace(
+          code, make_shared<Unit>(code, abbr, decodeLocalization(locales, id)));
+    } catch (const AttributeNotFound& ex) {
+      // @todo: handle attribute not found
+    }
   }
   return result;
 }
 
 optional<AccessRights> decodeAccessRights(const xml_node& node) {
-  string access_string = node.attribute("accessRights").as_string();
-  if (access_string.empty()) {
-    access_string = node.attribute("accessRightRestriction").as_string();
-  }
-  if (!access_string.empty()) {
+  try {
+    string access_string = node.attribute("accessRights").as_string();
+    if (access_string.empty()) {
+      access_string =
+          getXMLAttribute("accessRightRestriction", node).as_string();
+    }
     if (access_string == "ro") {
       return AccessRights::ReadOnly;
     } else if (access_string == "wo") {
       return AccessRights::WriteOnly;
     } else if (access_string == "rw") {
       return AccessRights::ReadWrite;
+    } else {
+      return nullopt; // @todo: handle malformed access string
     }
+  } catch (const AttributeNotFound& ex) {
+    return nullopt;
   }
-  return nullopt;
 }
 
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
@@ -380,10 +374,9 @@ using RecordValue = variant<RecordT<BooleanT>,
 RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& node,
     const xml_node& locales) {
-  string type_string = node.child("Datatype")
-                           .child("RecordItem")
-                           .child("SimpleDatatype")
-                           .attribute("xsi:type")
+  string type_string = getXMLAttribute("xsi:type",
+      vector<string>{"Datatype", "RecordItem", "SimpleDatatype"},
+      node)
                            .as_string();
   auto type = toDatatype(type_string);
   switch (type) {
@@ -474,19 +467,40 @@ VariablesMap decodeVariables(const xml_node& xml,
     const VariablesMap& std_variables = {}) {
   VariablesMap variables = std_variables;
   for (auto variable : xml.children("Variable")) {
-    variables.emplace(variable.attribute("id").as_string(),
-        make_shared<Variable>(variable.attribute("index").as_ullong(),
-            decodeLocalizedText("Name", variable, locales).value(),
-            decodeAccessRights(variable).value(),
-            decodeDataValue(variable,
-                locales,
-                toDatatype(string(variable.attribute("xsi:type").as_string())),
-                datatypes),
-            decodeLocalizedText("Description", variable, locales).value(),
-            nullopt,
-            variable.attribute("dynamic").as_bool(false),
-            variable.attribute("modifiesOtherVariables").as_bool(false),
-            variable.attribute("excludedFromDataStorage").as_bool(false)));
+    try {
+      string id = getXMLAttribute("id", variable).as_string();
+      auto index = getXMLAttribute("index", variable).as_ullong();
+      try {
+        auto type_attribute =
+            getXMLAttribute("xsi:type", getXMLNode("Datatype", variable));
+
+        variables.emplace(id,
+            make_shared<Variable>(index,
+                decodeLocalizedText("Name", variable, locales).value(),
+                decodeAccessRights(variable).value(),
+                decodeDataValue(variable,
+                    locales,
+                    toDatatype(type_attribute.as_string()),
+                    datatypes),
+                decodeLocalizedText("Description", variable, locales).value(),
+                nullopt,
+                variable.attribute("dynamic").as_bool(false),
+                variable.attribute("modifiesOtherVariables").as_bool(false),
+                variable.attribute("excludedFromDataStorage").as_bool(false)));
+      } catch (const NodeNotFound& ex) {
+        try {
+          auto type_ref_attribute = getXMLAttribute(
+              "datatypeId", getXMLNode("DatatypeRef", variable));
+          // @todo: handle DatatypeRef here
+        } catch (const exception& ex) {
+          throw runtime_error("Caught an exception while processing Variable " +
+              id + " Exception: " + ex.what());
+        }
+      }
+
+    } catch (const AttributeNotFound& ex) {
+      // @todo: handle AttributeNotFound
+    }
   }
   return variables;
 }
@@ -495,31 +509,14 @@ pair<Repository::DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
     const filesystem::path& path) {
   auto doc = getXML(path);
 
-  auto xml = doc.child("IODDStandardDefinitions");
-  if (xml.empty()) {
-    throw runtime_error(
-        path.string() + " does not contain IODDStandardDefinitions structure");
-  }
+  auto xml = getXMLNode("IODDStandardDefinitions", doc, path);
+  auto locales_xml = getXMLNode(
+      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
 
-  auto locales_xml =
-      xml.child("ExternalTextCollection").child("PrimaryLanguage");
-  if (locales_xml.empty()) {
-    throw runtime_error(path.string() +
-        " does not contain ExternalTextCollection PrimaryLanguage structure");
-  }
-
-  auto datatype_collection_xml = xml.child("DatatypeCollection");
-  if (datatype_collection_xml.empty()) {
-    throw runtime_error(
-        path.string() + " does not contain DatatypeCollection structure");
-  }
+  auto datatype_collection_xml = getXMLNode("DatatypeCollection", xml, path);
   auto datatypes = decodeDatatypes(datatype_collection_xml, locales_xml);
 
-  auto variable_collection_xml = xml.child("VariableCollection");
-  if (variable_collection_xml.empty()) {
-    throw runtime_error(
-        path.string() + " does not contain VariableCollection structure");
-  }
+  auto variable_collection_xml = getXMLNode("VariableCollection", xml, path);
   auto variables =
       decodeVariables(variable_collection_xml, locales_xml, datatypes);
 
@@ -529,11 +526,13 @@ pair<Repository::DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
 
 DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   if (auto identity_xml = node.child("DeviceIdentity"); !identity_xml.empty()) {
-    auto vendor_id = identity_xml.attribute("vendorId").as_uint();
-    string vendor_name = identity_xml.attribute("vendorName").as_string();
-    auto device_id = identity_xml.attribute("deviceId").as_uint();
+    auto vendor_id = getXMLAttribute("vendorId", identity_xml).as_uint();
+    string vendor_name =
+        getXMLAttribute("vendorName", identity_xml).as_string();
+    auto device_id = getXMLAttribute("deviceId", identity_xml).as_uint();
     string device_name_attribute =
-        identity_xml.child("DeviceName").attribute("textId").as_string();
+        getXMLAttribute("textId", getXMLNode("DeviceName", identity_xml))
+            .as_string();
     auto device_name = decodeLocalization(locales, device_name_attribute);
     return DeviceIdentity(vendor_id, vendor_name, device_id, device_name);
   } else {
@@ -729,25 +728,26 @@ VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
   auto variable = findVariable(
       xml.attribute("variableId").as_string(), variables, std_variables);
 
-  auto button_xml = xml.child("Button");
-  if (!button_xml.empty()) {
+  try {
+    auto button_xml = getXMLNode("Button", xml);
     auto button_value = decodeButtonValue(
         variable->type(), button_xml.attribute("buttonValue"));
     auto description = decodeLocalizedText("Description", button_xml, locales);
     auto action_msg =
         decodeLocalizedText("ActionStartedMessage", button_xml, locales);
+
     return make_shared<VariableRef>(
         variable, button_value, description, action_msg);
+  } catch (const NodeNotFound& ex) {
+    auto gradient = decodeFloatAttribute(xml, "gradient");
+    auto offset = decodeFloatAttribute(xml, "offset");
+    auto unit = decodeUnitPtr(units, xml);
+    auto format = decodeDisplayFormat(xml);
+    auto access = decodeAccessRights(xml);
+
+    return make_shared<VariableRef>(
+        variable, gradient, offset, unit, format, access);
   }
-
-  auto gradient = decodeFloatAttribute(xml, "gradient");
-  auto offset = decodeFloatAttribute(xml, "offset");
-  auto unit = decodeUnitPtr(units, xml);
-  auto format = decodeDisplayFormat(xml);
-  auto access = decodeAccessRights(xml);
-
-  return make_shared<VariableRef>(
-      variable, gradient, offset, unit, format, access);
 }
 
 RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
@@ -757,27 +757,28 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
     const xml_node& locales) {
   auto variable = findVariable(
       xml.attribute("variableId").as_string(), variables, std_variables);
-  auto subindex = xml.attribute("subindex").as_uint();
+  auto subindex = getXMLAttribute("subindex", xml).as_uint();
 
-  auto button_xml = xml.child("Button");
-  if (!button_xml.empty()) {
+  try {
+    auto button_xml = getXMLNode("Button", xml);
     auto button_value = decodeButtonValue(
         variable->type(), button_xml.attribute("buttonValue"));
     auto description = decodeLocalizedText("Description", button_xml, locales);
     auto action_msg =
         decodeLocalizedText("ActionStartedMessage", button_xml, locales);
+
     return make_shared<RecordRef>(
         variable, button_value, description, action_msg, subindex);
+  } catch (const NodeNotFound& ex) {
+    auto gradient = decodeFloatAttribute(xml, "gradient");
+    auto offset = decodeFloatAttribute(xml, "offset");
+    auto unit = decodeUnitPtr(units, xml);
+    auto format = decodeDisplayFormat(xml);
+    auto access = decodeAccessRights(xml);
+
+    return make_shared<RecordRef>(
+        variable, gradient, offset, unit, format, access, subindex);
   }
-
-  auto gradient = decodeFloatAttribute(xml, "gradient");
-  auto offset = decodeFloatAttribute(xml, "offset");
-  auto unit = decodeUnitPtr(units, xml);
-  auto format = decodeDisplayFormat(xml);
-  auto access = decodeAccessRights(xml);
-
-  return make_shared<RecordRef>(
-      variable, gradient, offset, unit, format, access, subindex);
 }
 
 MenuPtr decodeMenu(const UnitsMapPtr& units,
@@ -804,7 +805,7 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
           decodeRecordRef(units, variables, std_variables, child, locales));
     }
     if (strcmp(child.name(), "MenuRef") == 0) {
-      string ref_id = child.attribute("menuId").as_string();
+      string ref_id = getXMLAttribute("menuId", child).as_string();
       optional<Condition> ref_condition = nullopt;
       auto child_condition = child.child("Condition");
       if (!child_condition.empty()) {
@@ -819,7 +820,8 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
           condition_subindex = subindex_attribute.as_uint();
         }
 
-        uint8_t condition_value = child_condition.attribute("value").as_uint();
+        uint8_t condition_value =
+            getXMLAttribute("value", child_condition).as_uint();
 
         ref_condition =
             Condition(condition_variable, condition_subindex, condition_value);
@@ -887,9 +889,10 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
     const xml_node& locales) {
   unordered_map<UserRole, UserInterfacePtr> result;
 
-  auto menus_xml = xml.child("MenuCollection");
+  auto menus_xml = ("MenuCollection", xml);
 
-  auto observer_menu_ids = decodeMenuIDs(xml.child("ObserverRoleMenuSet"));
+  auto observer_menu_ids =
+      decodeMenuIDs(getXMLNode("ObserverRoleMenuSet", xml));
   result.emplace(UserRole::ObservationRole,
       decodeRoleUI(UserRole::ObservationRole,
           observer_menu_ids,
@@ -900,7 +903,7 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
           locales));
 
   auto maintainence_menu_ids =
-      decodeMenuIDs(xml.child("MaintenanceRoleMenuSet"));
+      decodeMenuIDs(getXMLNode("MaintenanceRoleMenuSet", xml));
   result.emplace(UserRole::MaintenanceRole,
       decodeRoleUI(UserRole::MaintenanceRole,
           maintainence_menu_ids,
@@ -910,7 +913,8 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
           menus_xml,
           locales));
 
-  auto specialist_menu_ids = decodeMenuIDs(xml.child("SpecialistRoleMenuSet"));
+  auto specialist_menu_ids =
+      decodeMenuIDs(getXMLNode("SpecialistRoleMenuSet", xml));
   result.emplace(UserRole::SpecialistRole,
       decodeRoleUI(UserRole::SpecialistRole,
           specialist_menu_ids,
@@ -931,44 +935,22 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const filesystem::path& doc) {
   auto xml = getXML(doc);
 
-  auto device_xml = xml.child("IODevice");
-  if (device_xml.empty()) {
-    throw runtime_error(doc.string() + " does not contain IODevice structure");
-  }
+  auto device_xml = getXMLNode("IODevice", xml);
+  auto locales_xml = getXMLNode(
+      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, device_xml);
 
-  auto locales_xml =
-      device_xml.child("ExternalTextCollection").child("PrimaryLanguage");
-  if (locales_xml.empty()) {
-    throw runtime_error(doc.string() +
-        " does not contain ExternalTextCollection PrimaryLanguage structure");
-  }
-
-  auto profile_xml = device_xml.child("ProfileBody");
+  auto profile_xml = getXMLNode("ProfileBody", device_xml);
   auto identity = decodeIdentity(profile_xml, locales_xml);
 
-  auto function_xml = profile_xml.child("DeviceFunction");
-  if (function_xml.empty()) {
-    throw runtime_error(
-        doc.string() + " does not contain DeviceFunction structure");
-  }
-
-  auto variables_xml = function_xml.child("VariableCollection");
-  if (variables_xml.empty()) {
-    throw runtime_error(
-        doc.string() + " does not contain VariableCollection structure");
-  }
+  auto function_xml = getXMLNode("DeviceFunction", profile_xml);
+  auto variables_xml = getXMLNode("VariableCollection", function_xml);
 
   auto variables = decodeStdVariables(
       variables_xml, locales_xml, std_datatypes, std_variables);
   variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
   auto variables_map = make_shared<VariablesMap>(variables);
 
-  auto ui_xml = function_xml.child("UserInterface");
-  if (ui_xml.empty()) {
-    throw runtime_error(
-        doc.string() + " does not contain UserInterface structure");
-  }
-
+  auto ui_xml = getXMLNode("UserInterface", function_xml);
   auto uis = decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
 
   return make_shared<DeviceDescriptor>(
