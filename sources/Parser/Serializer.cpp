@@ -167,7 +167,7 @@ BooleanT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
 
 template <>
 UIntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
-  auto length = node.attribute("bitLength").as_uint();
+  auto length = getXMLAttribute("bitLength", node).as_uint();
   return UIntegerT(length,
       decodeUintSingleValues(node, locales),
       decodeUintValueRanges(node, locales));
@@ -175,7 +175,7 @@ UIntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
 
 template <>
 IntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
-  auto length = node.attribute("bitLength").as_uint();
+  auto length = getXMLAttribute("bitLength", node).as_uint();
   return IntegerT(length,
       decodeIntSingleValues(node, locales),
       decodeIntValueRanges(node, locales));
@@ -190,14 +190,14 @@ FloatT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
 template <>
 StringT decodeSimpleDataValue(
     const xml_node& node, const xml_node& /* locales */) {
-  return StringT(node.attribute("fixedLength").as_uint(),
+  return StringT(getXMLAttribute("fixedLength", node).as_uint(),
       (strcmp(node.attribute("encoding").as_string(), "UTF-8") != 0));
 }
 
 template <>
 OctetStringT decodeSimpleDataValue(
     const xml_node& node, const xml_node& /* locales */) {
-  return OctetStringT(node.attribute("fixedLength").as_uint());
+  return OctetStringT(getXMLAttribute("fixedLength", node).as_uint());
 }
 
 template <>
