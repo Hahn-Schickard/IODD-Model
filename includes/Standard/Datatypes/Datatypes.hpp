@@ -6,6 +6,7 @@
 #include "Float.hpp"
 #include "Integer.hpp"
 #include "OctetString.hpp"
+#include "ProcessDataUnion.hpp"
 #include "Record.hpp"
 #include "String.hpp"
 #include "Time.hpp"
@@ -165,7 +166,9 @@ using DataValue = std::variant< // clang-format off
         RecordT<OctetStringT>,
         RecordT<StringT>, 
         RecordT<TimeT>, 
-        RecordT<TimeSpanT>
+        RecordT<TimeSpanT>,
+        ProcessDataIn,
+        ProcessDataOut
 >; // clang-format on
 
 inline Datatype toDatatype(const DataValue& variant) {
@@ -197,7 +200,9 @@ inline Datatype toDatatype(const DataValue& variant) {
       [&](const RecordT<OctetStringT>&) { result = Datatype::Record; },
       [&](const RecordT<StringT>&) { result = Datatype::Record; },
       [&](const RecordT<TimeT>&) { result = Datatype::Record; },
-      [&](const RecordT<TimeSpanT>&) { result = Datatype::Record; });
+      [&](const RecordT<TimeSpanT>&) { result = Datatype::Record; },
+      [&](const ProcessDataIn&) { result = Datatype::ProcessDataIn; },
+      [&](const ProcessDataOut&) { result = Datatype::ProcessDataOut; });
   return result;
 }
 
@@ -264,7 +269,9 @@ inline void expand(DataValue& lhs, const DataValue& rhs) {
       },
       [&rhs](RecordT<TimeSpanT> value) {
         value.expand(std::get<RecordT<TimeSpanT>>(rhs));
-      });
+      },
+      [&rhs](const ProcessDataIn&) { /* no expansion for ProcessDataIn*/ },
+      [&rhs](const ProcessDataOut&) { /* no expansion for ProcessDataOut*/ });
 }
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_DATA_TYPES_HPP

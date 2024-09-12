@@ -437,10 +437,10 @@ DataValue decodeDataValue(const xml_node& node,
     return variantCast(decodeRecordValue(datatypes_map, node, locales));
   }
   case Datatype::ProcessDataIn: {
-    throw logic_error("Failed to decoded ProcessDataIn DataType Values");
+    return ProcessDataIn();
   }
   case Datatype::ProcessDataOut: {
-    throw logic_error("Failed to decoded ProcessDataOut DataType Values");
+    return ProcessDataOut();
   }
   default: {
     return variantCast(decodeSimpleDataValue(type, node, locales));
