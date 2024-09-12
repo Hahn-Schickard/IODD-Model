@@ -500,39 +500,51 @@ VariablesMap decodeVariables(const xml_node& xml,
     const VariablesMap& std_variables = {}) {
   VariablesMap variables = std_variables;
   for (auto variable : xml.children("Variable")) {
+    string id = getXMLAttribute("id", variable).as_string();
+    auto index = getXMLAttribute("index", variable).as_ullong();
     try {
-      string id = getXMLAttribute("id", variable).as_string();
-      auto index = getXMLAttribute("index", variable).as_ullong();
+      auto name = decodeLocalizedText("Name", variable, locales).value();
+      auto access = decodeAccessRights(variable).value();
+      auto description = decodeLocalizedText("Description", variable, locales);
+      auto dynamic = variable.attribute("dynamic").as_bool(false);
+      auto modifies_others =
+          variable.attribute("modifiesOtherVariables").as_bool(false);
+      auto historized =
+          variable.attribute("excludedFromDataStorage").as_bool(false);
+      DataValue data_value;
       try {
-        auto type_node = getXMLNode("Datatype", variable);
-        auto type_attribute = getXMLAttribute("xsi:type", type_node);
+        auto datatype_xml = getXMLNode("Datatype", variable);
+        auto type_attribute = getXMLAttribute("xsi:type", datatype_xml);
 
-        variables.emplace(id,
-            make_shared<Variable>(index,
-                decodeLocalizedText("Name", variable, locales).value(),
-                decodeAccessRights(variable).value(),
-                decodeDataValue(variable,
-                    locales,
-                    toDatatype(type_attribute.as_string()),
-                    datatypes),
-                decodeLocalizedText("Description", variable, locales).value(),
-                nullopt,
-                variable.attribute("dynamic").as_bool(false),
-                variable.attribute("modifiesOtherVariables").as_bool(false),
-                variable.attribute("excludedFromDataStorage").as_bool(false)));
+        data_value = decodeDataValue(datatype_xml,
+            locales,
+            toDatatype(type_attribute.as_string()),
+            datatypes);
       } catch (const NodeNotFound& ex) {
-        try {
-          auto type_ref_attribute = getXMLAttribute(
-              "datatypeId", getXMLNode("DatatypeRef", variable));
-          // @todo: handle DatatypeRef here
-        } catch (const exception& ex) {
-          throw runtime_error("Caught an exception while processing Variable " +
-              id + " Exception: " + ex.what());
+        string datatype_ref_id =
+            getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", variable))
+                .as_string();
+        auto it = datatypes.find(datatype_ref_id);
+        if (it != datatypes.end()) {
+          data_value = it->second;
+        } else {
+          throw runtime_error("Variable " + id + " requires DataTypeRef " +
+              datatype_ref_id + ", but it does not exist");
         }
       }
-
-    } catch (const AttributeNotFound& ex) {
-      // @todo: handle AttributeNotFound
+      variables.emplace(id,
+          make_shared<Variable>(index,
+              move(name),
+              access,
+              move(data_value),
+              move(description),
+              nullopt,
+              dynamic,
+              modifies_others,
+              historized));
+    } catch (const exception& ex) {
+      throw runtime_error("Could not process variable " + id +
+          " due to exception: " + ex.what());
     }
   }
   return variables;
