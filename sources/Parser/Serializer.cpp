@@ -358,7 +358,7 @@ RecordItem<T> decodeRecordItem(const Repository::DatatypesMap& datatypes_map,
   auto offset = node.attribute("bitOffset").as_ullong();
   auto name = decodeLocalizedText("Name", node, locales).value();
   auto access = decodeAccessRights(node);
-  auto desc = decodeLocalizedText("Description ", node, locales);
+  auto desc = decodeLocalizedText("Description", node, locales);
 
   return RecordItem(
       subindex, offset, move(value), move(name), access, move(desc));
