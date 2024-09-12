@@ -66,9 +66,15 @@ optional<AccessRights> decodeAccessRights(const xml_node& node) {
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 optional<TextID> decodeLocalizedText(
     const string& child_name, const xml_node& node, const xml_node& locales) {
-  if (auto name_node = node.child(child_name.c_str()); !node.empty()) {
-    return decodeLocalization(
-        locales, name_node.attribute("textId").as_string());
+  auto name_node = node.child(child_name.c_str());
+  if (!name_node.empty()) {
+    try {
+      return decodeLocalization(
+          locales, getXMLAttribute("textId", name_node).as_string());
+    } catch (const exception& ex) {
+      throw runtime_error(
+          "Could not get localization for " + child_name + " field");
+    }
   }
   return nullopt;
 }
