@@ -260,7 +260,7 @@ ArrayT<T> decodeArray(const Repository::DatatypesMap& datatypes_map,
     const xml_node& locale) {
   vector<T> values;
 
-  if (!node.child("Datatype").child("SimpleDatatype").empty()) {
+  if (!node.child("SimpleDatatype").empty()) {
     for (auto node_value : node.children("SimpleDatatype")) {
       values.push_back(decodeSimpleDataValue<T>(node_value, locale));
     }
@@ -285,14 +285,14 @@ ArrayValue decodeArrayValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& locale) {
   Datatype type;
   try {
-    string type_string = getXMLAttribute(
-        "xsi:type", vector<string>{"Datatype", "SimpleDatatype"}, node)
-                             .as_string();
+    string type_string =
+        getXMLAttribute("xsi:type", getXMLNode("SimpleDatatype", node))
+            .as_string();
     type = toDatatype(type_string);
   } catch (const NodeNotFound& ex) {
-    string datatype_ref_id = getXMLAttribute(
-        "datatypeId", vector<string>{"Datatype", "DatatypeRef"}, node)
-                                 .as_string();
+    string datatype_ref_id =
+        getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", node))
+            .as_string();
     auto it = datatypes_map.find(datatype_ref_id);
     if (it != datatypes_map.end()) {
       type = toDatatype(it->second);
@@ -373,7 +373,7 @@ RecordT<T> decodeRecord(const Repository::DatatypesMap& datatypes_map,
     auto record = decodeRecordItem<T>(datatypes_map, node_value, locales);
     records.emplace(record.subindex(), move(record));
   }
-  return RecordT<T>(node.child("Datatype").attribute("bitLength").as_llong(),
+  return RecordT<T>(getXMLAttribute("bitLength", node).as_llong(),
       node.attribute("subindexAccessSupported").as_bool(true),
       move(records));
 }
@@ -392,15 +392,13 @@ RecordValue decodeRecordValue(const Repository::DatatypesMap& datatypes_map,
     const xml_node& locales) {
   Datatype type;
   try {
-    string type_string = getXMLAttribute("xsi:type",
-        vector<string>{"Datatype", "RecordItem", "SimpleDatatype"},
-        node)
+    string type_string = getXMLAttribute(
+        "xsi:type", vector<string>{"RecordItem", "SimpleDatatype"}, node)
                              .as_string();
     type = toDatatype(type_string);
   } catch (const NodeNotFound& ex) {
-    string datatype_ref_id = getXMLAttribute("datatypeId",
-        vector<string>{"Datatype", "RecordItem", "DatatypeRef"},
-        node)
+    string datatype_ref_id = getXMLAttribute(
+        "datatypeId", vector<string>{"RecordItem", "DatatypeRef"}, node)
                                  .as_string();
     auto it = datatypes_map.find(datatype_ref_id);
     if (it != datatypes_map.end()) {
