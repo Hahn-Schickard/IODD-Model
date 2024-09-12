@@ -83,9 +83,9 @@ unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
     const xml_node& node, const xml_node& locales) {
   unordered_set<SingleValuePtr<bool>> result;
   for (auto node_value : node.children("SingleValue")) {
-    result.emplace(
-        make_shared<SingleValue<bool>>(node_value.attribute("value").as_bool(),
-            decodeLocalizedText("Name", node_value, locales)));
+    result.emplace(make_shared<SingleValue<bool>>(
+        getXMLAttribute("value", node_value).as_bool(),
+        decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
 }
@@ -95,7 +95,7 @@ NumberT<uint64_t>::SingleValues decodeUintSingleValues(
   NumberT<uint64_t>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
     result.emplace(make_shared<SingleValue<uint64_t>>(
-        node_value.attribute("value").as_ullong(),
+        getXMLAttribute("value", node_value).as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -106,8 +106,8 @@ NumberT<uint64_t>::ValueRanges decodeUintValueRanges(
   NumberT<uint64_t>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
     result.emplace(make_shared<ValueRange<uint64_t>>(
-        node_value.attribute("lowerValue").as_ullong(),
-        node_value.attribute("upperValue").as_ullong(),
+        getXMLAttribute("lowerValue", node_value).as_ullong(),
+        getXMLAttribute("upperValue", node_value).as_ullong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -118,7 +118,7 @@ NumberT<int64_t>::SingleValues decodeIntSingleValues(
   NumberT<int64_t>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
     result.emplace(make_shared<SingleValue<int64_t>>(
-        node_value.attribute("value").as_llong(),
+        getXMLAttribute("value", node_value).as_llong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -129,8 +129,8 @@ NumberT<int64_t>::ValueRanges decodeIntValueRanges(
   NumberT<int64_t>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
     result.emplace(make_shared<ValueRange<int64_t>>(
-        node_value.attribute("lowerValue").as_llong(),
-        node_value.attribute("upperValue").as_llong(),
+        getXMLAttribute("lowerValue", node_value).as_llong(),
+        getXMLAttribute("upperValue", node_value).as_llong(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -141,7 +141,7 @@ NumberT<float>::SingleValues decodeFloatSingleValues(
   NumberT<float>::SingleValues result;
   for (auto node_value : node.children("SingleValue")) {
     result.emplace(make_shared<SingleValue<float>>(
-        node_value.attribute("value").as_float(),
+        getXMLAttribute("value", node_value).as_float(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
@@ -152,8 +152,8 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
   NumberT<float>::ValueRanges result;
   for (auto node_value : node.children("ValueRange")) {
     result.emplace(make_shared<ValueRange<float>>(
-        node_value.attribute("lowerValue").as_float(),
-        node_value.attribute("upperValue").as_float(),
+        getXMLAttribute("lowerValue", node_value).as_float(),
+        getXMLAttribute("upperValue", node_value).as_float(),
         decodeLocalizedText("Name", node_value, locales)));
   }
   return result;
