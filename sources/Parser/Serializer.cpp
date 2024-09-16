@@ -880,11 +880,14 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
     const VariablesMapPtr& variables,
     const VariablesMapPtr& std_variables,
     const string& menu_id,
-    const xml_node& xml,
+    const xml_node& menus,
     const xml_node& locales,
     const optional<Condition>& condition = nullopt) {
-  if (strcmp(xml.name(), "Menu ") != 0) {
-    throw logic_error("Can not decode non Menu element as a menu");
+  auto xml = menus.find_child_by_attribute("Menu", "id", menu_id.c_str());
+
+  if (strcmp(xml.name(), "Menu") != 0) {
+    throw logic_error(
+        "Can not decode " + menu_id + " as a Menu element. It's not a Menu");
   }
 
   std::vector<Menu::Ref> refs;
@@ -925,7 +928,7 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
           variables,
           std_variables,
           ref_id,
-          xml,
+          menus,
           locales,
           ref_condition));
     }
