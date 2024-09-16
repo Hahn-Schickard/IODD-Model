@@ -15,6 +15,23 @@ enum class UserRole : uint8_t {
   SpecialistRole
 };
 
+inline std::string toString(UserRole role) {
+  switch (role) {
+  case UserRole::ObservationRole: {
+    return "Observation Role";
+  }
+  case UserRole::MaintenanceRole: {
+    return "Maintenance Role";
+  }
+  case UserRole::SpecialistRole: {
+    return "Specialist Role";
+  }
+  default: {
+    throw std::logic_error("Could not decode UserRole. Unsupported enum value");
+  }
+  }
+}
+
 struct UserInterface {
   UserInterface(UserRole _role,
       MenuPtr _identification,
