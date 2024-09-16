@@ -18,7 +18,7 @@ template <typename T> struct NumberT {
   NumberT(SingleValues&& values, ValueRanges&& ranges)
       : values_(std::move(values)), ranges_(std::move(ranges)) {}
 
-  NamedAttributePtr getName(T value) {
+  NamedAttributePtr getName(T value) const {
     if (auto it = values_.find(std::make_shared<SingleValue<T>>(value));
         it != values_.end()) {
       return *it;
