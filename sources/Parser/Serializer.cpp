@@ -1047,12 +1047,10 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
 
     auto variables = decodeStdVariables(
         variables_xml, locales_xml, std_datatypes, std_variables);
-    auto size = variables.size();
     for (const auto& variable :
         decodeVariables(variables_xml, locales_xml, *std_datatypes)) {
       variables.insert(variable);
     }
-    size = variables.size();
     auto variables_map = make_shared<VariablesMap>(variables);
 
     auto ui_xml = getXMLNode("UserInterface", function_xml);
