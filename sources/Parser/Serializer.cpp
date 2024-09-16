@@ -668,15 +668,16 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
     const Repository::DatatypesMapPtr& datatypes,
     const xml_node& node,
     const xml_node& locales) {
-  try {
-    // @TODO: refactor decoding for updated values
-    // (some mandatory items like bitLength) are not set
-    auto simple_value = decodeSimpleDataValue(type, node, locales);
-    return variantCast(simple_value);
-  } catch (const invalid_argument& ex) {
-    // @TODO: decode StdRecordItemRef
+  if (!node.children().empty()) {
+    if (type == IODD::Datatype::Boolean || isNumericData(type)) {
+      auto simple_value = decodeSimpleDataValue(type, node, locales);
+      return variantCast(simple_value);
+    } else {
+      // @TODO:handle Complex data types like StdRecordItemRef here
+    }
+  } else {
+    return nullopt;
   }
-  return nullopt;
 }
 
 VariablesMap decodeStdVariables(const xml_node& xml,
