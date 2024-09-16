@@ -19,7 +19,7 @@ template <size_t MIN, size_t MAX> struct FixedBitLength {
     }
   }
 
-  size_t bitLength() { return bit_length_; }
+  size_t bitLength() const { return bit_length_; }
 
 private:
   size_t bit_length_;
