@@ -526,11 +526,10 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
     const Repository::DatatypesMap& std_datatypes = {}) {
   Repository::DatatypesMap datatypes = std_datatypes;
   for (auto datatype : xml.children("Datatype")) {
-    datatypes.emplace(getXMLAttribute("id", datatype).as_string(),
-        decodeDataValue(datatype,
-            locales,
-            toDatatype(
-                string(getXMLAttribute("xsi:type", datatype).as_string()))));
+    string id = getXMLAttribute("id", datatype).as_string();
+    auto type =
+        toDatatype(string(getXMLAttribute("xsi:type", datatype).as_string()));
+    datatypes.emplace(id, decodeDataValue(datatype, locales, type));
   }
   return datatypes;
 }
@@ -823,8 +822,8 @@ VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
     const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
-  auto variable = findVariable(
-      xml.attribute("variableId").as_string(), variables, std_variables);
+  string variable_id = getXMLAttribute("variableId", xml).as_string();
+  auto variable = findVariable(variable_id, variables, std_variables);
 
   try {
     auto button_xml = getXMLNode("Button", xml);
@@ -853,8 +852,8 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
     const VariablesMapPtr& std_variables,
     const xml_node& xml,
     const xml_node& locales) {
-  auto variable = findVariable(
-      xml.attribute("variableId").as_string(), variables, std_variables);
+  string variable_id = getXMLAttribute("variableId", xml).as_string();
+  auto variable = findVariable(variable_id, variables, std_variables);
   auto subindex = getXMLAttribute("subindex", xml).as_uint();
 
   try {
