@@ -22,7 +22,7 @@ struct Repository {
       DescriptorsMap&& descriptors);
 
   DeviceDescriptorPtr getDescriptor(
-      const std::string& vendor_id, const std::string& device_id);
+      const std::string& vendor_id, const std::string& device_id) const;
 
   DescriptorsMap getDescriptors() const;
 

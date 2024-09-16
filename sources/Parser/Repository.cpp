@@ -34,7 +34,7 @@ Repository::Repository(UnitsMapPtr&& units,
           move(descriptors)) {}
 
 DeviceDescriptorPtr Repository::getDescriptor(
-    const string& vendor_id, const string& device_id) {
+    const string& vendor_id, const string& device_id) const {
   auto identity = makeDeviceIdentity(vendor_id, device_id);
   auto it = descriptors_.find(identity);
   if (it != descriptors_.end()) {
