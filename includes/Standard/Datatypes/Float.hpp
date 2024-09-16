@@ -13,12 +13,7 @@ struct FloatT : public NumberT<float> {
 
   FloatT() = default;
 
-  FloatT(SingleValues&& values) : NumberT(std::move(values)) {}
-
-  FloatT(ValueRanges&& ranges) : NumberT(std::move(ranges)) {}
-
-  FloatT(SingleValues&& values, ValueRanges&& ranges)
-      : NumberT(std::move(values), std::move(ranges)) {}
+  FloatT(NumberT<float>&& values) : NumberT(std::move(values)) {}
 };
 
 } // namespace IODD

@@ -13,16 +13,11 @@ struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<uint64_t> {
 
   UIntegerT() = default;
 
-  UIntegerT(uint8_t bits, SingleValues&& values)
+  UIntegerT(uint8_t bits, NumberT<uint64_t>&& values)
       : FixedBitLength(bits), NumberT(std::move(values)) {}
 
-  UIntegerT(uint8_t bits, ValueRanges&& values)
-      : FixedBitLength(bits), NumberT(std::move(values)) {}
-
-  UIntegerT(
-      uint8_t bits, SingleValues&& single_values, ValueRanges&& value_ranges)
-      : FixedBitLength(bits),
-        NumberT(std::move(single_values), std::move(value_ranges)) {}
+  UIntegerT(NumberT<uint64_t>&& values) // used as expansion
+      : FixedBitLength(64), NumberT(std::move(values)) {}
 };
 } // namespace IODD
 

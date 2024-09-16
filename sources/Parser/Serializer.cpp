@@ -160,6 +160,36 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
 }
 
 template <typename T>
+NumberT<T> decodeNumericValues(
+    const xml_node& /* node */, const xml_node& /* locales */) {
+  throw runtime_error("Failed to decode Numeric Value. Unsupported data type");
+}
+
+template <>
+NumberT<uint64_t> decodeNumericValues(
+    const xml_node& node, const xml_node& locales) {
+  auto values = decodeUintSingleValues(node, locales);
+  auto ranges = decodeUintValueRanges(node, locales);
+  return NumberT(move(values), move(ranges));
+}
+
+template <>
+NumberT<int64_t> decodeNumericValues(
+    const xml_node& node, const xml_node& locales) {
+  auto values = decodeIntSingleValues(node, locales);
+  auto ranges = decodeIntValueRanges(node, locales);
+  return NumberT(move(values), move(ranges));
+}
+
+template <>
+NumberT<float> decodeNumericValues(
+    const xml_node& node, const xml_node& locales) {
+  auto values = decodeFloatSingleValues(node, locales);
+  auto ranges = decodeFloatValueRanges(node, locales);
+  return NumberT(move(values), move(ranges));
+}
+
+template <typename T>
 T decodeSimpleDataValue(
     const xml_node& /* node */, const xml_node& /* locales */) {
   throw runtime_error(
@@ -173,24 +203,31 @@ BooleanT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
 
 template <>
 UIntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
-  auto length = getXMLAttribute("bitLength", node).as_uint();
-  return UIntegerT(length,
-      decodeUintSingleValues(node, locales),
-      decodeUintValueRanges(node, locales));
+  auto values = decodeNumericValues<uint64_t>(node, locales);
+  try {
+    auto length = getXMLAttribute("bitLength", node).as_uint();
+    return UIntegerT(length, move(values));
+  } catch (const AttributeNotFound&) {
+    // used to create an update value
+    return UIntegerT(move(values));
+  }
 }
 
 template <>
 IntegerT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
-  auto length = getXMLAttribute("bitLength", node).as_uint();
-  return IntegerT(length,
-      decodeIntSingleValues(node, locales),
-      decodeIntValueRanges(node, locales));
+  auto values = decodeNumericValues<int64_t>(node, locales);
+  try {
+    auto length = getXMLAttribute("bitLength", node).as_uint();
+    return IntegerT(length, move(values));
+  } catch (const AttributeNotFound&) {
+    // used to create an update value
+    return IntegerT(move(values));
+  }
 }
 
 template <>
 FloatT decodeSimpleDataValue(const xml_node& node, const xml_node& locales) {
-  return FloatT(decodeFloatSingleValues(node, locales),
-      decodeFloatValueRanges(node, locales));
+  return FloatT(decodeNumericValues<float>(node, locales));
 }
 
 template <>
