@@ -50,6 +50,10 @@ struct DeviceDescriptor : public DeviceIdentity {
 
   VariablePtr getVariable(const std::string& id) const;
 
+  VariablesMapPtr getSTDVariables() const;
+
+  VariablesMapPtr getVariables() const;
+
   size_t variableCount() const;
 
   NamedAttributePtr getVariableValueName(const std::string& id,
