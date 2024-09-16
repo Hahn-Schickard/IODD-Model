@@ -119,11 +119,12 @@ VariableRef::VariableRef(const VariablePtr& variable,
     const optional<TextID>& action_started_msg)
     : variable_(variable), value_(value), desc_(description),
       action_msg_(action_started_msg) {
-  if (variable_->type() != Datatype::Boolean ||
-      variable_->type() != Datatype::UInteger ||
+  if (variable_->type() != Datatype::Boolean &&
+      variable_->type() != Datatype::UInteger &&
       variable_->type() != Datatype::Integer) {
-    throw invalid_argument(
-        "Buttons must use BooleanT, UIntegerT or IntegerT variables");
+    throw invalid_argument("Buttons must use BooleanT, UIntegerT or IntegerT "
+                           "variables types. Given Variable type is: " +
+        toString(variable_->type()));
   }
   if (variable_->type() != buttonValueToDatatype(value_.value())) {
     throw invalid_argument("Button variable type must match button value type");
