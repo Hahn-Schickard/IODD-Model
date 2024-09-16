@@ -694,7 +694,9 @@ VariablesMap decodeStdVariables(const xml_node& xml,
             std_variable != variables.end()) {
           optional<SimpleDatatypeValue> default_value = nullopt;
           if (auto node_value = variable.attribute("defaultValue");
-              !node_value.empty()) {
+              !node_value.empty() &&
+              // @TODO: implement support for nonSimpleData default values
+              isSimpleData(std_variable->second->type())) {
             default_value =
                 decodeDefaultValue(std_variable->second->type(), node_value);
           }
