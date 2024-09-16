@@ -631,11 +631,6 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   }
 }
 
-VariablesMap operator+=(VariablesMap lhs, const VariablesMap& rhs) {
-  lhs.insert(rhs.begin(), rhs.end());
-  return lhs;
-}
-
 SimpleDatatypeValue decodeDefaultValue(
     Datatype type, const xml_attribute& attribute) {
   switch (type) {
@@ -1046,7 +1041,12 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
 
     auto variables = decodeStdVariables(
         variables_xml, locales_xml, std_datatypes, std_variables);
-    variables += decodeVariables(variables_xml, locales_xml, *std_datatypes);
+    auto size = variables.size();
+    for (const auto& variable :
+        decodeVariables(variables_xml, locales_xml, *std_datatypes)) {
+      variables.insert(variable);
+    }
+    size = variables.size();
     auto variables_map = make_shared<VariablesMap>(variables);
 
     auto ui_xml = getXMLNode("UserInterface", function_xml);
