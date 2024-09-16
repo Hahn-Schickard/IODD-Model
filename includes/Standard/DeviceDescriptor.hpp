@@ -50,6 +50,8 @@ struct DeviceDescriptor : public DeviceIdentity {
 
   VariablePtr getVariable(const std::string& id) const;
 
+  size_t variableCount() const;
+
   NamedAttributePtr getVariableValueName(const std::string& id,
       const SimpleDatatypeValue& value,
       std::optional<uint8_t> subindex = std::nullopt) const;

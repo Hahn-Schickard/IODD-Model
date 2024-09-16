@@ -87,6 +87,8 @@ VariablePtr DeviceDescriptor::getVariable(const string& id) const {
   throw out_of_range("Variable with id " + id + " does not exists");
 }
 
+size_t DeviceDescriptor::variableCount() const { return variables_->size(); }
+
 NamedAttributePtr DeviceDescriptor::getVariableValueName(const string& id,
     const SimpleDatatypeValue& value,
     optional<uint8_t> subindex) const {
