@@ -40,6 +40,8 @@ struct Menu {
       const std::optional<TextID>& _name = std::nullopt,
       const std::optional<Condition> _condition = std::nullopt);
 
+  size_t size() const;
+
   const std::string id;
   const std::vector<Ref> references;
   const std::optional<TextID> name;

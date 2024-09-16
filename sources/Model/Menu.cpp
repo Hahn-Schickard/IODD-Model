@@ -27,4 +27,6 @@ Menu::Menu(const string& _id,
     const optional<Condition> _condition)
     : id(_id), references(_references), name(_name), condition(_condition) {}
 
+size_t Menu::size() const { return references.size(); }
+
 } // namespace IODD
