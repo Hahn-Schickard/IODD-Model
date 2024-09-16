@@ -93,7 +93,9 @@ VariablesMapPtr DeviceDescriptor::getSTDVariables() const {
 
 VariablesMapPtr DeviceDescriptor::getVariables() const { return variables_; }
 
-size_t DeviceDescriptor::variableCount() const { return variables_->size(); }
+size_t DeviceDescriptor::variableCount() const {
+  return variables_->size() + std_variables_->size();
+}
 
 NamedAttributePtr DeviceDescriptor::getVariableValueName(const string& id,
     const SimpleDatatypeValue& value,
