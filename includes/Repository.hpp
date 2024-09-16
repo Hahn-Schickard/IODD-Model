@@ -24,6 +24,8 @@ struct Repository {
   DeviceDescriptorPtr getDescriptor(
       const std::string& vendor_id, const std::string& device_id);
 
+  DescriptorsMap getDescriptors() const;
+
   size_t size() const noexcept;
 
 private:

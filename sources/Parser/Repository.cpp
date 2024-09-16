@@ -45,5 +45,9 @@ DeviceDescriptorPtr Repository::getDescriptor(
   }
 }
 
+Repository::DescriptorsMap Repository::getDescriptors() const {
+  return descriptors_;
+}
+
 size_t Repository::size() const noexcept { return descriptors_.size(); }
 } // namespace IODD
