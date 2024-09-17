@@ -73,21 +73,11 @@ void checkValueType(
     }
     break;
   }
-  case Datatype::Array: {
-    [[fallthrough]];
-  }
-  case Datatype::Record: {
+  default: {
     if (!holds_alternative<vector<uint8_t>>(value)) {
       throw invalid_argument("Non byte vector value type passed to " +
           toString(variable->type()) + " variable decoder");
     }
-    break;
-  }
-  case Datatype::ProcessDataIn: {
-    [[fallthrough]];
-  }
-  case Datatype::ProcessDataOut: {
-    // can be any type?
     break;
   }
   }
