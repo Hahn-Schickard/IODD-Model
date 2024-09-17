@@ -498,26 +498,54 @@ auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
   return {v};
 }
 
+Datatype decodeDatatype(
+    const xml_node& xml, const Repository::DatatypesMap& datatypes_map = {}) {
+  string type_string = getXMLAttribute("xsi:type", xml).as_string();
+  if (type_string == "RecordT" || type_string == "ArrayT") {
+    xml_node node;
+    if (type_string == "RecordT") {
+      node = getXMLNode("RecordItem", xml);
+    } else {
+      node = xml;
+    }
+
+    string subtype_string;
+    try {
+      subtype_string =
+          getXMLAttribute("xsi:type", getXMLNode("SimpleDatatype", node))
+              .as_string();
+    } catch (const NodeNotFound&) {
+      string datatype_ref_id =
+          getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", node))
+              .as_string();
+      auto it = datatypes_map.find(datatype_ref_id);
+      if (it != datatypes_map.end()) {
+        subtype_string = toString(toDatatype(it->second));
+      } else {
+        throw runtime_error("Failed to decode " + type_string +
+            " subtype. DatatypeRef " + datatype_ref_id + " is not defined");
+      }
+    }
+    return toDatatype(subtype_string + "_" + type_string);
+  } else {
+    return toDatatype(type_string);
+  }
+}
+
 DataValue decodeDataValue(const xml_node& node,
     const xml_node& locales,
-    Datatype type,
     const Repository::DatatypesMap& datatypes_map = {}) {
-  switch (type) {
-  case Datatype::Array: {
+  auto type = decodeDatatype(node, datatypes_map);
+  if (isArray(type)) {
     return variantCast(decodeArrayValue(datatypes_map, node, locales));
-  }
-  case Datatype::Record: {
+  } else if (isRecord(type)) {
     return variantCast(decodeRecordValue(datatypes_map, node, locales));
-  }
-  case Datatype::ProcessDataIn: {
+  } else if (type == Datatype::ProcessDataIn) {
     return ProcessDataIn();
-  }
-  case Datatype::ProcessDataOut: {
+  } else if (type == Datatype::ProcessDataOut) {
     return ProcessDataOut();
-  }
-  default: {
+  } else {
     return variantCast(decodeSimpleDataValue(type, node, locales));
-  }
   }
 }
 
@@ -527,9 +555,7 @@ Repository::DatatypesMap decodeDatatypes(const xml_node& xml,
   Repository::DatatypesMap datatypes = std_datatypes;
   for (auto datatype : xml.children("Datatype")) {
     string id = getXMLAttribute("id", datatype).as_string();
-    auto type =
-        toDatatype(string(getXMLAttribute("xsi:type", datatype).as_string()));
-    datatypes.emplace(id, decodeDataValue(datatype, locales, type));
+    datatypes.emplace(id, decodeDataValue(datatype, locales));
   }
   return datatypes;
 }
@@ -554,12 +580,7 @@ VariablesMap decodeVariables(const xml_node& xml,
       DataValue data_value;
       try {
         auto datatype_xml = getXMLNode("Datatype", variable);
-        auto type_attribute = getXMLAttribute("xsi:type", datatype_xml);
-
-        data_value = decodeDataValue(datatype_xml,
-            locales,
-            toDatatype(type_attribute.as_string()),
-            datatypes);
+        data_value = decodeDataValue(datatype_xml, locales, datatypes);
       } catch (const NodeNotFound& ex) {
         string datatype_ref_id =
             getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", variable))
