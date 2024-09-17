@@ -7,12 +7,15 @@ namespace IODD {
 Condition::Condition(const VariablePtr& variable, uint8_t value)
     : variable_(variable), value_(value) {}
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 Condition::Condition(
     const VariablePtr& variable, uint8_t subindex, uint8_t value)
     : variable_(variable), subindex_(subindex), value_(value) {}
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
-Condition::Condition(
-    const VariablePtr& variable, optional<uint8_t> subindex, uint8_t value)
+Condition::Condition(const VariablePtr& variable,
+    const optional<uint8_t>& subindex,
+    uint8_t value)
     : variable_(variable), subindex_(subindex), value_(value) {}
 
 VariablePtr Condition::variable() const { return variable_; }
@@ -21,12 +24,20 @@ optional<uint8_t> Condition::subindex() const { return subindex_; }
 
 uint8_t Condition::value() const { return value_; }
 
-Menu::Menu(const string& _id,
-    const vector<Ref>& _references,
-    const optional<TextID>& _name,
-    const optional<Condition> _condition)
-    : id(_id), references(_references), name(_name), condition(_condition) {}
+Menu::Menu(const string& id,
+    const vector<Ref>& references,
+    const optional<TextID>& name,
+    const optional<Condition>& condition)
+    : id_(id), references_(references), name_(name), condition_(condition) {}
 
-size_t Menu::size() const { return references.size(); }
+size_t Menu::size() const { return references_.size(); }
+
+string Menu::id() const { return id_; }
+
+vector<Menu::Ref> Menu::references() const { return references_; }
+
+optional<TextID> Menu::name() const { return name_; }
+
+optional<Condition> Menu::condition() const { return condition_; }
 
 } // namespace IODD

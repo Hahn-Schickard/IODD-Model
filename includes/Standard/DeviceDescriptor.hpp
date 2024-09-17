@@ -43,7 +43,7 @@ struct DeviceDescriptor : public DeviceIdentity {
       UserInterfaces&& interfaces);
 
   DeviceDescriptor(DeviceIdentity&& identity,
-      const UnitsMapPtr units,
+      const UnitsMapPtr& units,
       const VariablesMapPtr& std_variables,
       VariablesMapPtr&& variables,
       UserInterfaces&& interfaces);

@@ -52,7 +52,7 @@ DeviceDescriptor::DeviceDescriptor(uint16_t vendor_id,
           move(interfaces)) {}
 
 DeviceDescriptor::DeviceDescriptor(DeviceIdentity&& identity,
-    const UnitsMapPtr units,
+    const UnitsMapPtr& units,
     const VariablesMapPtr& std_variables,
     VariablesMapPtr&& variables,
     UserInterfaces&& interfaces)

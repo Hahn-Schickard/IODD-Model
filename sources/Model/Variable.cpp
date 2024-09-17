@@ -15,38 +15,39 @@ T getSimpleDatatypeValue(const SimpleDatatypeValue& variant) {
 }
 
 template <typename T>
-NamedAttributePtr getValueName(T value_type, const SimpleDatatypeValue& value) {
+NamedAttributePtr getValueName(
+    const T& value_type, const SimpleDatatypeValue& value) {
   throw std::runtime_error(
       "Given value type does not support named value attribute");
 }
 
 template <>
 NamedAttributePtr getValueName<BooleanT>(
-    BooleanT value_type, const SimpleDatatypeValue& value) {
+    const BooleanT& value_type, const SimpleDatatypeValue& value) {
   return value_type.getName(getSimpleDatatypeValue<bool>(value));
 }
 
 template <>
 NamedAttributePtr getValueName<UIntegerT>(
-    UIntegerT value_type, const SimpleDatatypeValue& value) {
+    const UIntegerT& value_type, const SimpleDatatypeValue& value) {
   return value_type.getName(getSimpleDatatypeValue<uint64_t>(value));
 }
 
 template <>
 NamedAttributePtr getValueName<IntegerT>(
-    IntegerT value_type, const SimpleDatatypeValue& value) {
+    const IntegerT& value_type, const SimpleDatatypeValue& value) {
   return value_type.getName(getSimpleDatatypeValue<int64_t>(value));
 }
 
 template <>
 NamedAttributePtr getValueName<FloatT>(
-    FloatT value_type, const SimpleDatatypeValue& value) {
+    const FloatT& value_type, const SimpleDatatypeValue& value) {
   return value_type.getName(getSimpleDatatypeValue<float>(value));
 }
 
 template <typename T>
-NamedAttributePtr getValueName(RecordT<T> record,
-    std::optional<uint8_t> subindex,
+NamedAttributePtr getValueName(const RecordT<T>& record,
+    const optional<uint8_t>& subindex,
     const SimpleDatatypeValue& value) {
   if (record.subindexAccess()) {
     if (subindex.has_value()) {

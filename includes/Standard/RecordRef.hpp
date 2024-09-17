@@ -13,11 +13,11 @@ struct RecordRef : public VariableRef {
       uint8_t subindex);
 
   RecordRef(const VariablePtr& variable,
-      std::optional<float> gradient,
-      std::optional<float> offset,
-      UnitPtr unit,
+      const std::optional<float>& gradient,
+      const std::optional<float>& offset,
+      const UnitPtr& unit,
       DisplayFormat format,
-      std::optional<AccessRights> access,
+      const std::optional<AccessRights>& access,
       uint8_t subindex);
 
   uint8_t subindex() const;

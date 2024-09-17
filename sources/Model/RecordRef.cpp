@@ -13,11 +13,11 @@ RecordRef::RecordRef(const VariablePtr& variable,
       subindex_(subindex) {}
 
 RecordRef::RecordRef(const VariablePtr& variable,
-    optional<float> gradient,
-    optional<float> offset,
-    UnitPtr unit,
+    const optional<float>& gradient,
+    const optional<float>& offset,
+    const UnitPtr& unit,
     DisplayFormat format,
-    optional<AccessRights> access,
+    const optional<AccessRights>& access,
     uint8_t subindex)
     : VariableRef(variable, gradient, offset, unit, format, access),
       subindex_(subindex) {}

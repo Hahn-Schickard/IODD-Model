@@ -568,6 +568,7 @@ VariablesMap decodeVariables(const xml_node& xml,
         if (it != datatypes.end()) {
           data_value = it->second;
         } else {
+          // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
           throw runtime_error("Variable " + id + " requires DataTypeRef " +
               datatype_ref_id + ", but it does not exist");
         }
@@ -646,7 +647,8 @@ SimpleDatatypeValue decodeDefaultValue(
   case Datatype::Float32: {
     return attribute.as_float();
   }
-  case Datatype::String: { // NOLINT(bugprone-branch-clone)
+    // NOLINTNEXTLINE(bugprone-branch-clone)
+  case Datatype::String: {
     [[fallthrough]];
   }
   case Datatype::Time: {
@@ -665,7 +667,7 @@ SimpleDatatypeValue decodeDefaultValue(
 }
 
 optional<DataValue> getUpdatedValues(IODD::Datatype type,
-    const Repository::DatatypesMapPtr& datatypes,
+    const Repository::DatatypesMapPtr& /* datatypes */,
     const xml_node& node,
     const xml_node& locales) {
   if (!node.children().empty()) {
@@ -675,9 +677,8 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
     } else {
       // @TODO:handle Complex data types like StdRecordItemRef here
     }
-  } else {
-    return nullopt;
   }
+  return nullopt;
 }
 
 VariablesMap decodeStdVariables(const xml_node& xml,
