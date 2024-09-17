@@ -15,37 +15,27 @@ enum class UserRole : uint8_t {
   SpecialistRole
 };
 
-inline std::string toString(UserRole role) {
-  switch (role) {
-  case UserRole::ObservationRole: {
-    return "Observation Role";
-  }
-  case UserRole::MaintenanceRole: {
-    return "Maintenance Role";
-  }
-  case UserRole::SpecialistRole: {
-    return "Specialist Role";
-  }
-  default: {
-    throw std::logic_error("Could not decode UserRole. Unsupported enum value");
-  }
-  }
-}
+std::string toString(UserRole role);
 
 struct UserInterface {
-  UserInterface(UserRole _role,
-      MenuPtr _identification,
-      MenuPtr _parameter,
-      MenuPtr _observation,
-      MenuPtr _diagnosis)
-      : role(_role), identification(_identification), parameter(_parameter),
-        observation(_observation), diagnosis(_diagnosis) {}
+  UserInterface(UserRole role,
+      const MenuPtr& identification,
+      const MenuPtr& parameter,
+      const MenuPtr& observation,
+      const MenuPtr& diagnosis);
 
-  const UserRole role;
-  const MenuPtr identification;
-  const MenuPtr parameter;
-  const MenuPtr observation;
-  const MenuPtr diagnosis;
+  UserRole role() const;
+  MenuPtr identification() const;
+  MenuPtr parameter() const;
+  MenuPtr observation() const;
+  MenuPtr diagnosis() const;
+
+private:
+  UserRole role_;
+  MenuPtr identification_;
+  MenuPtr parameter_;
+  MenuPtr observation_;
+  MenuPtr diagnosis_;
 };
 
 using UserInterfacePtr = std::shared_ptr<UserInterface>;

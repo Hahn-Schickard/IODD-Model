@@ -12,12 +12,13 @@ string pad(size_t times = 1) { return string(times * PADDING_SIZE, ' '); }
 string padDot(size_t times = 1) { return pad(times) + "•" + pad(); }
 
 void printUI(const UserInterfacePtr& ui) {
-  cout << pad() << toString(ui->role) << " UI has:" << endl;
-  cout << padDot(2) << ui->parameter->size() << " parameter menus" << endl;
-  cout << padDot(2) << ui->identification->size() << " identification menus"
+  cout << pad() << toString(ui->role()) << " UI has:" << endl;
+  cout << padDot(2) << ui->parameter()->size() << " parameter menus" << endl;
+  cout << padDot(2) << ui->identification()->size() << " identification menus"
        << endl;
-  cout << padDot(2) << ui->observation->size() << " observation menus" << endl;
-  cout << padDot(2) << ui->diagnosis->size() << " diagnosis menus" << endl;
+  cout << padDot(2) << ui->observation()->size() << " observation menus"
+       << endl;
+  cout << padDot(2) << ui->diagnosis()->size() << " diagnosis menus" << endl;
 }
 
 void printDescriptor(const DeviceDescriptorPtr& descriptor) {
