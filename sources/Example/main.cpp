@@ -5,12 +5,10 @@
 using namespace std;
 using namespace IODD;
 
-inline constexpr uint8_t PADDING_SIZE = 1;
-inline constexpr string_view BULLET = "•";
+constexpr uint8_t PADDING_SIZE = 1;
+constexpr string_view BULLET = "•";
 
-inline string pad(size_t times = 1) {
-  return string(times * PADDING_SIZE, ' ');
-}
+string pad(size_t times = 1) { return string(times * PADDING_SIZE, ' '); }
 
 void printUI(const UserInterfacePtr& ui) {
   cout << pad() << toString(ui->role) << " UI has:" << endl;
