@@ -383,6 +383,11 @@ RecordItem<T> decodeRecordItem(const Repository::DatatypesMap& datatypes_map,
     const xml_node& locales) {
   T value;
 
+  auto name_locale = decodeLocalizedText("Name", node, locales);
+  if (!name_locale.has_value()) {
+    throw runtime_error("Missing RecordItem name localization");
+  }
+
   if (auto node_value = node.child("SimpleDatatype"); !node_value.empty()) {
     value = decodeSimpleDataValue<T>(node_value, locales);
   } else if (auto node_value = node.child("DatatypeRef"); !node_value.empty()) {
@@ -399,12 +404,15 @@ RecordItem<T> decodeRecordItem(const Repository::DatatypesMap& datatypes_map,
 
   auto subindex = node.attribute("subindex").as_ullong();
   auto offset = node.attribute("bitOffset").as_ullong();
-  auto name = decodeLocalizedText("Name", node, locales).value();
   auto access = decodeAccessRights(node);
   auto desc = decodeLocalizedText("Description", node, locales);
 
-  return RecordItem(
-      subindex, offset, move(value), move(name), access, move(desc));
+  return RecordItem(subindex,
+      offset,
+      move(value),
+      move(name_locale.value()),
+      access,
+      move(desc));
 }
 
 template <typename T>
@@ -568,9 +576,19 @@ VariablesMap decodeVariables(const xml_node& xml,
   for (auto variable : xml.children("Variable")) {
     string id = getXMLAttribute("id", variable).as_string();
     auto index = getXMLAttribute("index", variable).as_ullong();
+
+    auto name_locale = decodeLocalizedText("Name", variable, locales);
+    if (!name_locale.has_value()) {
+      throw runtime_error("Variable " + id + " does no have name localization");
+    }
+
+    auto access = decodeAccessRights(variable);
+    if (!access.has_value()) {
+      throw runtime_error(
+          "Variable " + id + " does no have access rights specification");
+    }
+
     try {
-      auto name = decodeLocalizedText("Name", variable, locales).value();
-      auto access = decodeAccessRights(variable).value();
       auto description = decodeLocalizedText("Description", variable, locales);
       auto dynamic = variable.attribute("dynamic").as_bool(false);
       auto modifies_others =
@@ -596,8 +614,8 @@ VariablesMap decodeVariables(const xml_node& xml,
       }
       variables.emplace(id,
           make_shared<Variable>(index,
-              move(name),
-              access,
+              move(name_locale.value()),
+              access.value(),
               move(data_value),
               move(description),
               nullopt,
