@@ -181,4 +181,8 @@ optional<TextID> VariableRef::description() const { return desc_; }
 
 optional<TextID> VariableRef::actionMessage() const { return action_msg_; }
 
+float VariableRef::gradient() const { return gradient_; }
+
+float VariableRef::offset() const { return offset_; }
+
 } // namespace IODD

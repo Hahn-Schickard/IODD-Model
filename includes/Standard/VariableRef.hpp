@@ -77,6 +77,10 @@ struct VariableRef {
 
   std::optional<TextID> actionMessage() const;
 
+  float gradient() const;
+
+  float offset() const;
+
 protected:
   VariablePtr variable_;
 
