@@ -11,28 +11,17 @@ template <typename T>
 struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
   ArrayT() = default;
 
-  ArrayT(size_t count, std::vector<T>&& values)
-      : ArrayT(count, false, std::move(values)) {}
+  ArrayT(size_t count, std::vector<T>&& values);
 
-  ArrayT(size_t count, bool subindex_access, std::vector<T>&& values)
-      : ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
-        count_(count), values_(std::move(values)) {}
+  ArrayT(size_t count, bool subindex_access, std::vector<T>&& values);
 
-  void expand(const ArrayT& other) {
-    values_.insert(values_.end(), other.values_.begin(), other.values_.end());
-  }
+  void expand(const ArrayT& other);
 
-  size_t hash() const noexcept {
-    size_t result;
-    for (const auto& value : values_) {
-      result += value.hash();
-    }
-    return result;
-  }
+  size_t hash() const noexcept;
 
-  size_t count() const { return count_; }
+  size_t count() const;
 
-  std::vector<T> values() const { return values_; }
+  std::vector<T> values() const;
 
 private:
   size_t count_;
