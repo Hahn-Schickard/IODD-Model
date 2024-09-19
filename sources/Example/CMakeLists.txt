@@ -17,7 +17,7 @@ target_sources(${MODULE} PRIVATE
 #@+ ======================== User DEPENDENCIES configuration ============================
 target_link_libraries(${MODULE}
                       PRIVATE #Private dependencies
-                      ${PROJECT_NAME}_Parser
+                      ${PROJECT_NAME}_Repo
                       PUBLIC  #Public dependencies
                       ${PROJECT_NAME}_Model
 )
