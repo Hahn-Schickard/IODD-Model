@@ -5,6 +5,7 @@
 #include "ComplexDatatype.hpp"
 #include "Primitives/TextID.hpp"
 
+#include <optional>
 #include <unordered_map>
 
 namespace IODD {
@@ -17,25 +18,21 @@ template <typename T> struct RecordItem {
       T&& value,
       TextID&& name,
       std::optional<AccessRights> access = std::nullopt,
-      std::optional<TextID>&& desc = std::nullopt)
-      : subindex_(subindex),
-        offset_(FixedBitLength<0, 1855>(offset).bitLength()),
-        value_(std::move(value)), name_(std::move(name)),
-        access_(std::move(access)), desc_(std::move(desc)) {}
+      std::optional<TextID>&& desc = std::nullopt);
 
-  size_t hash() const noexcept { return subindex_; }
+  size_t hash() const noexcept;
 
-  uint8_t subindex() const { return subindex_; }
+  uint8_t subindex() const;
 
-  uint16_t offset() const { return offset_; }
+  uint16_t offset() const;
 
-  T value() const { return value_; }
+  T value() const;
 
-  TextID name() const { return name_; }
+  TextID name() const;
 
-  std::optional<AccessRights> access() const { return access_; }
+  std::optional<AccessRights> access() const;
 
-  std::optional<TextID> description() const { return desc_; }
+  std::optional<TextID> description() const;
 
 private:
   uint8_t subindex_;
@@ -54,36 +51,17 @@ struct RecordT : public FixedBitLength<1, 1856>,
                  public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
   RecordT() = default;
 
-  RecordT(uint16_t bit_length, RecordItems<T>&& items)
-      : RecordT(bit_length, false, std::move(items)) {}
+  RecordT(uint16_t bit_length, RecordItems<T>&& items);
 
-  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& items)
-      : FixedBitLength(bit_length), // clang-format off
-        ComplexDataTypeT<T, IsSimpleDatatype<T>>(subindex_access),
-        items_(std::move(items)) {} // clang-format on
+  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& items);
 
-  void expand(const RecordT& other) {
-    // existing key values should NOT be updated
-    items_.insert(other.items_.begin(), other.items_.end());
-  }
+  void expand(const RecordT& other);
 
-  size_t hash() const noexcept {
-    size_t result;
-    for (const auto& item : items_) {
-      result += (item.second.hash() < 8) | item.second.value.hash();
-    }
-    return result;
-  }
+  size_t hash() const noexcept;
 
-  RecordItems<T> items() const { return items_; }
+  RecordItems<T> items() const;
 
-  RecordItem<T> item(uint8_t subindex) const {
-    if (const auto& it = items_.find(subindex); it != items_.end()) {
-      return it->second;
-    }
-    throw std::out_of_range(
-        "Record " + std::to_string(subindex) + " does not exits");
-  }
+  RecordItem<T> item(uint8_t subindex) const;
 
 private:
   RecordItems<T> items_;
