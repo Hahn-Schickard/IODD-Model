@@ -1,8 +1,6 @@
 #include "XML_Helper.hpp"
 
 #include <cstring>
-#include <stdexcept>
-
 #include <sstream>
 
 using namespace std;
