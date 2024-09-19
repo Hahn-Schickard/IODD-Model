@@ -6,7 +6,6 @@ using namespace std;
 
 namespace IODD {
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 TextID::TextID(const string& id, const string& locale)
     : id_(id), locale_(locale) {
   if (id_.empty()) {

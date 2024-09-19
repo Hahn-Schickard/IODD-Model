@@ -104,7 +104,6 @@ float decodeNumeric(
   return (f_value * gradient) + offset;
 }
 
-// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 VariableRef::VariableRef(const VariablePtr& variable,
     ButtonValue value,
     const optional<TextID>& description,
@@ -140,7 +139,6 @@ VariableRef::VariableRef(const VariablePtr& variable,
     access_ = access.value();
   }
 }
-// NOLINTEND(bugprone-easily-swappable-parameters)
 
 VariableRef::Value VariableRef::value(const VariableRef::Value& value) const {
   checkValueType(variable_, value);

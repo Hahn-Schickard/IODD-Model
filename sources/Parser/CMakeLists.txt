@@ -10,7 +10,9 @@ list(APPEND THIS_INCLUDES_DIRS
             ${INCLUDES_DIR}
 )
 
-file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
+file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.?pp"
+                       "${CMAKE_CURRENT_LIST_DIR}/Decoders/*.?pp"
+)
 
 INCLUDE_DIRS_AND_FILES("${THIS_INCLUDES_DIRS}" THIS_INCLUDES)
 

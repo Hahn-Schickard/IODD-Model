@@ -6,7 +6,7 @@ using namespace std;
 
 namespace IODD {
 
-template <typename T> // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+template <typename T>
 RecordItem<T>::RecordItem(uint8_t subindex,
     uint16_t offset,
     T&& value,

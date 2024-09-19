@@ -1,3 +1,6 @@
+#ifndef __IODD_XML_HELPER_HPP
+#define __IODD_XML_HELPER_HPP
+
 #include <pugixml.hpp>
 
 #include <filesystem>
@@ -57,3 +60,5 @@ pugi::xml_attribute getXMLAttribute(
 pugi::xml_attribute getXMLAttribute(const std::string& attribute_name,
     const std::vector<std::string>& nodes,
     const pugi::xml_node& parent);
+
+#endif //__IODD_XML_HELPER_HPP

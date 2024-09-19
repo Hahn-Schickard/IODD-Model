@@ -25,14 +25,14 @@ template struct SingleValue<uint64_t>;
 template struct SingleValue<int64_t>;
 template struct SingleValue<float>;
 
-template <typename T> // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+template <typename T>
 ValueRange<T>::ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
   if (upper_ <= lower_) {
     throw invalid_argument("Upper bound must be larger than lower bound");
   }
 }
 
-template <typename T> // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+template <typename T>
 ValueRange<T>::ValueRange(T lower, T upper, optional<TextID>&& name)
     : NamedAttribute(move(name)), lower_(lower), upper_(upper) {}
 

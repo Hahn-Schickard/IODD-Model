@@ -7,11 +7,9 @@ namespace IODD {
 Condition::Condition(const VariablePtr& variable, uint8_t value)
     : variable_(variable), value_(value) {}
 
-// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 Condition::Condition(
     const VariablePtr& variable, uint8_t subindex, uint8_t value)
     : variable_(variable), subindex_(subindex), value_(value) {}
-// NOLINTEND(bugprone-easily-swappable-parameters)
 
 Condition::Condition(const VariablePtr& variable,
     const optional<uint8_t>& subindex,

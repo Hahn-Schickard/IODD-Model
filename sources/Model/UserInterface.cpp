@@ -21,7 +21,6 @@ string toString(UserRole role) {
   }
 }
 
-// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 UserInterface::UserInterface(UserRole role,
     const MenuPtr& identification,
     const MenuPtr& parameter,
@@ -29,7 +28,6 @@ UserInterface::UserInterface(UserRole role,
     const MenuPtr& diagnosis)
     : role_(role), identification_(identification), parameter_(parameter),
       observation_(observation), diagnosis_(diagnosis) {}
-// NOLINTEND(bugprone-easily-swappable-parameters)
 
 UserRole UserInterface::role() const { return role_; }
 

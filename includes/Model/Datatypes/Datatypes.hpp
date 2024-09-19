@@ -13,6 +13,7 @@
 #include "Timespan.hpp"
 #include "UInteger.hpp"
 
+#include <unordered_map>
 #include <variant>
 
 namespace IODD {
@@ -101,6 +102,9 @@ using DataValue = std::variant< // clang-format off
         ProcessDataIn,
         ProcessDataOut
 >; // clang-format on
+
+using DatatypesMap = std::unordered_map<std::string, DataValue>;
+using DatatypesMapPtr = std::shared_ptr<DatatypesMap>;
 
 Datatype toDatatype(const DataValue& variant);
 

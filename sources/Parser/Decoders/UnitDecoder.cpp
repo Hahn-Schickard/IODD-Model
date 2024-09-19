@@ -1,0 +1,49 @@
+#include "UnitDecoder.hpp"
+#include "PrimitivesDecoder.hpp"
+#include "XML_Helper.hpp"
+
+using namespace std;
+using namespace pugi;
+
+namespace IODD {
+UnitsMapPtr decodeUnits(const filesystem::path& path) {
+  auto result = make_shared<UnitsMap>();
+
+  auto doc = getXML(path);
+  auto xml = getXMLNode("IODDStandardUnitDefinitions", doc, path);
+  auto locales = getXMLNode(
+      vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
+  auto units_collection = getXMLNode("UnitCollection", xml, path);
+
+  for (const auto& unit : units_collection.children("Unit")) {
+    try {
+      auto code = getXMLAttribute("code", unit).as_uint();
+      string abbr = getXMLAttribute("abbr", unit).as_string();
+      string id = getXMLAttribute("textId", unit).as_string();
+      result->emplace(
+          code, make_shared<Unit>(code, abbr, decodeLocalization(locales, id)));
+    } catch (const AttributeNotFound& ex) {
+      // @todo: handle attribute not found
+    }
+  }
+  return result;
+}
+
+UnitPtr findUnit(uint16_t id, const UnitsMapPtr& units) {
+  auto it = units->find(id);
+  if (it != units->end()) {
+    return it->second;
+  }
+  return nullptr;
+}
+
+UnitPtr decodeUnitPtr(const UnitsMapPtr& units, const xml_node& xml) {
+  auto unit_attribute = xml.attribute("unitCode");
+  if (!unit_attribute.empty()) {
+    auto unit_id = unit_attribute.as_uint();
+    return findUnit(unit_id, units);
+  }
+  return nullptr;
+}
+
+} // namespace IODD
