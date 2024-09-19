@@ -3,13 +3,12 @@
 
 #include "Model/DeviceDescriptor.hpp"
 
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 
 namespace IODD {
 struct Repository {
-  using DescriptorsMap = std::unordered_map<std::string, DeviceDescriptorPtr>;
-
   Repository(UnitsMapPtr&& units,
       DatatypesMapPtr&& datatypes,
       VariablesMapPtr&& std_variables,
@@ -32,6 +31,8 @@ private:
   VariablesMapPtr std_variables_;
   DescriptorsMap descriptors_;
 };
+
+std::unique_ptr<Repository> makeRepository(const std::filesystem::path& dir);
 
 } // namespace IODD
 

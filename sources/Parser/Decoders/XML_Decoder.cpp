@@ -1,15 +1,12 @@
-#include "Serializer.hpp"
+#include "XML_Decoder.hpp"
 
-#include "Decoders/DataValueDecoder.hpp"
-#include "Decoders/PrimitivesDecoder.hpp"
-#include "Decoders/UnitDecoder.hpp"
-#include "Decoders/UserInterfaceDecoder.hpp"
-#include "Decoders/VariablesDecoder.hpp"
-#include "Decoders/XML_Helper.hpp"
+#include "DataValueDecoder.hpp"
+#include "PrimitivesDecoder.hpp"
+#include "UnitDecoder.hpp"
+#include "UserInterfaceDecoder.hpp"
+#include "VariablesDecoder.hpp"
+#include "XML_Helper.hpp"
 
-#include <cstring>
-#include <filesystem>
-#include <sstream>
 #include <stdexcept>
 
 using namespace std;
@@ -95,10 +92,10 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
   }
 }
 
-Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
+DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
     const pair<DatatypesMapPtr, VariablesMapPtr>& variables,
     const filesystem::path& path) {
-  Repository::DescriptorsMap descriptors;
+  DescriptorsMap descriptors;
 
   for (const auto& entry : filesystem::directory_iterator(path)) {
     if (entry.path().extension() == ".xml") {
@@ -108,19 +105,5 @@ Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
     }
   }
   return descriptors;
-}
-
-Repository deserializeModel(const std::filesystem::path& dir) {
-  if (!filesystem::is_directory(dir)) {
-    throw invalid_argument(dir.string() + " is not a directory");
-  }
-
-  auto std_units_map = decodeUnits(dir / "IODD-StandardUnitDefinitions.xml");
-  auto std_variables_map =
-      decodeStdDefinitions(dir / "IODD-StandardDefinitions.xml");
-  auto descriptors =
-      decodeDescriptors(std_units_map, std_variables_map, dir / "descriptors");
-  return Repository(
-      move(std_units_map), move(std_variables_map), move(descriptors));
 }
 } // namespace IODD

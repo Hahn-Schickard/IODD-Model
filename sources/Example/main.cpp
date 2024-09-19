@@ -1,4 +1,4 @@
-#include "Serializer.hpp"
+#include "Repository.hpp"
 
 #include "Variant_Visitor.hpp"
 
@@ -137,10 +137,10 @@ void printDescriptor(const DeviceDescriptorPtr& descriptor) {
 
 int main() {
   try {
-    auto repo = deserializeModel(filesystem::path("config"));
+    auto repo = makeRepository(filesystem::path("config"));
 
-    cout << "IODD Repository has " << repo.size() << " descriptors" << endl;
-    for (const auto& descriptor : repo.getDescriptors()) {
+    cout << "IODD Repository has " << repo->size() << " descriptors" << endl;
+    for (const auto& descriptor : repo->getDescriptors()) {
       cout << "Device descriptor for " << descriptor.first
            << " device:" << endl;
       printDescriptor(descriptor.second);

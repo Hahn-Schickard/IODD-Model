@@ -1,5 +1,8 @@
 #include "Repository.hpp"
 
+#include "Decoders/UnitDecoder.hpp"
+#include "Decoders/XML_Decoder.hpp"
+
 #include <stdexcept>
 
 using namespace std;
@@ -45,9 +48,18 @@ DeviceDescriptorPtr Repository::getDescriptor(
   }
 }
 
-Repository::DescriptorsMap Repository::getDescriptors() const {
-  return descriptors_;
-}
+DescriptorsMap Repository::getDescriptors() const { return descriptors_; }
 
 size_t Repository::size() const noexcept { return descriptors_.size(); }
+
+unique_ptr<Repository> makeRepository(const filesystem::path& dir) {
+  auto std_units_map = decodeUnits(dir / "IODD-StandardUnitDefinitions.xml");
+  auto std_variables_map =
+      decodeStdDefinitions(dir / "IODD-StandardDefinitions.xml");
+  auto descriptors =
+      decodeDescriptors(std_units_map, std_variables_map, dir / "descriptors");
+
+  return make_unique<Repository>(
+      move(std_units_map), move(std_variables_map), move(descriptors));
+}
 } // namespace IODD

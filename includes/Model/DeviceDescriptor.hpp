@@ -76,6 +76,7 @@ private:
 };
 
 using DeviceDescriptorPtr = std::shared_ptr<DeviceDescriptor>;
+using DescriptorsMap = std::unordered_map<std::string, DeviceDescriptorPtr>;
 } // namespace IODD
 
 #endif // __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
