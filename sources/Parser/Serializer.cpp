@@ -1120,19 +1120,16 @@ Repository::DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
   return descriptors;
 }
 
-Repository deserializeModel(const string& config_directory_path) {
-  auto config_dir = filesystem::path(config_directory_path);
-
-  if (!filesystem::is_directory(config_dir)) {
-    throw invalid_argument(config_dir.string() + " is not a directory");
+Repository deserializeModel(const std::filesystem::path& dir) {
+  if (!filesystem::is_directory(dir)) {
+    throw invalid_argument(dir.string() + " is not a directory");
   }
 
-  auto std_units_map =
-      decodeUnits(config_dir / "IODD-StandardUnitDefinitions.xml");
+  auto std_units_map = decodeUnits(dir / "IODD-StandardUnitDefinitions.xml");
   auto std_variables_map =
-      decodeStdDefinitions(config_dir / "IODD-StandardDefinitions.xml");
-  auto descriptors = decodeDescriptors(
-      std_units_map, std_variables_map, config_dir / "descriptors");
+      decodeStdDefinitions(dir / "IODD-StandardDefinitions.xml");
+  auto descriptors =
+      decodeDescriptors(std_units_map, std_variables_map, dir / "descriptors");
   return Repository(
       move(std_units_map), move(std_variables_map), move(descriptors));
 }

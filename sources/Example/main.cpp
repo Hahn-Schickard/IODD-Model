@@ -137,7 +137,7 @@ void printDescriptor(const DeviceDescriptorPtr& descriptor) {
 
 int main() {
   try {
-    auto repo = deserializeModel("config");
+    auto repo = deserializeModel(filesystem::path("config"));
 
     cout << "IODD Repository has " << repo.size() << " descriptors" << endl;
     for (const auto& descriptor : repo.getDescriptors()) {
