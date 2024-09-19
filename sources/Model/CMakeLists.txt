@@ -10,7 +10,10 @@ list(APPEND THIS_INCLUDES_DIRS
             ${INCLUDES_DIR}/Model
 )
 
-file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
+file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
+                       "${CMAKE_CURRENT_LIST_DIR}/Datatypes/*.cpp"
+                       "${CMAKE_CURRENT_LIST_DIR}/Datatypes/Primitives/*.cpp"
+)
 
 INCLUDE_DIRS_AND_FILES("${THIS_INCLUDES_DIRS}" THIS_INCLUDES)
 
