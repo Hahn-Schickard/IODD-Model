@@ -7,7 +7,7 @@ set(THIS Model)
 set(MODULE ${PROJECT_NAME}_${THIS})
 
 list(APPEND THIS_INCLUDES_DIRS
-            ${INCLUDES_DIR}/Standard
+            ${INCLUDES_DIR}/Model
 )
 
 file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
