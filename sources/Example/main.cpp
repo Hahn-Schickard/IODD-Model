@@ -55,7 +55,7 @@ void printRefRepresentation(const VariableRefPtr& ref, const size_t offset) {
     if (auto unit = ref->unit()) {
       cout << pad(offset) << "It measures";
       if (auto name = unit->name()) {
-        cout << " " << name->locale() << endl;
+        cout << " " << name->locale();
       }
       auto symbol = unit->abbr();
       cout << " in " << symbol << endl;
@@ -76,14 +76,14 @@ void printRefRepresentation(const VariableRefPtr& ref, const size_t offset) {
 }
 
 void printVarRef(const VariableRefPtr& ref, const size_t offset) {
-  cout << pad(offset) << "Variable reference for ";
+  cout << "Variable reference for ";
   printVariable(ref->variable(), 0);
   cout << endl;
   printRefRepresentation(ref, offset);
 }
 
 void printRecordRef(const RecordRefPtr& ref, const size_t offset) {
-  cout << pad(offset) << "RecordItem reference for ";
+  cout << "RecordItem reference for ";
   printVariable(ref->variable(), 0);
   cout << " subindex " << (size_t)ref->subindex() << endl;
   printRefRepresentation(ref, offset);
