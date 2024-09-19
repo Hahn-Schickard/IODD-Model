@@ -9,6 +9,7 @@ Checks: >
   -modernize-use-nodiscard,
   -modernize-return-braced-init-list,
   -modernize-pass-by-value,
+  -bugprone-easily-swappable-parameters,
   performance-*,
   portability-*,
   readability-*,
