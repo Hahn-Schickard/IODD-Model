@@ -2,21 +2,21 @@
 #define __IODD_STANDARD_DEFINES_VALUE_TYPES_HPP
 
 #include "NamedAttribute.hpp"
-#include <cstdint>
+
+#include <optional>
 
 namespace IODD {
 
 template <typename T> struct SingleValue : public NamedAttribute {
   SingleValue() = default;
 
-  SingleValue(T value) : value_(value) {}
+  SingleValue(T value);
 
-  SingleValue(T value, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), value_(value) {}
+  SingleValue(T value, std::optional<TextID>&& name);
 
-  size_t hash() const noexcept { return std::hash<T>{}(value_); }
+  size_t hash() const noexcept;
 
-  T value() const { return value_; }
+  T value() const;
 
 private:
   T value_;
@@ -27,27 +27,17 @@ template <typename T> using SingleValuePtr = std::shared_ptr<SingleValue<T>>;
 template <typename T> struct ValueRange : public NamedAttribute {
   ValueRange() = default;
 
-  ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
-    if (upper_ <= lower_) {
-      throw std::invalid_argument(
-          "Upper bound must be larger than lower bound");
-    }
-  }
+  ValueRange(T lower, T upper);
 
-  ValueRange(T lower, T upper, std::optional<TextID>&& name)
-      : NamedAttribute(std::move(name)), lower_(lower), upper_(upper) {}
+  ValueRange(T lower, T upper, std::optional<TextID>&& name);
 
-  bool inRange(T value) const noexcept {
-    return (value > lower_) && (value < upper_);
-  }
+  bool inRange(T value) const noexcept;
 
-  size_t hash() const noexcept {
-    return std::hash<T>{}(lower_) + std::hash<T>{}(upper_);
-  }
+  size_t hash() const noexcept;
 
-  T lower() const { return lower_; }
+  T lower() const;
 
-  T upper() const { return upper_; }
+  T upper() const;
 
 private:
   T lower_;

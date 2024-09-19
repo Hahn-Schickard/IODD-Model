@@ -3,6 +3,8 @@
 
 #include "ValueTypes.hpp"
 
+#include <unordered_set>
+
 namespace IODD {
 
 template <typename T> struct NumberT {
@@ -11,51 +13,17 @@ template <typename T> struct NumberT {
 
   NumberT() = default;
 
-  NumberT(SingleValues&& values) : values_(std::move(values)) {}
+  NumberT(SingleValues&& values);
 
-  NumberT(ValueRanges&& ranges) : ranges_(std::move(ranges)) {}
+  NumberT(ValueRanges&& ranges);
 
-  NumberT(SingleValues&& values, ValueRanges&& ranges)
-      : values_(std::move(values)), ranges_(std::move(ranges)) {}
+  NumberT(SingleValues&& values, ValueRanges&& ranges);
 
-  NamedAttributePtr getName(T value) const {
-    if (auto it = values_.find(std::make_shared<SingleValue<T>>(value));
-        it != values_.end()) {
-      return *it;
-    } else {
-      for (const auto& range : ranges_) {
-        if (range->inRange(value)) {
-          return range;
-        }
-      }
-    }
-    throw std::out_of_range(
-        std::to_string(value) + " value has no assigned named");
-  }
+  NamedAttributePtr getName(T value) const;
 
-  void expand(const NumberT& other) {
-    for (const auto& value : other.values_) {
-      if (values_.find(value) == values_.end()) {
-        values_.insert(value);
-      }
-    }
-    for (const auto& range : other.ranges_) {
-      if (ranges_.find(range) == ranges_.end()) {
-        ranges_.insert(range);
-      }
-    }
-  }
+  void expand(const NumberT& other);
 
-  size_t hash() const noexcept {
-    size_t result;
-    for (const auto& value : values_) {
-      result += value->hash();
-    }
-    for (const auto& value : ranges_) {
-      result += value->hash();
-    }
-    return result;
-  }
+  size_t hash() const noexcept;
 
 private:
   SingleValues values_;

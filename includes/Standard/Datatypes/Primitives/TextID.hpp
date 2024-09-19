@@ -1,31 +1,20 @@
 #ifndef __IODD_STANDARD_DEFINES_TEXT_ID_HPP
 #define __IODD_STANDARD_DEFINES_TEXT_ID_HPP
 
-#include <stdexcept>
 #include <string>
 
 namespace IODD {
 
 struct TextID {
-  TextID(const std::string& id, const std::string& locale)
-      : id_(id), locale_(locale) {
-    if (id_.empty()) {
-      throw std::invalid_argument(
-          "Failed to create TextID. ID argument can not be empty");
-    }
-    if (locale_.empty()) {
-      throw std::invalid_argument("Failed to create TextID " + id_ +
-          ". Locale argument can not be empty");
-    }
-  }
+  TextID(const std::string& id, const std::string& locale);
 
-  std::string id() const { return id_; }
+  std::string id() const;
 
-  std::string locale() const { return locale_; }
+  std::string locale() const;
 
-  size_t hash() const noexcept { return std::hash<std::string>{}(id_); }
+  size_t hash() const noexcept;
 
-  explicit operator bool() const { return !id_.empty() && !locale_.empty(); }
+  explicit operator bool() const;
 
 private:
   std::string id_;
