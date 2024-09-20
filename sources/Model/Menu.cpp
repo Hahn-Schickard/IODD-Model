@@ -32,7 +32,7 @@ size_t Menu::size() const { return references_.size(); }
 
 string Menu::id() const { return id_; }
 
-vector<Menu::Ref> Menu::references() const { return references_; }
+Menu::Refs Menu::references() const { return references_; }
 
 optional<TextID> Menu::name() const { return name_; }
 

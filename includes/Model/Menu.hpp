@@ -34,9 +34,10 @@ private:
 
 struct Menu {
   using Ref = std::variant<VariableRefPtr, RecordRefPtr, std::shared_ptr<Menu>>;
+  using Refs = std::vector<Ref>;
 
   Menu(const std::string& id_,
-      const std::vector<Ref>& references_,
+      const Refs& references_,
       const std::optional<TextID>& name_ = std::nullopt,
       const std::optional<Condition>& condition_ = std::nullopt);
 
@@ -44,7 +45,7 @@ struct Menu {
 
   std::string id() const;
 
-  std::vector<Ref> references() const;
+  Refs references() const;
 
   std::optional<TextID> name() const;
 
@@ -52,7 +53,7 @@ struct Menu {
 
 private:
   std::string id_;
-  std::vector<Ref> references_;
+  Refs references_;
   std::optional<TextID> name_;
   std::optional<Condition> condition_;
 };
