@@ -26,7 +26,14 @@ Menu::Menu(const string& id,
     const vector<Ref>& references,
     const optional<TextID>& name,
     const optional<Condition>& condition)
-    : id_(id), references_(references), name_(name), condition_(condition) {}
+    : id_(id), references_(references), name_(name), condition_(condition) {
+  if (id_.empty()) {
+    throw invalid_argument("Menu ID can not be empty");
+  }
+  if (references_.empty()) {
+    throw invalid_argument("Menu References can not be empty");
+  }
+}
 
 size_t Menu::size() const { return references_.size(); }
 
