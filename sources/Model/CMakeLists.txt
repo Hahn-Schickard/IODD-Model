@@ -55,3 +55,10 @@ install(
     FILES ${THIS_INCLUDES}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
+
+install(
+    DIRECTORY ${INCLUDES_DIR}/Model
+              ${INCLUDES_DIR}/Model/Datatypes
+              ${INCLUDES_DIR}/Model/Datatypes/Primitives
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
