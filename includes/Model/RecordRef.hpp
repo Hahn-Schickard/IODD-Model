@@ -7,18 +7,18 @@ namespace IODD {
 
 struct RecordRef : public VariableRef {
   RecordRef(const VariablePtr& variable,
+      uint8_t subindex,
       ButtonValue value,
-      const std::optional<TextID>& description,
-      const std::optional<TextID>& action_started_msg,
-      uint8_t subindex);
+      const std::optional<TextID>& description = std::nullopt,
+      const std::optional<TextID>& action_started_msg = std::nullopt);
 
   RecordRef(const VariablePtr& variable,
-      const std::optional<float>& gradient,
-      const std::optional<float>& offset,
-      const UnitPtr& unit,
-      DisplayFormat format,
-      const std::optional<AccessRights>& access,
-      uint8_t subindex);
+      uint8_t subindex,
+      const std::optional<float>& gradient = std::nullopt,
+      const std::optional<float>& offset = std::nullopt,
+      const UnitPtr& unit = nullptr,
+      DisplayFormat format = DisplayFormat::None,
+      const std::optional<AccessRights>& access = std::nullopt);
 
   uint8_t subindex() const;
 

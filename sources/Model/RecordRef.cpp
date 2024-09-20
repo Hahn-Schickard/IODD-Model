@@ -5,20 +5,20 @@ using namespace std;
 namespace IODD {
 
 RecordRef::RecordRef(const VariablePtr& variable,
+    uint8_t subindex,
     ButtonValue value,
     const optional<TextID>& description,
-    const optional<TextID>& action_started_msg,
-    uint8_t subindex)
+    const optional<TextID>& action_started_msg)
     : VariableRef(variable, value, description, action_started_msg),
       subindex_(subindex) {}
 
 RecordRef::RecordRef(const VariablePtr& variable,
+    uint8_t subindex,
     const optional<float>& gradient,
     const optional<float>& offset,
     const UnitPtr& unit,
     DisplayFormat format,
-    const optional<AccessRights>& access,
-    uint8_t subindex)
+    const optional<AccessRights>& access)
     : VariableRef(variable, gradient, offset, unit, format, access),
       subindex_(subindex) {}
 

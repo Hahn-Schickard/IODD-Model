@@ -116,7 +116,7 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
         decodeLocalizedText("ActionStartedMessage", button_xml, locales);
 
     return make_shared<RecordRef>(
-        variable, button_value, description, action_msg, subindex);
+        variable, subindex, button_value, description, action_msg);
   } catch (const NodeNotFound& ex) {
     auto gradient = decodeFloatAttribute(xml, "gradient");
     auto offset = decodeFloatAttribute(xml, "offset");
@@ -125,7 +125,7 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
     auto access = decodeAccessRights(xml);
 
     return make_shared<RecordRef>(
-        variable, gradient, offset, unit, format, access, subindex);
+        variable, subindex, gradient, offset, unit, format, access);
   }
 }
 
