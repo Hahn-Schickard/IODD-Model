@@ -47,15 +47,15 @@ struct VariableRef {
 
   VariableRef(const VariablePtr& variable,
       ButtonValue value,
-      const std::optional<TextID>& description,
-      const std::optional<TextID>& action_started_msg);
+      const std::optional<TextID>& description = std::nullopt,
+      const std::optional<TextID>& action_started_msg = std::nullopt);
 
   VariableRef(const VariablePtr& variable,
-      const std::optional<float>& gradient,
-      const std::optional<float>& offset,
-      const UnitPtr& unit,
-      DisplayFormat format,
-      const std::optional<AccessRights>& access);
+      const std::optional<float>& gradient = std::nullopt,
+      const std::optional<float>& offset = std::nullopt,
+      const UnitPtr& unit = nullptr,
+      DisplayFormat format = DisplayFormat::None,
+      const std::optional<AccessRights>& access = std::nullopt);
 
   Value value(const Value& value) const;
 
