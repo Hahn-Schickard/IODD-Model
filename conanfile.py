@@ -30,7 +30,7 @@ class PackageConan(ConanFile):
         "CMakeLists.txt",
         "conanfile.py",
         # @+ START USER EXPORTS
-        "config",
+        "config*",
         # @- END USER EXPORTS
     ]
     generators = "CMakeDeps"
