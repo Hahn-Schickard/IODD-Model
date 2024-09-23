@@ -83,7 +83,7 @@ void checkValueType(
   }
 }
 
-float decodeNumeric(
+float computeNumeric(
     const VariableRef::Value& value, float gradient, float offset) {
   float f_value;
   match(
@@ -140,14 +140,15 @@ VariableRef::VariableRef(const VariablePtr& variable,
   }
 }
 
-VariableRef::Value VariableRef::value(const VariableRef::Value& value) const {
+VariableRef::Value VariableRef::calculate(
+    const VariableRef::Value& value) const {
   checkValueType(variable_, value);
   if (isDecimal(format_)) {
     if (isNumericData(variable_->type())) {
-      return decodeNumeric(value, gradient_, offset_);
+      return computeNumeric(value, gradient_, offset_);
     }
   }
-  // value does not need to be decoded, return it as is
+  // value does not need to be calculated, return it as is
   return value;
 }
 

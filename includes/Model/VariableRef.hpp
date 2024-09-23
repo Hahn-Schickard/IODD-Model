@@ -57,7 +57,7 @@ struct VariableRef {
       DisplayFormat format = DisplayFormat::None,
       const std::optional<AccessRights>& access = std::nullopt);
 
-  Value value(const Value& value) const;
+  Value calculate(const Value& value) const;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
