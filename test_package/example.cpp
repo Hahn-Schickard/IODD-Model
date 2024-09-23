@@ -1,4 +1,4 @@
-#include "IODD_Model/Model/DeviceDescriptor.hpp"
+#include "IODD/Repository.hpp"
 
 #include <iostream>
 
@@ -32,8 +32,13 @@ int main() {
         make_shared<VariablesMap>(variables_mock),
         make_shared<VariablesMap>(variables_mock),
         move(mocked_uis));
+
     cout << device->getDeviceName().locale() << " has "
          << device->variableCount() << " variables" << endl;
+
+    auto repo = makeRepository(filesystem::path("config"));
+    cout << "IODD Repository has " << repo->size() << " descriptors" << endl;
+
     cout << "Integration test successful" << endl;
     exit(EXIT_SUCCESS);
   } catch (const exception& ex) {
