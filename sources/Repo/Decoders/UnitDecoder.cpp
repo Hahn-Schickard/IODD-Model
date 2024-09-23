@@ -23,7 +23,9 @@ UnitsMapPtr decodeUnits(const filesystem::path& path) {
       result->emplace(
           code, make_shared<Unit>(code, abbr, decodeLocalization(locales, id)));
     } catch (const AttributeNotFound& ex) {
-      // @todo: handle attribute not found
+      throw runtime_error("Failed to decode unit " +
+          to_string(unit.offset_debug()) + " from " + path.string() +
+          " due to exception: " + string(ex.what()));
     }
   }
   return result;
