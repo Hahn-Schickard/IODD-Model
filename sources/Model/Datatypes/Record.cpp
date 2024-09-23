@@ -40,15 +40,6 @@ template <typename T> optional<TextID> RecordItem<T>::description() const {
   return desc_;
 }
 
-template struct RecordItem<BooleanT>;
-template struct RecordItem<UIntegerT>;
-template struct RecordItem<IntegerT>;
-template struct RecordItem<FloatT>;
-template struct RecordItem<StringT>;
-template struct RecordItem<OctetStringT>;
-template struct RecordItem<TimeT>;
-template struct RecordItem<TimeSpanT>;
-
 template <typename T>
 RecordT<T>::RecordT(uint16_t bit_length, RecordItems<T>&& items)
     : RecordT(bit_length, false, move(items)) {}
@@ -84,13 +75,4 @@ template <typename T> RecordItem<T> RecordT<T>::item(uint8_t subindex) const {
   }
   throw out_of_range("Record " + to_string(subindex) + " does not exits");
 }
-
-template struct RecordT<BooleanT>;
-template struct RecordT<UIntegerT>;
-template struct RecordT<IntegerT>;
-template struct RecordT<FloatT>;
-template struct RecordT<StringT>;
-template struct RecordT<OctetStringT>;
-template struct RecordT<TimeT>;
-template struct RecordT<TimeSpanT>;
 } // namespace IODD

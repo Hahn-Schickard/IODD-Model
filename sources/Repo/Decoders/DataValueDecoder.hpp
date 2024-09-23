@@ -26,6 +26,38 @@ T decodeSimpleDataValue(
       "Failed to decode Simple Data Value. Unsupported data type");
 }
 
+template <>
+BooleanT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+UIntegerT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+IntegerT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+FloatT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+StringT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+OctetStringT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+TimeT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+TimeSpanT decodeSimpleDataValue(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
 SimpleDatatype decodeSimpleDataValue(
     Datatype type, const pugi::xml_node& node, const pugi::xml_node& locales);
 

@@ -37,5 +37,17 @@ NumberT<T> decodeNumericValues(
     const pugi::xml_node& /* node */, const pugi::xml_node& /* locales */) {
   throw runtime_error("Failed to decode Numeric Value. Unsupported data type");
 }
+
+template <>
+NumberT<uint64_t> decodeNumericValues(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+NumberT<int64_t> decodeNumericValues(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
+
+template <>
+NumberT<float> decodeNumericValues(
+    const pugi::xml_node& node, const pugi::xml_node& locales);
 } // namespace IODD
 #endif //__IODD_NUMERICS_DECODER_HPP

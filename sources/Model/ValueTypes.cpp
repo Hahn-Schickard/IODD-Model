@@ -18,13 +18,6 @@ template <typename T> size_t SingleValue<T>::hash() const noexcept {
 
 template <typename T> T SingleValue<T>::value() const { return value_; }
 
-template <typename T> using SingleValuePtr = shared_ptr<SingleValue<T>>;
-
-template struct SingleValue<bool>;
-template struct SingleValue<uint64_t>;
-template struct SingleValue<int64_t>;
-template struct SingleValue<float>;
-
 template <typename T>
 ValueRange<T>::ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
   if (upper_ <= lower_) {
@@ -47,9 +40,5 @@ template <typename T> size_t ValueRange<T>::hash() const noexcept {
 template <typename T> T ValueRange<T>::lower() const { return lower_; }
 
 template <typename T> T ValueRange<T>::upper() const { return upper_; }
-
-template struct ValueRange<uint64_t>;
-template struct ValueRange<int64_t>;
-template struct ValueRange<float>;
 
 } // namespace IODD
