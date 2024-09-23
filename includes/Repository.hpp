@@ -32,7 +32,9 @@ private:
   DescriptorsMap descriptors_;
 };
 
-std::unique_ptr<Repository> makeRepository(const std::filesystem::path& dir);
+using RepositoryPtr = std::unique_ptr<Repository>;
+
+RepositoryPtr makeRepository(const std::filesystem::path& dir);
 
 } // namespace IODD
 

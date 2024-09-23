@@ -52,7 +52,7 @@ DescriptorsMap Repository::getDescriptors() const { return descriptors_; }
 
 size_t Repository::size() const noexcept { return descriptors_.size(); }
 
-unique_ptr<Repository> makeRepository(const filesystem::path& dir) {
+RepositoryPtr makeRepository(const filesystem::path& dir) {
   auto std_units_map = decodeUnits(dir / "IODD-StandardUnitDefinitions.xml");
   auto std_variables_map =
       decodeStdDefinitions(dir / "IODD-StandardDefinitions.xml");
