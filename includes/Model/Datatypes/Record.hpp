@@ -46,14 +46,14 @@ private:
 template <typename T>
 using RecordItems = std::unordered_map<uint8_t, RecordItem<T>>;
 
-template struct RecordItem<BooleanT>;
-template struct RecordItem<UIntegerT>;
-template struct RecordItem<IntegerT>;
-template struct RecordItem<FloatT>;
-template struct RecordItem<StringT>;
-template struct RecordItem<OctetStringT>;
-template struct RecordItem<TimeT>;
-template struct RecordItem<TimeSpanT>;
+extern template struct RecordItem<BooleanT>;
+extern template struct RecordItem<UIntegerT>;
+extern template struct RecordItem<IntegerT>;
+extern template struct RecordItem<FloatT>;
+extern template struct RecordItem<StringT>;
+extern template struct RecordItem<OctetStringT>;
+extern template struct RecordItem<TimeT>;
+extern template struct RecordItem<TimeSpanT>;
 
 template <typename T>
 struct RecordT : public FixedBitLength<1, 1856>,
@@ -76,14 +76,14 @@ private:
   RecordItems<T> items_;
 };
 
-template struct RecordT<BooleanT>;
-template struct RecordT<UIntegerT>;
-template struct RecordT<IntegerT>;
-template struct RecordT<FloatT>;
-template struct RecordT<StringT>;
-template struct RecordT<OctetStringT>;
-template struct RecordT<TimeT>;
-template struct RecordT<TimeSpanT>;
+extern template struct RecordT<BooleanT>;
+extern template struct RecordT<UIntegerT>;
+extern template struct RecordT<IntegerT>;
+extern template struct RecordT<FloatT>;
+extern template struct RecordT<StringT>;
+extern template struct RecordT<OctetStringT>;
+extern template struct RecordT<TimeT>;
+extern template struct RecordT<TimeSpanT>;
 
 template <typename T>
 inline bool operator==(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {

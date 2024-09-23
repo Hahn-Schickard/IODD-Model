@@ -28,13 +28,13 @@ private:
   std::vector<T> values_;
 };
 
-template struct ArrayT<BooleanT>;
-template struct ArrayT<UIntegerT>;
-template struct ArrayT<IntegerT>;
-template struct ArrayT<FloatT>;
-template struct ArrayT<StringT>;
-template struct ArrayT<OctetStringT>;
-template struct ArrayT<TimeT>;
-template struct ArrayT<TimeSpanT>;
+extern template struct ArrayT<BooleanT>;
+extern template struct ArrayT<UIntegerT>;
+extern template struct ArrayT<IntegerT>;
+extern template struct ArrayT<FloatT>;
+extern template struct ArrayT<StringT>;
+extern template struct ArrayT<OctetStringT>;
+extern template struct ArrayT<TimeT>;
+extern template struct ArrayT<TimeSpanT>;
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_ARRAY_T_HPP

@@ -24,10 +24,10 @@ private:
 
 template <typename T> using SingleValuePtr = std::shared_ptr<SingleValue<T>>;
 
-template struct SingleValue<bool>;
-template struct SingleValue<uint64_t>;
-template struct SingleValue<int64_t>;
-template struct SingleValue<float>;
+extern template struct SingleValue<bool>;
+extern template struct SingleValue<uint64_t>;
+extern template struct SingleValue<int64_t>;
+extern template struct SingleValue<float>;
 
 template <typename T> struct ValueRange : public NamedAttribute {
   ValueRange() = default;
@@ -51,9 +51,9 @@ private:
 
 template <typename T> using ValueRangePtr = std::shared_ptr<ValueRange<T>>;
 
-template struct ValueRange<uint64_t>;
-template struct ValueRange<int64_t>;
-template struct ValueRange<float>;
+extern template struct ValueRange<uint64_t>;
+extern template struct ValueRange<int64_t>;
+extern template struct ValueRange<float>;
 
 template <typename T>
 inline bool operator==(const SingleValue<T>& lhs, const SingleValue<T>& rhs) {

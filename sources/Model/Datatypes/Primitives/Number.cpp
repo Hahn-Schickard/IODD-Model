@@ -55,4 +55,8 @@ template <typename T> size_t NumberT<T>::hash() const noexcept {
   }
   return result;
 }
+
+template struct NumberT<uint64_t>;
+template struct NumberT<int64_t>;
+template struct NumberT<float>;
 } // namespace IODD

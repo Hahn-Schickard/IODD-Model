@@ -28,4 +28,13 @@ template <typename T> size_t ArrayT<T>::hash() const noexcept {
 template <typename T> size_t ArrayT<T>::count() const { return count_; }
 
 template <typename T> vector<T> ArrayT<T>::values() const { return values_; }
+
+template struct ArrayT<BooleanT>;
+template struct ArrayT<UIntegerT>;
+template struct ArrayT<IntegerT>;
+template struct ArrayT<FloatT>;
+template struct ArrayT<StringT>;
+template struct ArrayT<OctetStringT>;
+template struct ArrayT<TimeT>;
+template struct ArrayT<TimeSpanT>;
 } // namespace IODD

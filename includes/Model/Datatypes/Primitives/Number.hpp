@@ -30,9 +30,9 @@ private:
   ValueRanges ranges_;
 };
 
-template struct NumberT<uint64_t>;
-template struct NumberT<int64_t>;
-template struct NumberT<float>;
+extern template struct NumberT<uint64_t>;
+extern template struct NumberT<int64_t>;
+extern template struct NumberT<float>;
 
 template <typename T>
 inline bool operator==(const NumberT<T>& lhs, const NumberT<T>& rhs) {
