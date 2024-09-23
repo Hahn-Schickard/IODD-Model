@@ -29,6 +29,7 @@ target_link_libraries(${MODULE}
                       PRIVATE #Private dependencies
                       pugixml::pugixml
                       PUBLIC  #Public dependencies
+                      stdc++fs
                       ${PROJECT_NAME}_Model
 )
 #@- =========================== END OF USER CONFIGURATION ===============================
