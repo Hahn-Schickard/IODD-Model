@@ -1,4 +1,4 @@
-#include "Datatypes/Primitives/TextID.hpp"
+#include "TextID.hpp"
 
 #include <stdexcept>
 

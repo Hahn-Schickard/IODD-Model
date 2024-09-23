@@ -1,4 +1,4 @@
-#include "Datatypes/Record.hpp"
+#include "Record.hpp"
 
 #include <stdexcept>
 

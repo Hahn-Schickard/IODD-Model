@@ -1,4 +1,4 @@
-#include "Datatypes/Primitives/ValueTypes.hpp"
+#include "ValueTypes.hpp"
 
 #include <stdexcept>
 

@@ -1,4 +1,4 @@
-#include "Datatypes/Boolean.hpp"
+#include "Boolean.hpp"
 
 #include <stdexcept>
 

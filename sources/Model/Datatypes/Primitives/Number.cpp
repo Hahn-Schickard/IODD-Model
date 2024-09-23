@@ -1,4 +1,4 @@
-#include "Datatypes/Primitives/Number.hpp"
+#include "Number.hpp"
 
 #include <stdexcept>
 

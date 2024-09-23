@@ -1,4 +1,4 @@
-#include "Datatypes/Array.hpp"
+#include "Array.hpp"
 
 using namespace std;
 

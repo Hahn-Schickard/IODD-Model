@@ -8,6 +8,8 @@ set(MODULE ${PROJECT_NAME}_${THIS})
 
 list(APPEND THIS_INCLUDES_DIRS
             ${INCLUDES_DIR}/Model
+            ${INCLUDES_DIR}/Model/Datatypes
+            ${INCLUDES_DIR}/Model/Datatypes/Primitives
 )
 
 file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
@@ -34,8 +36,9 @@ target_link_libraries(${MODULE}
 #@- =========================== END OF USER CONFIGURATION ===============================
 
 target_include_directories(${MODULE} INTERFACE
-                           $<BUILD_INTERFACE:${INCLUDES_DIR}>
-                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Standard>
+                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model>
+                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes>
+                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes/Primitives>
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
 )
