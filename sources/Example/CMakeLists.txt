@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 #@+ ======================== User MODULE NAME configuration ============================
-set(THIS Runner)
+set(THIS Example)
 #@- =========================== END OF USER CONFIGURATION ===============================
 
 set(MODULE ${PROJECT_NAME}_${THIS})
