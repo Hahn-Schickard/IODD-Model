@@ -41,4 +41,12 @@ template <typename T> T ValueRange<T>::lower() const { return lower_; }
 
 template <typename T> T ValueRange<T>::upper() const { return upper_; }
 
+template struct SingleValue<bool>;
+template struct SingleValue<uint64_t>;
+template struct SingleValue<int64_t>;
+template struct SingleValue<float>;
+template struct ValueRange<uint64_t>;
+template struct ValueRange<int64_t>;
+template struct ValueRange<float>;
+
 } // namespace IODD
