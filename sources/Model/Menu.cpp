@@ -4,10 +4,11 @@ using namespace std;
 
 namespace IODD {
 Menu::Menu(const string& id,
-    const vector<Ref>& references,
-    const optional<TextID>& name,
+    vector<Ref>&& references,
+    optional<TextID>&& name,
     const optional<Condition>& condition)
-    : id_(id), references_(references), name_(name), condition_(condition) {
+    : id_(id), references_(references), name_(move(name)),
+      condition_(condition) {
   if (id_.empty()) {
     throw invalid_argument("Menu ID can not be empty");
   }

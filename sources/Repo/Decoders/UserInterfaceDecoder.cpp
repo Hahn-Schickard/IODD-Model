@@ -187,7 +187,7 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
           ref_condition));
     }
   }
-  return make_shared<Menu>(menu_id, refs, name, condition);
+  return make_shared<Menu>(menu_id, move(refs), move(name), condition);
 }
 
 MenuPtr decodeOptionalMenu(const string& menu_name,
