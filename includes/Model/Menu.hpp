@@ -1,6 +1,7 @@
 #ifndef __IODD_STANDARD_DEFINES_MENU_HPP
 #define __IODD_STANDARD_DEFINES_MENU_HPP
 
+#include "Condition.hpp"
 #include "RecordRef.hpp"
 
 #include <cstdint>
@@ -10,27 +11,6 @@
 #include <vector>
 
 namespace IODD {
-
-struct Condition {
-  Condition(const VariablePtr& variable, uint8_t value);
-
-  Condition(const VariablePtr& variable, uint8_t subindex, uint8_t value);
-
-  Condition(const VariablePtr& variable,
-      const std::optional<uint8_t>& subindex,
-      uint8_t value);
-
-  VariablePtr variable() const;
-
-  std::optional<uint8_t> subindex() const;
-
-  uint8_t value() const;
-
-private:
-  VariablePtr variable_;
-  std::optional<uint8_t> subindex_;
-  uint8_t value_;
-};
 
 struct Menu {
   using Ref = std::variant<VariableRefPtr, RecordRefPtr, std::shared_ptr<Menu>>;
