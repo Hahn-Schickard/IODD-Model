@@ -18,6 +18,9 @@
 
 namespace IODD {
 
+using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
+    std::variant<bool, uint64_t, int64_t, float, std::string>;
+
 using SimpleDatatype = std::variant<BooleanT,
     UIntegerT,
     IntegerT,
@@ -109,5 +112,9 @@ using DatatypesMapPtr = std::shared_ptr<DatatypesMap>;
 Datatype toDatatype(const DataValue& variant);
 
 void expand(DataValue& lhs, const DataValue& rhs);
+
+NamedAttributePtr getValueName(const DataValue& type,
+    const SimpleDatatypeValue& value,
+    std::optional<uint8_t> subindex = std::nullopt);
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_DATA_TYPES_HPP
