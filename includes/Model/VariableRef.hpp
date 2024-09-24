@@ -15,9 +15,9 @@
 namespace IODD {
 
 enum class DisplayFormat : uint8_t {
-  None = 20, /*!< Display format is not used */
-  Bin = 10, /*!< Binary notation */
-  Hex = 11, /*!< Hexadecimal notation */
+  None = 30, /*!< Display format is not used */
+  Bin = 20, /*!< Binary notation */
+  Hex = 21, /*!< Hexadecimal notation */
   Dec0 = 0, /*!< Decimal notation without digits after the decimal point */
   Dec1 = 1, /*!< Decimal notation with 1 digit after the decimal point */
   Dec2 = 2, /*!< Decimal notation with 2 digits after the decimal point */
@@ -27,7 +27,8 @@ enum class DisplayFormat : uint8_t {
   Dec6 = 6, /*!< Decimal notation with 6 digits after the decimal point */
   Dec7 = 7, /*!< Decimal notation with 7 digits after the decimal point */
   Dec8 = 8, /*!< Decimal notation with 8 digits after the decimal point */
-  Dec9 = 9 /*!< Decimal notation with 9 digits after the decimal point */
+  Dec9 = 9, /*!< Decimal notation with 9 digits after the decimal point */
+  Dec = 10 /*!< Display decimal point digits as needed*/
 };
 
 bool isDecimal(DisplayFormat format);

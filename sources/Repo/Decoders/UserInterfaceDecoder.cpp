@@ -33,6 +33,7 @@ DisplayFormat decodeDisplayFormat(const xml_node& xml) {
   auto format_attribute = xml.attribute("displayFormat");
   if (!format_attribute.empty()) {
     unordered_map<string, DisplayFormat> format_types{
+        {"Dec", DisplayFormat::Dec},
         {"Dec.0", DisplayFormat::Dec0},
         {"Dec.1", DisplayFormat::Dec1},
         {"Dec.2", DisplayFormat::Dec2},

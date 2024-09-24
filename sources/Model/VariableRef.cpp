@@ -6,7 +6,7 @@ namespace IODD {
 
 bool isDecimal(DisplayFormat format) {
   return static_cast<uint8_t>(format) <=
-      static_cast<uint8_t>(DisplayFormat::Dec9);
+      static_cast<uint8_t>(DisplayFormat::Dec);
 }
 
 bool isBinary(DisplayFormat format) { return format == DisplayFormat::Bin; }
