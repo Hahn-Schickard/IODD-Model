@@ -10,16 +10,22 @@ using namespace std;
 
 namespace IODD {
 
-// NOLINTBEGIN(readability-magic-numbers)
-bool isNumericData(Datatype type) { return static_cast<uint8_t>(type) < 3; }
+bool isNumericData(Datatype type) {
+  return static_cast<uint8_t>(type) < static_cast<uint8_t>(Datatype::Boolean);
+}
 
-bool isSimpleData(Datatype type) { return static_cast<uint8_t>(type) < 9; }
+bool isSimpleData(Datatype type) {
+  return static_cast<uint8_t>(type) <
+      static_cast<uint8_t>(Datatype::Array_UInteger);
+}
 
 bool isComplexData(Datatype type) {
   if (isSimpleData(type)) {
     return false;
   } else {
-    return static_cast<uint8_t>(type) < 30;
+    return static_cast<uint8_t>(type) <
+        static_cast<uint8_t>(Datatype::ProcessDataIn);
+    ;
   }
 }
 
@@ -27,7 +33,8 @@ bool isArray(Datatype type) {
   if (!isComplexData(type)) {
     return false;
   } else {
-    return static_cast<uint8_t>(type) < 19;
+    return static_cast<uint8_t>(type) <
+        static_cast<uint8_t>(Datatype::Record_UInteger);
   }
 }
 
@@ -35,12 +42,15 @@ bool isRecord(Datatype type) {
   if (!isComplexData(type)) {
     return false;
   } else {
-    return static_cast<uint8_t>(type) < 29;
+    return static_cast<uint8_t>(type) <
+        static_cast<uint8_t>(Datatype::ProcessDataIn);
   }
 }
 
-bool isProcessData(Datatype type) { return static_cast<uint8_t>(type) > 29; }
-// NOLINTEND(readability-magic-numbers)
+bool isProcessData(Datatype type) {
+  return static_cast<uint8_t>(type) >=
+      static_cast<uint8_t>(Datatype::ProcessDataIn);
+}
 
 string toString(Datatype type) {
   switch (type) {
