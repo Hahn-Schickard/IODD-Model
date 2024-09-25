@@ -34,19 +34,23 @@ DeviceDescriptor::DeviceDescriptor(uint16_t vendor_id,
     const TextID& device_name,
     const UnitsMapPtr& units,
     VariablesMap&& variables,
+    ProcessDataCollection&& process_data,
     UserInterfaces&& interfaces)
     : DeviceDescriptor(
           DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
           units,
           move(variables),
+          move(process_data),
           move(interfaces)) {}
 
 DeviceDescriptor::DeviceDescriptor(DeviceIdentity&& identity,
     const UnitsMapPtr& units,
     VariablesMap&& variables,
+    ProcessDataCollection&& process_data,
     UserInterfaces&& interfaces)
     : DeviceIdentity(move(identity)), units_(units),
-      variables_(move(variables)), interfaces_(move(interfaces)) {
+      variables_(move(variables)), process_data_(move(process_data)),
+      interfaces_(move(interfaces)) {
   if (units_->empty()) {
     throw invalid_argument(
         "Failed to create DeviceDescriptor. Units can not be empty");

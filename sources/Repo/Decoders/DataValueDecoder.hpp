@@ -108,6 +108,11 @@ auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
   return {v};
 }
 
+struct ProcessDataUnionAsValue : std::runtime_error {
+  ProcessDataUnionAsValue()
+      : runtime_error("Data Value decoded as Process Data Union") {}
+};
+
 DataValue decodeDataValue(const pugi::xml_node& node,
     const pugi::xml_node& locales,
     const DatatypesMap& datatypes_map = {});

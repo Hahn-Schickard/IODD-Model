@@ -335,16 +335,15 @@ DatatypesMap decodeDatatypes(const xml_node& xml,
 
 DataValue decodeDataValue(const xml_node& node,
     const xml_node& locales,
-    const DatatypesMap& datatypes_map) {
+    const DatatypesMap&
+        datatypes_map) { // @todo: check if DatatypesMap can be made into ptr
   auto type = decodeDatatype(node, datatypes_map);
   if (isArray(type)) {
     return variantCast(decodeArrayValue(datatypes_map, node, locales));
   } else if (isRecord(type)) {
     return variantCast(decodeRecordValue(datatypes_map, node, locales));
-  } else if (type == Datatype::ProcessDataIn) {
-    return ProcessDataIn();
-  } else if (type == Datatype::ProcessDataOut) {
-    return ProcessDataOut();
+  } else if (isProcessData(type)) {
+    throw ProcessDataUnionAsValue();
   } else {
     return variantCast(decodeSimpleDataValue(type, node, locales));
   }

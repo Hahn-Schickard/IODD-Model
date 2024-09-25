@@ -34,33 +34,46 @@ VariablesMap decodeVariables(const xml_node& xml,
           variable.attribute("modifiesOtherVariables").as_bool(false);
       auto historized =
           variable.attribute("excludedFromDataStorage").as_bool(false);
-      DataValue data_value;
       try {
-        auto datatype_xml = getXMLNode("Datatype", variable);
-        data_value = decodeDataValue(datatype_xml, locales, datatypes);
-      } catch (const NodeNotFound& ex) {
-        string datatype_ref_id =
-            getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", variable))
-                .as_string();
-        auto it = datatypes.find(datatype_ref_id);
-        if (it != datatypes.end()) {
-          data_value = it->second;
-        } else {
-          // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
-          throw runtime_error("Variable " + id + " requires DataTypeRef " +
-              datatype_ref_id + ", but it does not exist");
+        DataValue data_value;
+        try {
+          auto datatype_xml = getXMLNode("Datatype", variable);
+          data_value = decodeDataValue(datatype_xml, locales, datatypes);
+        } catch (const NodeNotFound& ex) {
+          string datatype_ref_id =
+              getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", variable))
+                  .as_string();
+          auto it = datatypes.find(datatype_ref_id);
+          if (it != datatypes.end()) {
+            data_value = it->second;
+          } else {
+            // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
+            throw runtime_error("Variable " + id + " requires DataTypeRef " +
+                datatype_ref_id + ", but it does not exist");
+          }
         }
+        variables.emplace(id,
+            make_shared<Variable>(index,
+                move(name_locale.value()),
+                access.value(),
+                move(data_value),
+                move(description),
+                nullopt,
+                dynamic,
+                modifies_others,
+                historized));
+      } catch (const ProcessDataUnionAsValue&) {
+        variables.emplace(id,
+            make_shared<Variable>(index,
+                move(name_locale.value()),
+                access.value(),
+                nullptr,
+                move(description),
+                nullopt,
+                dynamic,
+                modifies_others,
+                historized));
       }
-      variables.emplace(id,
-          make_shared<Variable>(index,
-              move(name_locale.value()),
-              access.value(),
-              move(data_value),
-              move(description),
-              nullopt,
-              dynamic,
-              modifies_others,
-              historized));
     } catch (const exception& ex) {
       throw runtime_error("Could not process variable " + id +
           " due to exception: " + ex.what());
@@ -129,29 +142,31 @@ VariablesMap decodeStdVariables(const xml_node& xml,
       // ignore parameter overlays
       if (id != "V_DirectParameters_1" && id != "V_DirectParameters_2") {
         auto std_variable = findVariable(id, std_variables);
-        optional<SimpleDatatypeValue> default_value = nullopt;
-        if (auto node_value = variable.attribute("defaultValue");
-            !node_value.empty() &&
-            // @TODO: implement support for nonSimpleData default values
-            isSimpleData(std_variable->type())) {
-          default_value = decodeDefaultValue(std_variable->type(), node_value);
-        }
-        optional<bool> excluded = nullopt;
-        if (auto historized = variable.attribute("excludedFromDataStorage");
-            !historized.empty()) {
-          excluded = historized.as_bool();
-        }
-        auto possible_value = getUpdatedValues(
-            std_variable->type(), datatypes, variable, locales);
+        auto std_var_ref = std_variable;
+        // check if variable is not a reference to process data
+        if (!std_variable->holdsProcessData()) {
+          optional<SimpleDatatypeValue> default_value = nullopt;
+          if (auto node_value = variable.attribute("defaultValue");
+              !node_value.empty() &&
+              // @TODO: implement support for nonSimpleData default values
+              isSimpleData(std_variable->type())) {
+            default_value =
+                decodeDefaultValue(std_variable->type(), node_value);
+          }
+          optional<bool> excluded = nullopt;
+          if (auto historized = variable.attribute("excludedFromDataStorage");
+              !historized.empty()) {
+            excluded = historized.as_bool();
+          }
+          auto possible_value = getUpdatedValues(
+              std_variable->type(), datatypes, variable, locales);
 
-        VariablePtr std_var_ref;
-        // check if variable needs to be updated
-        if (default_value.has_value() || excluded.has_value() ||
-            possible_value.has_value()) {
-          std_var_ref = make_shared<Variable>(
-              *std_variable, default_value, excluded, possible_value);
-        } else {
-          std_var_ref = std_variable;
+          // check if variable needs to be updated
+          if (default_value.has_value() || excluded.has_value() ||
+              possible_value.has_value()) {
+            std_var_ref = make_shared<Variable>(
+                *std_variable, default_value, excluded, possible_value);
+          }
         }
         // append referenced variable
         result.emplace(id, std_var_ref);

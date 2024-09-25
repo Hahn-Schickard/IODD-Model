@@ -1,6 +1,7 @@
 #ifndef __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 #define __IODD_STANDARD_DEVICE_DESCRIPTOR_HPP
 
+#include "ProcessDataUnion.hpp"
 #include "Unit.hpp"
 #include "UserInterface.hpp"
 #include "Variable.hpp"
@@ -39,11 +40,13 @@ struct DeviceDescriptor : public DeviceIdentity {
       const TextID& device_name,
       const UnitsMapPtr& units,
       VariablesMap&& variables,
+      ProcessDataCollection&& process_data,
       UserInterfaces&& interfaces);
 
   DeviceDescriptor(DeviceIdentity&& identity,
       const UnitsMapPtr& units,
       VariablesMap&& variables,
+      ProcessDataCollection&& process_data,
       UserInterfaces&& interfaces);
 
   VariablePtr getVariable(const std::string& id) const;
@@ -67,6 +70,7 @@ struct DeviceDescriptor : public DeviceIdentity {
 private:
   UnitsMapPtr units_;
   VariablesMap variables_;
+  ProcessDataCollection process_data_;
   UserInterfaces interfaces_;
 };
 

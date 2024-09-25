@@ -2,6 +2,7 @@
 #define __IODD_STANDARD_DEFINES_VARIABLE_HPP
 
 #include "Datatypes/Datatypes.hpp"
+#include "Datatypes/ProcessData.hpp"
 
 namespace IODD {
 
@@ -23,11 +24,25 @@ struct Variable {
       std::optional<bool> excluded,
       std::optional<DataValue> value);
 
+  Variable(size_t index,
+      TextID&& name,
+      AccessRights access,
+      const ProcessDataTPtr& process_data = nullptr,
+      std::optional<TextID>&& desc = std::nullopt,
+      std::optional<SimpleDatatypeValue> default_value = std::nullopt,
+      bool dynamic = false,
+      bool modifies_others = false,
+      bool excluded = false);
+
+  Variable(const Variable& other, const ProcessDataTPtr& process_data);
+
   size_t index() const;
 
   TextID name() const;
 
   AccessRights access() const;
+
+  bool holdsProcessData() const;
 
   DataValue value() const;
 
@@ -50,7 +65,8 @@ private:
   size_t index_;
   TextID name_;
   AccessRights access_;
-  DataValue value_;
+  std::optional<DataValue> value_;
+  ProcessDataTPtr process_data_;
   std::optional<TextID> desc_;
   std::optional<SimpleDatatypeValue> default_;
   bool dynamic_;

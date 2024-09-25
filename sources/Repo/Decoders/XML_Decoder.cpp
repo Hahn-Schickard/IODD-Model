@@ -2,6 +2,7 @@
 
 #include "DataValueDecoder.hpp"
 #include "PrimitivesDecoder.hpp"
+#include "ProcessDataDecoder.hpp"
 #include "UnitDecoder.hpp"
 #include "UserInterfaceDecoder.hpp"
 #include "VariablesDecoder.hpp"
@@ -53,6 +54,34 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
   }
 }
 
+void updateVariableValue(
+    const string& name, VariablesMap& variables, const ProcessDataTPtr& data) {
+  auto var = findVariable(name, variables);
+  variables[name] = make_shared<Variable>(*var, data);
+}
+
+void setVariableProcessData(VariablesMap& variables,
+    const ProcessDataCollection& process_data_collection) {
+  if (process_data_collection.size() > 1) {
+    throw runtime_error("Setting multiple ProcessData values for variables via "
+                        "conditions is not supported");
+  }
+  auto process_data_it = process_data_collection.begin();
+  if (process_data_it != process_data_collection.end()) {
+    auto process_data = process_data_it->second;
+    if (process_data->inData()) {
+      updateVariableValue(
+          "V_ProcessDataInput", variables, process_data->inData());
+    }
+    if (process_data->outData()) {
+      updateVariableValue(
+          "V_ProcessDataOutput", variables, process_data->outData());
+    }
+  } else {
+    throw runtime_error("ProcessDataCollection is empty");
+  }
+}
+
 DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const DatatypesMapPtr& std_datatypes,
     const VariablesMap& std_variables,
@@ -69,21 +98,25 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     auto identity = decodeIdentity(profile_xml, locales_xml);
 
     auto function_xml = getXMLNode("DeviceFunction", profile_xml);
-    auto variables_xml = getXMLNode("VariableCollection", function_xml);
 
+    auto variables_xml = getXMLNode("VariableCollection", function_xml);
     auto variables = decodeStdVariables(
         variables_xml, locales_xml, std_datatypes, std_variables);
     for (const auto& variable :
         decodeVariables(variables_xml, locales_xml, *std_datatypes)) {
       variables.insert(variable);
     }
-    auto variables_map = make_shared<VariablesMap>(variables);
+
+    auto process_xml = getXMLNode("ProcessDataCollection", function_xml);
+    auto process_data =
+        decodeProcessData(process_xml, locales_xml, variables, std_datatypes);
+    setVariableProcessData(variables, process_data);
 
     auto ui_xml = getXMLNode("UserInterface", function_xml);
     auto uis = decodeUI(units, variables, ui_xml, locales_xml);
 
     return make_shared<DeviceDescriptor>(
-        move(identity), units, move(variables), move(uis));
+        move(identity), units, move(variables), move(process_data), move(uis));
   } catch (const exception& ex) {
     throw runtime_error("Failed to decode file " + doc.string() +
         " due to exception: " + ex.what());

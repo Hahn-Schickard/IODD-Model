@@ -6,7 +6,6 @@
 #include "Float.hpp"
 #include "Integer.hpp"
 #include "OctetString.hpp"
-#include "ProcessDataUnion.hpp"
 #include "Record.hpp"
 #include "String.hpp"
 #include "Time.hpp"
@@ -103,9 +102,7 @@ using DataValue = std::variant< // clang-format off
         RecordT<OctetStringT>,
         RecordT<StringT>, 
         RecordT<TimeT>, 
-        RecordT<TimeSpanT>,
-        ProcessDataIn,
-        ProcessDataOut
+        RecordT<TimeSpanT>
 >; // clang-format on
 
 using DatatypesMap = std::unordered_map<std::string, DataValue>;

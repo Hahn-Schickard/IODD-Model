@@ -236,9 +236,7 @@ Datatype toDatatype(const DataValue& variant) {
       },
       [&](const RecordT<StringT>&) { result = Datatype::Record_String; },
       [&](const RecordT<TimeT>&) { result = Datatype::Record_Time; },
-      [&](const RecordT<TimeSpanT>&) { result = Datatype::Record_TimeSpan; },
-      [&](const ProcessDataIn&) { result = Datatype::ProcessDataIn; },
-      [&](const ProcessDataOut&) { result = Datatype::ProcessDataOut; });
+      [&](const RecordT<TimeSpanT>&) { result = Datatype::Record_TimeSpan; });
   return result;
 }
 
@@ -294,9 +292,7 @@ void expand(DataValue& lhs, const DataValue& rhs) {
       [&rhs](RecordT<TimeT> value) { value.expand(get<RecordT<TimeT>>(rhs)); },
       [&rhs](RecordT<TimeSpanT> value) {
         value.expand(get<RecordT<TimeSpanT>>(rhs));
-      },
-      [&rhs](const ProcessDataIn&) { /* no expansion for ProcessDataIn*/ },
-      [&rhs](const ProcessDataOut&) { /* no expansion for ProcessDataOut*/ });
+      });
 }
 
 template <typename T>
