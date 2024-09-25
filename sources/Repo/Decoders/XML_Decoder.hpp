@@ -7,16 +7,16 @@
 
 namespace IODD {
 
-std::pair<DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
+std::pair<DatatypesMapPtr, VariablesMap> decodeStdDefinitions(
     const std::filesystem::path& path);
 
 DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
-    const std::pair<DatatypesMapPtr, VariablesMapPtr>& variables,
+    const std::pair<DatatypesMapPtr, VariablesMap>& variables,
     const std::filesystem::path& path);
 
 DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const DatatypesMapPtr& std_datatypes,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& std_variables,
     const std::filesystem::path& doc);
 } // namespace IODD
 

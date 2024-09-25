@@ -8,7 +8,7 @@ using namespace pugi;
 
 namespace IODD {
 optional<Condition> decodeCondition(
-    const xml_node& xml, const VariablesMapPtr& variables) {
+    const xml_node& xml, const VariablesMap& variables) {
   auto condition_xml = xml.child("Condition");
   if (!condition_xml.empty()) {
     string var_id = getXMLAttribute("variableId", condition_xml).as_string();

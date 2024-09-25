@@ -71,12 +71,11 @@ VariableRef::ButtonValue decodeButtonValue(
 }
 
 VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   string variable_id = getXMLAttribute("variableId", xml).as_string();
-  auto variable = findVariable(variable_id, variables, std_variables);
+  auto variable = findVariable(variable_id, variables);
 
   try {
     auto button_xml = getXMLNode("Button", xml);
@@ -101,12 +100,11 @@ VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
 }
 
 RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   string variable_id = getXMLAttribute("variableId", xml).as_string();
-  auto variable = findVariable(variable_id, variables, std_variables);
+  auto variable = findVariable(variable_id, variables);
   auto subindex = getXMLAttribute("subindex", xml).as_uint();
 
   try {
@@ -132,8 +130,7 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
 }
 
 MenuPtr decodeMenu(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const string& menu_id,
     const xml_node& menus,
     const xml_node& locales,
@@ -150,12 +147,10 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
 
   for (const auto& child : xml.children()) {
     if (strcmp(child.name(), "VariableRef") == 0) {
-      refs.emplace_back(
-          decodeVariableRef(units, variables, std_variables, child, locales));
+      refs.emplace_back(decodeVariableRef(units, variables, child, locales));
     }
     if (strcmp(child.name(), "RecordItemRef") == 0) {
-      refs.emplace_back(
-          decodeRecordRef(units, variables, std_variables, child, locales));
+      refs.emplace_back(decodeRecordRef(units, variables, child, locales));
     }
     if (strcmp(child.name(), "MenuRef") == 0) {
       string ref_id = getXMLAttribute("menuId", child).as_string();
@@ -171,13 +166,11 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
 MenuPtr decodeOptionalMenu(const string& menu_name,
     unordered_map<string, string> menu_ids,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   try {
-    return decodeMenu(
-        units, variables, std_variables, menu_ids.at(menu_name), xml, locales);
+    return decodeMenu(units, variables, menu_ids.at(menu_name), xml, locales);
   } catch (const out_of_range& ex) {
     return nullptr;
   }
@@ -186,35 +179,24 @@ MenuPtr decodeOptionalMenu(const string& menu_name,
 UserInterfacePtr decodeRoleUI(UserRole role,
     unordered_map<string, string> menu_ids,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
-  auto ident_menu = decodeMenu(units,
-      variables,
-      std_variables,
-      menu_ids.at("IdentificationMenu"),
-      xml,
-      locales);
+  auto ident_menu = decodeMenu(
+      units, variables, menu_ids.at("IdentificationMenu"), xml, locales);
   auto param_menu = decodeOptionalMenu(
-      "ParameterMenu", menu_ids, units, variables, std_variables, xml, locales);
-  auto observe_menu = decodeOptionalMenu("ObservationMenu",
-      menu_ids,
-      units,
-      variables,
-      std_variables,
-      xml,
-      locales);
+      "ParameterMenu", menu_ids, units, variables, xml, locales);
+  auto observe_menu = decodeOptionalMenu(
+      "ObservationMenu", menu_ids, units, variables, xml, locales);
   auto diag_menu = decodeOptionalMenu(
-      "DiagnosisMenu", menu_ids, units, variables, std_variables, xml, locales);
+      "DiagnosisMenu", menu_ids, units, variables, xml, locales);
 
   return make_shared<UserInterface>(
       role, ident_menu, param_menu, observe_menu, diag_menu);
 }
 
 unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   unordered_map<UserRole, UserInterfacePtr> result;
@@ -228,7 +210,6 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
           observer_menu_ids,
           units,
           variables,
-          std_variables,
           menus_xml,
           locales));
 
@@ -239,7 +220,6 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
           maintainence_menu_ids,
           units,
           variables,
-          std_variables,
           menus_xml,
           locales));
 
@@ -250,7 +230,6 @@ unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
           specialist_menu_ids,
           units,
           variables,
-          std_variables,
           menus_xml,
           locales));
 

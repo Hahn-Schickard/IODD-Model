@@ -13,7 +13,7 @@ string pad(size_t times = 1) { return string(times * PADDING_SIZE, ' '); }
 
 string padDot(size_t times = 1) { return pad(times) + "•" + pad(); }
 
-void printVariable(const VariablePtr& var, const size_t offset) {
+void printVariable(const VariablePtr& var, const size_t offset = 0) {
   cout << pad(offset) << var->index() << " " << toString(var->type()) << " "
        << var->name().locale();
 }
@@ -21,7 +21,7 @@ void printVariable(const VariablePtr& var, const size_t offset) {
 void printCondition(const optional<Condition>& condition, const size_t offset) {
   if (condition) {
     cout << pad(offset) << "Is used if variable: ";
-    printVariable(condition->variable(), 0);
+    printVariable(condition->variable());
     if (auto subindex = condition->subindex()) {
       cout << " subindex " << (size_t)*subindex;
     }
@@ -77,14 +77,14 @@ void printRefRepresentation(const VariableRefPtr& ref, const size_t offset) {
 
 void printVarRef(const VariableRefPtr& ref, const size_t offset) {
   cout << "Variable reference for ";
-  printVariable(ref->variable(), 0);
+  printVariable(ref->variable());
   cout << endl;
   printRefRepresentation(ref, offset);
 }
 
 void printRecordRef(const RecordRefPtr& ref, const size_t offset) {
   cout << "RecordItem reference for ";
-  printVariable(ref->variable(), 0);
+  printVariable(ref->variable());
   cout << " subindex " << (size_t)ref->subindex() << endl;
   printRefRepresentation(ref, offset);
 }
@@ -127,10 +127,19 @@ void printUI(const UserInterfacePtr& ui) {
 
 void printDescriptor(const DeviceDescriptorPtr& descriptor) {
   cout << pad() << "Device " << descriptor->getDeviceName().locale()
-       << " is manufactured by " << descriptor->getVendorName() << " has "
-       << descriptor->variableCount() << " variables" << endl;
+       << " is manufactured by " << descriptor->getVendorName() << endl;
+  cout << pad() << "It has " << descriptor->variableCount()
+       << " variables:" << endl;
 
-  for (const auto& ui : descriptor->getUIs()) {
+  for (const auto& var : descriptor->getVariables()) {
+    cout << padDot() << "Variable: " << var.first;
+    printVariable(var.second, 1);
+    cout << endl;
+  }
+
+  auto uis = descriptor->getUIs();
+  cout << pad() << "It has " << uis.size() << " user interfaces:" << endl;
+  for (const auto& ui : uis) {
     printUI(ui.second);
   }
 }
