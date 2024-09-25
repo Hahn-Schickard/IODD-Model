@@ -1,4 +1,5 @@
 #include "UserInterfaceDecoder.hpp"
+#include "ConditionDecoder.hpp"
 #include "PrimitivesDecoder.hpp"
 #include "UnitDecoder.hpp"
 #include "VariablesDecoder.hpp"
@@ -158,33 +159,10 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
     }
     if (strcmp(child.name(), "MenuRef") == 0) {
       string ref_id = getXMLAttribute("menuId", child).as_string();
-      optional<Condition> ref_condition = nullopt;
-      auto child_condition = child.child("Condition");
-      if (!child_condition.empty()) {
-        VariablePtr condition_variable =
-            findVariable(child_condition.attribute("variableId").as_string(),
-                variables,
-                std_variables);
+      auto ref_condition = decodeCondition(child, variables);
 
-        std::optional<uint8_t> condition_subindex = nullopt;
-        auto subindex_attribute = child_condition.attribute("subindex");
-        if (subindex_attribute.empty()) {
-          condition_subindex = subindex_attribute.as_uint();
-        }
-
-        uint8_t condition_value =
-            getXMLAttribute("value", child_condition).as_uint();
-
-        ref_condition =
-            Condition(condition_variable, condition_subindex, condition_value);
-      }
-      refs.emplace_back(decodeMenu(units,
-          variables,
-          std_variables,
-          ref_id,
-          menus,
-          locales,
-          ref_condition));
+      refs.emplace_back(
+          decodeMenu(units, variables, ref_id, menus, locales, ref_condition));
     }
   }
   return make_shared<Menu>(menu_id, move(refs), move(name), condition);
