@@ -61,7 +61,8 @@ void printRefRepresentation(const VariableRefPtr& ref, const size_t offset) {
       cout << " in " << symbol << endl;
     }
     if (isDecimal(ref->displayFormat())) {
-      if (isNumericData(ref->variable()->type())) {
+      if (isNumericData(ref->variable()->type()) ||
+          isNumericComplexData(ref->variable()->type())) {
         cout << pad(offset)
              << "The measurement is calculated as follows: " << endl;
         cout << pad(offset) << "(Raw Value * " << ref->gradient() << ") + "
