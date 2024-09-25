@@ -14,6 +14,16 @@ bool isNumericData(Datatype type) {
   return static_cast<uint8_t>(type) < static_cast<uint8_t>(Datatype::Boolean);
 }
 
+bool isNumericComplexData(Datatype type) {
+  if (!isComplexData(type)) {
+    return false;
+  } else {
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    return (static_cast<uint8_t>(type) % 10) <
+        static_cast<uint8_t>(Datatype::Boolean);
+  }
+}
+
 bool isSimpleData(Datatype type) {
   return static_cast<uint8_t>(type) <
       static_cast<uint8_t>(Datatype::Array_UInteger);

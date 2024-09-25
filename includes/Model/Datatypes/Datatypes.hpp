@@ -65,6 +65,8 @@ bool isSimpleData(Datatype type);
 
 bool isComplexData(Datatype type);
 
+bool isNumericComplexData(Datatype type);
+
 bool isArray(Datatype type);
 
 bool isRecord(Datatype type);
