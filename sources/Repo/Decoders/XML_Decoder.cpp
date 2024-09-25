@@ -81,11 +81,10 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     auto variables_map = make_shared<VariablesMap>(variables);
 
     auto ui_xml = getXMLNode("UserInterface", function_xml);
-    auto uis =
-        decodeUI(units, variables_map, std_variables, ui_xml, locales_xml);
+    auto uis = decodeUI(units, variables_map, ui_xml, locales_xml);
 
     return make_shared<DeviceDescriptor>(
-        move(identity), units, std_variables, move(variables_map), move(uis));
+        move(identity), units, move(variables_map), move(uis));
   } catch (const exception& ex) {
     throw runtime_error("Failed to decode file " + doc.string() +
         " due to exception: " + ex.what());

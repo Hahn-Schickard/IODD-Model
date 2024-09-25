@@ -33,31 +33,23 @@ DeviceDescriptor::DeviceDescriptor(uint16_t vendor_id,
     uint32_t device_id,
     const TextID& device_name,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& std_variables,
     VariablesMapPtr&& variables,
     UserInterfaces&& interfaces)
     : DeviceDescriptor(
           DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
           units,
-          std_variables,
           move(variables),
           move(interfaces)) {}
 
 DeviceDescriptor::DeviceDescriptor(DeviceIdentity&& identity,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& std_variables,
     VariablesMapPtr&& variables,
     UserInterfaces&& interfaces)
     : DeviceIdentity(move(identity)), units_(units),
-      std_variables_(std_variables), variables_(move(variables)),
-      interfaces_(move(interfaces)) {
+      variables_(move(variables)), interfaces_(move(interfaces)) {
   if (units_->empty()) {
     throw invalid_argument(
         "Failed to create DeviceDescriptor. Units can not be empty");
-  }
-  if (std_variables_->empty()) {
-    throw invalid_argument("Failed to create DeviceDescriptor. Standard "
-                           "Variables can not be empty");
   }
   if (variables_->empty()) {
     throw invalid_argument(
@@ -72,22 +64,13 @@ DeviceDescriptor::DeviceDescriptor(DeviceIdentity&& identity,
 VariablePtr DeviceDescriptor::getVariable(const string& id) const {
   if (auto iter = variables_->find(id); iter != variables_->end()) {
     return iter->second;
-  } else if (auto iter = std_variables_->find(id);
-             iter != std_variables_->end()) {
-    return iter->second;
   }
   throw out_of_range("Variable with id " + id + " does not exists");
 }
 
-VariablesMapPtr DeviceDescriptor::getSTDVariables() const {
-  return std_variables_;
-}
-
 VariablesMapPtr DeviceDescriptor::getVariables() const { return variables_; }
 
-size_t DeviceDescriptor::variableCount() const {
-  return variables_->size() + std_variables_->size();
-}
+size_t DeviceDescriptor::variableCount() const { return variables_->size(); }
 
 NamedAttributePtr DeviceDescriptor::getVariableValueName(const string& id,
     const SimpleDatatypeValue& value,
