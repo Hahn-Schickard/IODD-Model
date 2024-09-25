@@ -122,44 +122,46 @@ VariablesMap decodeStdVariables(const xml_node& xml,
     const xml_node& locales,
     const DatatypesMapPtr& datatypes,
     const VariablesMap& std_variables) {
-  VariablesMap variables = std_variables;
+  VariablesMap result;
   for (auto variable : xml.children("StdVariableRef")) {
-    string id = variable.attribute("id").as_string();
-    // ignore parameter overlays
     try {
+      string id = getXMLAttribute("id", variable).as_string();
+      // ignore parameter overlays
       if (id != "V_DirectParameters_1" && id != "V_DirectParameters_2") {
-        if (auto std_variable = variables.find(id);
-            std_variable != variables.end()) {
-          optional<SimpleDatatypeValue> default_value = nullopt;
-          if (auto node_value = variable.attribute("defaultValue");
-              !node_value.empty() &&
-              // @TODO: implement support for nonSimpleData default values
-              isSimpleData(std_variable->second->type())) {
-            default_value =
-                decodeDefaultValue(std_variable->second->type(), node_value);
-          }
-          optional<bool> excluded = nullopt;
-          if (auto historized = variable.attribute("excludedFromDataStorage");
-              !historized.empty()) {
-            excluded = historized.as_bool();
-          }
-          auto possible_value = getUpdatedValues(
-              std_variable->second->type(), datatypes, variable, locales);
-          // check if variable needs to be updated
-          if (default_value.has_value() || excluded.has_value() ||
-              possible_value.has_value()) {
-            std_variable->second = make_shared<Variable>(
-                *std_variable->second, default_value, excluded, possible_value);
-          }
-        } else {
-          throw runtime_error(id + " is not defined in standard variables");
+        auto std_variable = findVariable(id, std_variables);
+        optional<SimpleDatatypeValue> default_value = nullopt;
+        if (auto node_value = variable.attribute("defaultValue");
+            !node_value.empty() &&
+            // @TODO: implement support for nonSimpleData default values
+            isSimpleData(std_variable->type())) {
+          default_value = decodeDefaultValue(std_variable->type(), node_value);
         }
+        optional<bool> excluded = nullopt;
+        if (auto historized = variable.attribute("excludedFromDataStorage");
+            !historized.empty()) {
+          excluded = historized.as_bool();
+        }
+        auto possible_value = getUpdatedValues(
+            std_variable->type(), datatypes, variable, locales);
+
+        VariablePtr std_var_ref;
+        // check if variable needs to be updated
+        if (default_value.has_value() || excluded.has_value() ||
+            possible_value.has_value()) {
+          std_var_ref = make_shared<Variable>(
+              *std_variable, default_value, excluded, possible_value);
+        } else {
+          std_var_ref = std_variable;
+        }
+        // append referenced variable
+        result.emplace(id, std_var_ref);
       }
     } catch (const exception& ex) {
-      throw runtime_error("Failed to decode StdVariableRef " + id +
-          " due to exception: " + ex.what());
+      throw runtime_error("Failed to decode StdVariableRef " +
+          to_string(variable.offset_debug()) +
+          " due to exception: " + string(ex.what()));
     }
   }
-  return variables;
+  return result;
 }
 } // namespace IODD
