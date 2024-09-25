@@ -115,15 +115,24 @@ void printMenu(const MenuPtr& menu, const size_t offset) {
 void printUI(const UserInterfacePtr& ui) {
   cout << pad() << toString(ui->role()) << " UI has:" << endl;
 
-  auto params = ui->parameter();
-  cout << padDot(2) << params->size() << " parameter menus" << endl;
-  printMenu(params, 2);
+  auto ident = ui->identification();
+  cout << padDot(2) << ident->size() << " identification menus" << endl;
+  printMenu(ident, 2);
 
-  cout << padDot(2) << ui->identification()->size() << " identification menus"
-       << endl;
-  cout << padDot(2) << ui->observation()->size() << " observation menus"
-       << endl;
-  cout << padDot(2) << ui->diagnosis()->size() << " diagnosis menus" << endl;
+  if (auto params = ui->parameter()) {
+    cout << padDot(2) << params->size() << " parameter menus" << endl;
+    printMenu(params, 2);
+  }
+
+  if (auto observ = ui->observation()) {
+    cout << padDot(2) << observ->size() << " observation menus" << endl;
+    printMenu(observ, 2);
+  }
+
+  if (auto diag = ui->diagnosis()) {
+    cout << padDot(2) << diag->size() << " diagnosis menus" << endl;
+    printMenu(diag, 2);
+  }
 }
 
 void printDescriptor(const DeviceDescriptorPtr& descriptor) {
