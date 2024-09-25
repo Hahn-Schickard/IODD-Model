@@ -9,7 +9,7 @@
 
 namespace IODD {
 std::optional<Condition> decodeCondition(
-    const pugi::xml_node& xml, const VariablesMapPtr& variables);
+    const pugi::xml_node& xml, const VariablesMap& variables);
 }
 
 #endif //__IODD_CONDITION_DECODER_HPP

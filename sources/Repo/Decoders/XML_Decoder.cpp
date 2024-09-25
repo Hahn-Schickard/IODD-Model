@@ -13,7 +13,7 @@ using namespace std;
 using namespace pugi;
 
 namespace IODD {
-pair<DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
+pair<DatatypesMapPtr, VariablesMap> decodeStdDefinitions(
     const filesystem::path& path) {
   try {
     auto doc = getXML(path);
@@ -29,8 +29,7 @@ pair<DatatypesMapPtr, VariablesMapPtr> decodeStdDefinitions(
     auto variables =
         decodeVariables(variable_collection_xml, locales_xml, datatypes);
 
-    return make_pair(make_shared<DatatypesMap>(datatypes),
-        make_shared<VariablesMap>(variables));
+    return make_pair(make_shared<DatatypesMap>(datatypes), variables);
   } catch (const exception& ex) {
     throw runtime_error("Caught an exception while processing " +
         path.string() + " Exception: " + ex.what());
@@ -56,7 +55,7 @@ DeviceIdentity decodeIdentity(const xml_node& node, const xml_node& locales) {
 
 DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     const DatatypesMapPtr& std_datatypes,
-    const VariablesMapPtr& std_variables,
+    const VariablesMap& std_variables,
     const filesystem::path& doc) {
   try {
     auto xml = getXML(doc);
@@ -81,10 +80,10 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
     auto variables_map = make_shared<VariablesMap>(variables);
 
     auto ui_xml = getXMLNode("UserInterface", function_xml);
-    auto uis = decodeUI(units, variables_map, ui_xml, locales_xml);
+    auto uis = decodeUI(units, variables, ui_xml, locales_xml);
 
     return make_shared<DeviceDescriptor>(
-        move(identity), units, move(variables_map), move(uis));
+        move(identity), units, move(variables), move(uis));
   } catch (const exception& ex) {
     throw runtime_error("Failed to decode file " + doc.string() +
         " due to exception: " + ex.what());
@@ -92,7 +91,7 @@ DeviceDescriptorPtr decode(const UnitsMapPtr& units,
 }
 
 DescriptorsMap decodeDescriptors(const UnitsMapPtr& units,
-    const pair<DatatypesMapPtr, VariablesMapPtr>& variables,
+    const pair<DatatypesMapPtr, VariablesMap>& variables,
     const filesystem::path& path) {
   DescriptorsMap descriptors;
 

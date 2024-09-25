@@ -38,17 +38,17 @@ struct DeviceDescriptor : public DeviceIdentity {
       uint32_t device_id,
       const TextID& device_name,
       const UnitsMapPtr& units,
-      VariablesMapPtr&& variables,
+      VariablesMap&& variables,
       UserInterfaces&& interfaces);
 
   DeviceDescriptor(DeviceIdentity&& identity,
       const UnitsMapPtr& units,
-      VariablesMapPtr&& variables,
+      VariablesMap&& variables,
       UserInterfaces&& interfaces);
 
   VariablePtr getVariable(const std::string& id) const;
 
-  VariablesMapPtr getVariables() const;
+  VariablesMap getVariables() const;
 
   size_t variableCount() const;
 
@@ -66,7 +66,7 @@ struct DeviceDescriptor : public DeviceIdentity {
 
 private:
   UnitsMapPtr units_;
-  VariablesMapPtr variables_;
+  VariablesMap variables_;
   UserInterfaces interfaces_;
 };
 

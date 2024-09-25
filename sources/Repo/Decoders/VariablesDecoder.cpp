@@ -121,8 +121,8 @@ optional<DataValue> getUpdatedValues(IODD::Datatype type,
 VariablesMap decodeStdVariables(const xml_node& xml,
     const xml_node& locales,
     const DatatypesMapPtr& datatypes,
-    const VariablesMapPtr& std_variables) {
-  VariablesMap variables = *std_variables;
+    const VariablesMap& std_variables) {
+  VariablesMap variables = std_variables;
   for (auto variable : xml.children("StdVariableRef")) {
     string id = variable.attribute("id").as_string();
     // ignore parameter overlays

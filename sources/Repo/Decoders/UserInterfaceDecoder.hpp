@@ -9,7 +9,7 @@
 namespace IODD {
 std::unordered_map<UserRole, UserInterfacePtr> decodeUI(
     const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const pugi::xml_node& xml,
     const pugi::xml_node& locales);
 }

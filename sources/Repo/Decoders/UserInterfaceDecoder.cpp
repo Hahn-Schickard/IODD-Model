@@ -71,7 +71,7 @@ VariableRef::ButtonValue decodeButtonValue(
 }
 
 VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   string variable_id = getXMLAttribute("variableId", xml).as_string();
@@ -100,7 +100,7 @@ VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
 }
 
 RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   string variable_id = getXMLAttribute("variableId", xml).as_string();
@@ -130,7 +130,7 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
 }
 
 MenuPtr decodeMenu(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const string& menu_id,
     const xml_node& menus,
     const xml_node& locales,
@@ -166,7 +166,7 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
 MenuPtr decodeOptionalMenu(const string& menu_name,
     unordered_map<string, string> menu_ids,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   try {
@@ -179,7 +179,7 @@ MenuPtr decodeOptionalMenu(const string& menu_name,
 UserInterfacePtr decodeRoleUI(UserRole role,
     unordered_map<string, string> menu_ids,
     const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   auto ident_menu = decodeMenu(
@@ -196,7 +196,7 @@ UserInterfacePtr decodeRoleUI(UserRole role,
 }
 
 unordered_map<UserRole, UserInterfacePtr> decodeUI(const UnitsMapPtr& units,
-    const VariablesMapPtr& variables,
+    const VariablesMap& variables,
     const xml_node& xml,
     const xml_node& locales) {
   unordered_map<UserRole, UserInterfacePtr> result;
