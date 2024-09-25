@@ -91,7 +91,7 @@ void printRecordRef(const RecordRefPtr& ref, const size_t offset) {
 }
 
 void printMenu(const MenuPtr& menu, const size_t offset) {
-  cout << "Menu id: " << menu->id();
+  cout << pad(offset) << "Menu id: " << menu->id();
   if (auto name = menu->name()) {
     cout << " " << name->locale();
   }
