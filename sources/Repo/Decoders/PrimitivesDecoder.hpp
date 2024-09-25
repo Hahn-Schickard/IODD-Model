@@ -1,8 +1,8 @@
 #ifndef __IODD_PRIMITIES_DECODER_HPP
 #define __IODD_PRIMITIES_DECODER_HPP
 
-#include "Model/Datatypes/AccessRights.hpp"
-#include "Model/Datatypes/Primitives/TextID.hpp"
+#include "AccessRights.hpp"
+#include "TextID.hpp"
 
 #include <optional>
 #include <pugixml.hpp>

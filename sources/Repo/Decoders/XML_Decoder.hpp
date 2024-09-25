@@ -1,7 +1,7 @@
 #ifndef __IODD_XML_DECODER_HPP
 #define __IODD_XML_DECODER_HPP
 
-#include "Model/DeviceDescriptor.hpp"
+#include "DeviceDescriptor.hpp"
 
 #include <filesystem>
 

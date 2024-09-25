@@ -1,9 +1,9 @@
 #ifndef __IODD_NUMERICS_DECODER_HPP
 #define __IODD_NUMERICS_DECODER_HPP
 
-#include "Model/Datatypes/Float.hpp"
-#include "Model/Datatypes/Integer.hpp"
-#include "Model/Datatypes/UInteger.hpp"
+#include "Float.hpp"
+#include "Integer.hpp"
+#include "UInteger.hpp"
 
 #include <pugixml.hpp>
 #include <stdexcept>

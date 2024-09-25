@@ -1,17 +1,17 @@
 #ifndef __IODD_DATA_VALUE_DECODER_HPP
 #define __IODD_DATA_VALUE_DECODER_HPP
 
-#include "Model/Datatypes/Array.hpp"
-#include "Model/Datatypes/Boolean.hpp"
-#include "Model/Datatypes/Datatypes.hpp"
-#include "Model/Datatypes/Float.hpp"
-#include "Model/Datatypes/Integer.hpp"
-#include "Model/Datatypes/OctetString.hpp"
-#include "Model/Datatypes/Record.hpp"
-#include "Model/Datatypes/String.hpp"
-#include "Model/Datatypes/Time.hpp"
-#include "Model/Datatypes/Timespan.hpp"
-#include "Model/Datatypes/UInteger.hpp"
+#include "Array.hpp"
+#include "Boolean.hpp"
+#include "Datatypes.hpp"
+#include "Float.hpp"
+#include "Integer.hpp"
+#include "OctetString.hpp"
+#include "Record.hpp"
+#include "String.hpp"
+#include "Time.hpp"
+#include "Timespan.hpp"
+#include "UInteger.hpp"
 
 #include <pugixml.hpp>
 #include <stdexcept>

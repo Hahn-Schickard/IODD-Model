@@ -1,7 +1,7 @@
 #ifndef __IODD_VARIABLES_DECODER_HPP
 #define __IODD_VARIABLES_DECODER_HPP
 
-#include "Model/Variable.hpp"
+#include "Variable.hpp"
 
 #include <pugixml.hpp>
 

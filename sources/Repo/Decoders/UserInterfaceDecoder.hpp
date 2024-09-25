@@ -1,7 +1,7 @@
 #ifndef __IODD_UI_DECODER_HPP
 #define __IODD_UI_DECODER_HPP
 
-#include "Model/UserInterface.hpp"
+#include "UserInterface.hpp"
 
 #include <pugixml.hpp>
 #include <unordered_map>
