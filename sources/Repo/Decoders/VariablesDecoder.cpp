@@ -162,20 +162,4 @@ VariablesMap decodeStdVariables(const xml_node& xml,
   }
   return variables;
 }
-
-VariablePtr findVariable(const string& id,
-    const VariablesMapPtr& variables,
-    const VariablesMapPtr& std_variables) {
-  auto it = variables->find(id);
-  if (it != variables->end()) {
-    return it->second;
-  }
-
-  it = std_variables->find(id);
-  if (it != std_variables->end()) {
-    return it->second;
-  }
-
-  throw out_of_range(id + " variable does not exist");
-}
 } // namespace IODD

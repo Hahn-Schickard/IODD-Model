@@ -64,4 +64,11 @@ bool Variable::modifiesOthers() const { return modifies_others_; }
 
 bool Variable::excluded() const { return excluded_; }
 
+VariablePtr findVariable(const string& id, const VariablesMapPtr& variables) {
+  auto it = variables->find(id);
+  if (it != variables->end()) {
+    return it->second;
+  }
+  throw out_of_range(id + " variable does not exist");
+}
 } // namespace IODD

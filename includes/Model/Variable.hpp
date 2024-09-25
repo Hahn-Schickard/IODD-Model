@@ -61,5 +61,8 @@ private:
 using VariablePtr = std::shared_ptr<Variable>;
 using VariablesMap = std::unordered_map<std::string, VariablePtr>;
 using VariablesMapPtr = std::shared_ptr<VariablesMap>;
+
+VariablePtr findVariable(
+    const std::string& id, const VariablesMapPtr& variables);
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_VARIABLE_HPP
