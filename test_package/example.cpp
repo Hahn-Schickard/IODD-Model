@@ -21,6 +21,11 @@ int main() {
         nullptr,
         nullptr,
         nullptr);
+    auto mocked_process_data = make_shared<ProcessDataUnion>("V_PdT",
+        make_shared<ProcessDataT>("V_PdInT",
+            64,
+            TextID("TI_PdIn_Name", "Process Data Input/Output"),
+            UIntegerT(64, NumberT<uint64_t>())));
     auto mocked_uis = DeviceDescriptor::UserInterfaces{
         {UserRole::ObservationRole, move(mocked_ui)}};
 
@@ -29,8 +34,8 @@ int main() {
         0,
         TextID("device_name", "Example Device"),
         make_shared<UnitsMap>(move(units_mock)),
-        make_shared<VariablesMap>(variables_mock),
-        make_shared<VariablesMap>(variables_mock),
+        move(variables_mock),
+        ProcessDataCollection{{"V_PdInT", move(mocked_process_data)}},
         move(mocked_uis));
 
     cout << device->getDeviceName().locale() << " has "
