@@ -30,6 +30,8 @@ target_sources(${MODULE}
 #@+ ======================== User DEPENDENCIES configuration ============================
 target_link_libraries(${MODULE}
                       PRIVATE #Private dependencies
+                      date::date
+                      HSCUL::HSCUL
                       PUBLIC  #Public dependencies
                       Variant_Visitor::Variant_Visitor
 )
