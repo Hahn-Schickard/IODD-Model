@@ -16,6 +16,7 @@ struct FloatT : public NumberT<float> {
   FloatT(NumberT<float>&& values) : NumberT(std::move(values)) {}
 };
 
+using FloatT_Ptr = std::shared_ptr<FloatT>;
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_FLOAT_T_HPP

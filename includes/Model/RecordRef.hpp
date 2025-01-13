@@ -22,6 +22,8 @@ struct RecordRef : public VariableRef {
 
   uint8_t subindex() const;
 
+  Value calculate(const Value& value) const override;
+
   NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
 private:

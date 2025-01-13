@@ -18,6 +18,8 @@ private:
   bool utf_; // US-ASCII if false
 };
 
+using StringT_Ptr = std::shared_ptr<StringT>;
+
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_STRING_T_HPP

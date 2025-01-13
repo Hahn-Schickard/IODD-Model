@@ -2,13 +2,13 @@
 #define __IODD_STANDARD_DEFINES_ARRAY_T_HPP
 
 #include "ComplexDatatype.hpp"
+#include "SimpleDataTypes.hpp"
 
 #include <vector>
 
 namespace IODD {
 
-template <typename T>
-struct ArrayT : public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
+template <class T> struct ArrayT : public ComplexDataTypeT {
   ArrayT() = default;
 
   ArrayT(size_t count, std::vector<T>&& values);
@@ -28,13 +28,15 @@ private:
   std::vector<T> values_;
 };
 
-extern template struct ArrayT<BooleanT>;
-extern template struct ArrayT<UIntegerT>;
-extern template struct ArrayT<IntegerT>;
-extern template struct ArrayT<FloatT>;
-extern template struct ArrayT<StringT>;
-extern template struct ArrayT<OctetStringT>;
-extern template struct ArrayT<TimeT>;
-extern template struct ArrayT<TimeSpanT>;
+template <class T> using ArrayT_Ptr = std::shared_ptr<ArrayT<T>>;
+
+extern template struct ArrayT<BooleanT_Ptr>;
+extern template struct ArrayT<UIntegerT_Ptr>;
+extern template struct ArrayT<IntegerT_Ptr>;
+extern template struct ArrayT<FloatT_Ptr>;
+extern template struct ArrayT<StringT_Ptr>;
+extern template struct ArrayT<OctetStringT_Ptr>;
+extern template struct ArrayT<TimeT_Ptr>;
+extern template struct ArrayT<TimeSpanT_Ptr>;
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_ARRAY_T_HPP

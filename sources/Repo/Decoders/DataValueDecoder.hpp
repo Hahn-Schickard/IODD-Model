@@ -1,17 +1,7 @@
 #ifndef __IODD_DATA_VALUE_DECODER_HPP
 #define __IODD_DATA_VALUE_DECODER_HPP
 
-#include "Array.hpp"
-#include "Boolean.hpp"
 #include "Datatypes.hpp"
-#include "Float.hpp"
-#include "Integer.hpp"
-#include "OctetString.hpp"
-#include "Record.hpp"
-#include "String.hpp"
-#include "Time.hpp"
-#include "Timespan.hpp"
-#include "UInteger.hpp"
 
 #include <pugixml.hpp>
 #include <stdexcept>
@@ -19,7 +9,7 @@
 
 namespace IODD {
 
-template <typename T>
+template <class T>
 T decodeSimpleDataValue(
     const pugi::xml_node& /* node */, const pugi::xml_node& /* locales */) {
   throw std::runtime_error(
@@ -27,63 +17,58 @@ T decodeSimpleDataValue(
 }
 
 template <>
-BooleanT decodeSimpleDataValue(
+BooleanT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-UIntegerT decodeSimpleDataValue(
+UIntegerT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-IntegerT decodeSimpleDataValue(
+IntegerT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-FloatT decodeSimpleDataValue(
+FloatT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-StringT decodeSimpleDataValue(
+StringT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-OctetStringT decodeSimpleDataValue(
+OctetStringT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-TimeT decodeSimpleDataValue(
+TimeT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 template <>
-TimeSpanT decodeSimpleDataValue(
+TimeSpanT_Ptr decodeSimpleDataValue(
     const pugi::xml_node& node, const pugi::xml_node& locales);
 
 SimpleDatatype decodeSimpleDataValue(
     Datatype type, const pugi::xml_node& node, const pugi::xml_node& locales);
 
-using ArrayValue = std::variant<ArrayT<BooleanT>,
-    ArrayT<UIntegerT>,
-    ArrayT<IntegerT>,
-    ArrayT<FloatT>,
-    ArrayT<OctetStringT>,
-    ArrayT<StringT>,
-    ArrayT<TimeT>,
-    ArrayT<TimeSpanT>>;
+// clang-format off
+using ArrayValue = std::variant<
+    ArrayT_Ptr<BooleanT_Ptr>,
+    ArrayT_Ptr<UIntegerT_Ptr>,
+    ArrayT_Ptr<IntegerT_Ptr>,
+    ArrayT_Ptr<FloatT_Ptr>,
+    ArrayT_Ptr<OctetStringT_Ptr>,
+    ArrayT_Ptr<StringT_Ptr>,
+    ArrayT_Ptr<TimeT_Ptr>,
+    ArrayT_Ptr<TimeSpanT_Ptr>
+>;
+// clang-format on
 
 ArrayValue decodeArrayValue(const DatatypesMap& datatypes_map,
     const pugi::xml_node& node,
     const pugi::xml_node& locale);
 
-using RecordValue = std::variant<RecordT<BooleanT>,
-    RecordT<UIntegerT>,
-    RecordT<IntegerT>,
-    RecordT<FloatT>,
-    RecordT<OctetStringT>,
-    RecordT<StringT>,
-    RecordT<TimeT>,
-    RecordT<TimeSpanT>>;
-
-RecordValue decodeRecordValue(const DatatypesMap& datatypes_map,
+RecordT_Ptr decodeRecordValue(const DatatypesMap& datatypes_map,
     const pugi::xml_node& node,
     const pugi::xml_node& locales);
 

@@ -8,6 +8,8 @@ struct TimeSpanT {
   size_t hash() const noexcept { return -2; }
 };
 
+using TimeSpanT_Ptr = std::shared_ptr<TimeSpanT>;
+
 inline bool operator==(const TimeSpanT& lhs, const TimeSpanT& rhs) {
   return lhs.hash() == rhs.hash();
 }

@@ -19,6 +19,8 @@ struct IntegerT : public FixedBitLength<2, 64>, public NumberT<int64_t> {
   IntegerT(NumberT<int64_t>&& values) // used as expansion
       : FixedBitLength(64), NumberT(std::move(values)) {}
 };
+
+using IntegerT_Ptr = std::shared_ptr<IntegerT>;
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_INTEGER_T_HPP

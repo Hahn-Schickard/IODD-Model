@@ -4,18 +4,21 @@
 #include "AccessRights.hpp"
 #include "ComplexDatatype.hpp"
 #include "Primitives/TextID.hpp"
+#include "SimpleDataTypes.hpp"
 
+#include <memory>
 #include <optional>
 #include <unordered_map>
+#include <variant>
 
 namespace IODD {
 
-template <typename T> struct RecordItem {
+struct RecordItem {
   RecordItem() = default;
 
   RecordItem(uint8_t subindex,
       uint16_t offset,
-      T&& value,
+      SimpleDatatype&& value,
       TextID&& name,
       std::optional<AccessRights> access = std::nullopt,
       std::optional<TextID>&& desc = std::nullopt);
@@ -26,7 +29,7 @@ template <typename T> struct RecordItem {
 
   uint16_t offset() const;
 
-  T value() const;
+  SimpleDatatype value() const;
 
   TextID name() const;
 
@@ -37,91 +40,68 @@ template <typename T> struct RecordItem {
 private:
   uint8_t subindex_;
   uint16_t offset_;
-  T value_;
+  SimpleDatatype value_;
   TextID name_;
   std::optional<AccessRights> access_;
   std::optional<TextID> desc_;
 };
 
-template <typename T>
-using RecordItems = std::unordered_map<uint8_t, RecordItem<T>>;
+using RecordItem_Ptr = std::shared_ptr<RecordItem>;
 
-extern template struct RecordItem<BooleanT>;
-extern template struct RecordItem<UIntegerT>;
-extern template struct RecordItem<IntegerT>;
-extern template struct RecordItem<FloatT>;
-extern template struct RecordItem<StringT>;
-extern template struct RecordItem<OctetStringT>;
-extern template struct RecordItem<TimeT>;
-extern template struct RecordItem<TimeSpanT>;
+using RecordItems = std::unordered_map<uint8_t, RecordItem_Ptr>;
 
-template <typename T>
-struct RecordT : public FixedBitLength<1, 1856>,
-                 public ComplexDataTypeT<T, IsSimpleDatatype<T>> {
+struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
   RecordT() = default;
 
-  RecordT(uint16_t bit_length, RecordItems<T>&& items);
+  RecordT(uint16_t bit_length, RecordItems&& items);
 
-  RecordT(uint16_t bit_length, bool subindex_access, RecordItems<T>&& items);
+  RecordT(uint16_t bit_length, bool subindex_access, RecordItems&& items);
 
   void expand(const RecordT& other);
 
   size_t hash() const noexcept;
 
-  RecordItems<T> items() const;
+  RecordItems items() const;
 
-  RecordItem<T> item(uint8_t subindex) const;
+  RecordItem_Ptr item(uint8_t subindex) const;
 
 private:
-  RecordItems<T> items_;
+  RecordItems items_;
 };
 
-extern template struct RecordT<BooleanT>;
-extern template struct RecordT<UIntegerT>;
-extern template struct RecordT<IntegerT>;
-extern template struct RecordT<FloatT>;
-extern template struct RecordT<StringT>;
-extern template struct RecordT<OctetStringT>;
-extern template struct RecordT<TimeT>;
-extern template struct RecordT<TimeSpanT>;
+using RecordT_Ptr = std::shared_ptr<RecordT>;
 
-template <typename T>
-inline bool operator==(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator==(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() == rhs.subindex()) && (lhs.value() == rhs.value()) &&
       (lhs.name() == rhs.name()) && (lhs.access() == rhs.access()) &&
       (lhs.description() == rhs.description());
 }
 
-template <typename T>
-inline bool operator!=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator!=(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() != rhs.subindex()) && (lhs.value() != rhs.value()) &&
       (lhs.name() != rhs.name()) && (lhs.access() != rhs.access()) &&
       (lhs.description() != rhs.description());
 }
 
-template <typename T>
-inline bool operator<=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator<=(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() <= rhs.subindex()) && (lhs.value() <= rhs.value()) &&
       (lhs.name() <= rhs.name()) && (lhs.access() <= rhs.access()) &&
       (lhs.description() <= rhs.description());
 }
 
-template <typename T>
-inline bool operator>=(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator>=(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() >= rhs.subindex()) && (lhs.value() >= rhs.value()) &&
       (lhs.name() >= rhs.name()) && (lhs.access() >= rhs.access()) &&
       (lhs.description() >= rhs.description());
 }
 
-template <typename T>
-inline bool operator<(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator<(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() < rhs.subindex()) && (lhs.value() < rhs.value()) &&
       (lhs.name() < rhs.name()) && (lhs.access() < rhs.access()) &&
       (lhs.description() < rhs.description());
 }
 
-template <typename T>
-inline bool operator>(const RecordItem<T>& lhs, const RecordItem<T>& rhs) {
+inline bool operator>(const RecordItem& lhs, const RecordItem& rhs) {
   return (lhs.subindex() > rhs.subindex()) && (lhs.value() > rhs.value()) &&
       (lhs.name() > rhs.name()) && (lhs.access() > rhs.access()) &&
       (lhs.description() > rhs.description());

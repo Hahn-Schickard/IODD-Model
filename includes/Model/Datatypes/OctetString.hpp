@@ -17,6 +17,8 @@ protected:
   size_t length_;
 };
 
+using OctetStringT_Ptr = std::shared_ptr<OctetStringT>;
+
 inline bool operator==(const OctetStringT& lhs, const OctetStringT& rhs) {
   return lhs.hash() == rhs.hash();
 }

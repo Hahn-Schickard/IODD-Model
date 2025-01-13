@@ -81,6 +81,16 @@ DataValue Variable::value() const {
   }
 }
 
+template <class T> T Variable::variantValue() const {
+  if (value_) {
+    return get<T>(value_);
+  } else {
+    throw runtime_error("Variable " + to_string(index_) + " " + name_.locale() +
+        " does not use DataValue type, thus not variant value could be "
+        "returned");
+  }
+}
+
 NamedAttributePtr Variable::valueName(
     const SimpleDatatypeValue& value, optional<uint8_t> subindex) const {
   if (value_) {

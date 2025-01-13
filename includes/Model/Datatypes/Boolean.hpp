@@ -25,6 +25,8 @@ private:
   Values values_;
 };
 
+using BooleanT_Ptr = std::shared_ptr<BooleanT>;
+
 inline bool operator==(const BooleanT& lhs, const BooleanT& rhs) {
   return lhs.hash() == rhs.hash();
 }
