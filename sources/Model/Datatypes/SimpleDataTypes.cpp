@@ -145,6 +145,22 @@ Datatype toDatatype(const string& value) {
       " can not be converted into IODD::Datatype enumeration");
 }
 
+void expand(SimpleDatatype& lhs, const SimpleDatatype& rhs) {
+  if (lhs.index() != rhs.index()) {
+    throw logic_error("Expanded data type does not match variable datatype");
+  }
+  match(
+      lhs,
+      [&rhs](BooleanT_Ptr value) { value->expand(*get<BooleanT_Ptr>(rhs)); },
+      [&rhs](UIntegerT_Ptr value) { value->expand(*get<UIntegerT_Ptr>(rhs)); },
+      [&rhs](IntegerT_Ptr value) { value->expand(*get<IntegerT_Ptr>(rhs)); },
+      [&rhs](FloatT_Ptr value) { value->expand(*get<FloatT_Ptr>(rhs)); },
+      [&rhs](OctetStringT_Ptr) { /* no expansion for OctetStringT */ },
+      [&rhs](StringT_Ptr) { /* no expansion for StringT */ },
+      [&rhs](TimeT_Ptr) { /* no expansion for TimeT */ },
+      [&rhs](TimeSpanT_Ptr) { /* no expansion for TimeSpanT */ });
+}
+
 size_t hash(const SimpleDatatype& value) {
   return match(
       value,
