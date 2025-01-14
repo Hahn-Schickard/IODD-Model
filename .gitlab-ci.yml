@@ -3,7 +3,7 @@ include:
  - local: ".gitlab-ci-templates.yml"
 
 variables:
-  IMAGE_VER: "6.4.0"
+  IMAGE_VER: "6.4.1"
 
 build:debian-bullseye:
   extends: .build
