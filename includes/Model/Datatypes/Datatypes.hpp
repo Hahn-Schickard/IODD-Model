@@ -19,14 +19,7 @@ using DataValue = std::variant< // clang-format off
         StringT_Ptr,
         TimeT_Ptr, 
         TimeSpanT_Ptr, 
-        ArrayT_Ptr<BooleanT_Ptr>, 
-        ArrayT_Ptr<UIntegerT_Ptr>, 
-        ArrayT_Ptr<IntegerT_Ptr>,
-        ArrayT_Ptr<FloatT_Ptr>, 
-        ArrayT_Ptr<OctetStringT_Ptr>, 
-        ArrayT_Ptr<StringT_Ptr>, 
-        ArrayT_Ptr<TimeT_Ptr>,
-        ArrayT_Ptr<TimeSpanT_Ptr>, 
+        ArrayT_Ptr,
         RecordT_Ptr
 >; // clang-format on
 

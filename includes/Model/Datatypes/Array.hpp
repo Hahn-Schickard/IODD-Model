@@ -8,12 +8,14 @@
 
 namespace IODD {
 
-template <class T> struct ArrayT : public ComplexDataTypeT {
+struct ArrayT : public ComplexDataTypeT {
+  using Values = std::vector<SimpleDatatype>;
+
   ArrayT() = default;
 
-  ArrayT(size_t count, std::vector<T>&& values);
+  ArrayT(Datatype type, size_t count, Values&& values);
 
-  ArrayT(size_t count, bool subindex_access, std::vector<T>&& values);
+  ArrayT(bool subindex_access, Datatype type, size_t count, Values&& values);
 
   void expand(const ArrayT& other);
 
@@ -21,22 +23,16 @@ template <class T> struct ArrayT : public ComplexDataTypeT {
 
   size_t count() const;
 
-  std::vector<T> values() const;
+  Values values() const;
+
+  Datatype type() const;
 
 private:
+  Datatype type_;
   size_t count_;
-  std::vector<T> values_;
+  Values values_;
 };
 
-template <class T> using ArrayT_Ptr = std::shared_ptr<ArrayT<T>>;
-
-extern template struct ArrayT<BooleanT_Ptr>;
-extern template struct ArrayT<UIntegerT_Ptr>;
-extern template struct ArrayT<IntegerT_Ptr>;
-extern template struct ArrayT<FloatT_Ptr>;
-extern template struct ArrayT<StringT_Ptr>;
-extern template struct ArrayT<OctetStringT_Ptr>;
-extern template struct ArrayT<TimeT_Ptr>;
-extern template struct ArrayT<TimeSpanT_Ptr>;
+using ArrayT_Ptr = std::shared_ptr<ArrayT>;
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_ARRAY_T_HPP

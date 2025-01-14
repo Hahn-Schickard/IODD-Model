@@ -20,30 +20,7 @@ void expand(DataValue& lhs, const DataValue& rhs) {
       [&rhs](TimeT_Ptr) { /* no expansion for TimeT */ },
       [&rhs](TimeSpanT_Ptr) { /* no expansion for TimeSpanT */ },
       // array types
-      [&rhs](ArrayT_Ptr<BooleanT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<BooleanT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<UIntegerT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<UIntegerT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<IntegerT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<IntegerT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<FloatT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<FloatT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<OctetStringT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<OctetStringT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<StringT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<StringT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<TimeT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<TimeT_Ptr>>(rhs));
-      },
-      [&rhs](ArrayT_Ptr<TimeSpanT_Ptr> value) {
-        value->expand(*get<ArrayT_Ptr<TimeSpanT_Ptr>>(rhs));
-      },
+      [&rhs](ArrayT_Ptr value) { value->expand(*get<ArrayT_Ptr>(rhs)); },
       // record types
       [&rhs](RecordT_Ptr value) { value->expand(*get<RecordT_Ptr>(rhs)); });
 }
@@ -158,24 +135,7 @@ Datatype toDatatype(const DataValue& variant) {
       [&](const TimeT_Ptr&) { result = Datatype::Time; },
       [&](const TimeSpanT_Ptr&) { result = Datatype::TimeSpan; },
       // array types
-      [&](const ArrayT_Ptr<BooleanT_Ptr>&) {
-        result = Datatype::Array_Boolean;
-      },
-      [&](const ArrayT_Ptr<UIntegerT_Ptr>&) {
-        result = Datatype::Array_UInteger;
-      },
-      [&](const ArrayT_Ptr<IntegerT_Ptr>&) {
-        result = Datatype::Array_Integer;
-      },
-      [&](const ArrayT_Ptr<FloatT_Ptr>&) { result = Datatype::Array_Float32; },
-      [&](const ArrayT_Ptr<OctetStringT_Ptr>&) {
-        result = Datatype::Array_OctetString;
-      },
-      [&](const ArrayT_Ptr<StringT_Ptr>&) { result = Datatype::Array_String; },
-      [&](const ArrayT_Ptr<TimeT_Ptr>&) { result = Datatype::Array_Time; },
-      [&](const ArrayT_Ptr<TimeSpanT_Ptr>&) {
-        result = Datatype::Array_TimeSpan;
-      },
+      [&](const ArrayT_Ptr&) { result = Datatype::Array; },
       // record types
       [&](const RecordT_Ptr&) { result = Datatype::Record; });
   return result;

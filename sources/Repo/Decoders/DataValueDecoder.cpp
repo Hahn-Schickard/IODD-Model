@@ -109,86 +109,6 @@ SimpleDatatype decodeSimpleDataValue(
   }
 }
 
-template <typename T>
-ArrayT_Ptr<T> decodeArray(const DatatypesMap& datatypes_map,
-    const xml_node& node,
-    const xml_node& locale) {
-  vector<T> values;
-
-  if (!node.child("SimpleDatatype").empty()) {
-    for (auto node_value : node.children("SimpleDatatype")) {
-      values.push_back(decodeSimpleDataValue<T>(node_value, locale));
-    }
-  } else if (!node.child("DatatypeRef").empty()) {
-    for (auto node_value : node.children("DatatypeRef")) {
-      string id = node_value.attribute("datatypeId").as_string();
-      if (auto it = datatypes_map.find(id); it != datatypes_map.end()) {
-        values.push_back(get<T>(it->second));
-      }
-    }
-  } else {
-    throw runtime_error("Array has no specified data type");
-  }
-
-  return make_shared<ArrayT<T>>(node.attribute("count").as_llong(),
-      node.attribute("subindexAccessSupported").as_bool(true),
-      move(values));
-}
-
-ArrayValue decodeArrayValue(const DatatypesMap& datatypes_map,
-    const xml_node& node,
-    const xml_node& locale) {
-  Datatype type;
-  try {
-    string type_string =
-        getXMLAttribute("xsi:type", getXMLNode("SimpleDatatype", node))
-            .as_string();
-    type = toDatatype(type_string);
-  } catch (const NodeNotFound& ex) {
-    string datatype_ref_id =
-        getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", node))
-            .as_string();
-    auto it = datatypes_map.find(datatype_ref_id);
-    if (it != datatypes_map.end()) {
-      type = toDatatype(it->second);
-    } else {
-      throw runtime_error("Failed to decode RecordT. Datatype " +
-          datatype_ref_id + " is not defined");
-    }
-  }
-
-  switch (type) {
-  case Datatype::Boolean: {
-    return decodeArray<BooleanT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::UInteger: {
-    return decodeArray<UIntegerT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::Integer: {
-    return decodeArray<IntegerT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::Float32: {
-    return decodeArray<FloatT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::String: {
-    return decodeArray<StringT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::OctetString: {
-    return decodeArray<OctetStringT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::Time: {
-    return decodeArray<TimeT_Ptr>(datatypes_map, node, locale);
-  }
-  case Datatype::TimeSpan: {
-    return decodeArray<TimeSpanT_Ptr>(datatypes_map, node, locale);
-  }
-  default: {
-    throw runtime_error("Failed to decode ArrayT. " + toString(type) +
-        " is not a simple data type");
-  }
-  }
-}
-
 SimpleDatatype getSimpleDatatype(DataValue value) {
   SimpleDatatype result;
   match(
@@ -204,6 +124,55 @@ SimpleDatatype getSimpleDatatype(DataValue value) {
       [&result](
           const auto&) { throw runtime_error("Not a simple data type"); });
   return result;
+}
+
+ArrayT_Ptr decodeArrayValue(const DatatypesMap& datatypes_map,
+    const xml_node& node,
+    const xml_node& locale) {
+  optional<Datatype> type = nullopt;
+  ArrayT::Values values;
+
+  if (!node.child("SimpleDatatype").empty()) {
+    for (auto node_value : node.children("SimpleDatatype")) {
+      string type_string =
+          getXMLAttribute("xsi:type", getXMLNode("SimpleDatatype", node))
+              .as_string();
+      if (type) {
+        if (type != toDatatype(type_string)) {
+          throw logic_error("ArrayT subvalue does not match ArrayT value type. "
+                            "ArrayT type is: " +
+              toString(type.value()) + " Subvalue type is: " + type_string);
+        }
+      } else {
+        type = toDatatype(type_string);
+      }
+      values.push_back(decodeSimpleDataValue(type.value(), node_value, locale));
+    }
+  } else if (!node.child("DatatypeRef").empty()) {
+    for (auto node_value : node.children("DatatypeRef")) {
+      string id = node_value.attribute("datatypeId").as_string();
+      if (auto it = datatypes_map.find(id); it != datatypes_map.end()) {
+        if (type) {
+          throw logic_error("ArrayT subvalue does not match ArrayT value type. "
+                            "ArrayT type is: " +
+              toString(type.value()) +
+              " Subvalue type is: " + toString(toDatatype(it->second)));
+        } else {
+          type = toDatatype(it->second);
+        }
+        values.push_back(getSimpleDatatype(it->second));
+      }
+    }
+  } else {
+    throw runtime_error("Array has no specified data type");
+  }
+
+  return make_shared<ArrayT>(
+      node.attribute("subindexAccessSupported").as_bool(true),
+      type.value(),
+      node.attribute("count").as_llong(),
+
+      move(values));
 }
 
 RecordItem_Ptr decodeRecordItem(const DatatypesMap& datatypes_map,
@@ -264,28 +233,7 @@ RecordT_Ptr decodeRecordValue(const DatatypesMap& datatypes_map,
 Datatype decodeDatatype(
     const xml_node& xml, const DatatypesMap& datatypes_map) {
   string type_string = getXMLAttribute("xsi:type", xml).as_string();
-  if (type_string == "ArrayT") {
-    string subtype_string;
-    try {
-      subtype_string =
-          getXMLAttribute("xsi:type", getXMLNode("SimpleDatatype", xml))
-              .as_string();
-    } catch (const NodeNotFound&) {
-      string datatype_ref_id =
-          getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", xml))
-              .as_string();
-      auto it = datatypes_map.find(datatype_ref_id);
-      if (it != datatypes_map.end()) {
-        subtype_string = toString(toDatatype(it->second));
-      } else {
-        throw runtime_error("Failed to decode " + type_string +
-            " subtype. DatatypeRef " + datatype_ref_id + " is not defined");
-      }
-    }
-    return toDatatype(subtype_string + "_" + type_string);
-  } else {
-    return toDatatype(type_string);
-  }
+  return toDatatype(type_string);
 }
 
 DatatypesMap decodeDatatypes(const xml_node& xml,
@@ -305,7 +253,7 @@ DataValue decodeDataValue(const xml_node& node,
         datatypes_map) { // @todo: check if DatatypesMap can be made into ptr
   auto type = decodeDatatype(node, datatypes_map);
   if (isArray(type)) {
-    return variantCast(decodeArrayValue(datatypes_map, node, locales));
+    return decodeArrayValue(datatypes_map, node, locales);
   } else if (isRecord(type)) {
     return decodeRecordValue(datatypes_map, node, locales);
   } else if (isProcessData(type)) {

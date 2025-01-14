@@ -40,8 +40,7 @@ bool isNumericComplexData(Datatype type) {
 }
 
 bool isSimpleData(Datatype type) {
-  return static_cast<uint8_t>(type) <
-      static_cast<uint8_t>(Datatype::Array_UInteger);
+  return static_cast<uint8_t>(type) < static_cast<uint8_t>(Datatype::Array);
 }
 
 bool isComplexData(Datatype type) {
@@ -102,29 +101,8 @@ string toString(Datatype type) {
   case Datatype::TimeSpan: {
     return "TimeSpanT";
   }
-  case Datatype::Array_Boolean: {
-    return "BooleanT ArrayT";
-  }
-  case Datatype::Array_UInteger: {
-    return "UIntegerT ArrayT";
-  }
-  case Datatype::Array_Integer: {
-    return "IntegerT ArrayT";
-  }
-  case Datatype::Array_Float32: {
-    return "Float32T ArrayT";
-  }
-  case Datatype::Array_String: {
-    return "StringT ArrayT";
-  }
-  case Datatype::Array_OctetString: {
-    return "OctetStringT ArrayT";
-  }
-  case Datatype::Array_Time: {
-    return "TimeT ArrayT";
-  }
-  case Datatype::Array_TimeSpan: {
-    return "TimeSpanT ArrayT";
+  case Datatype::Array: {
+    return "ArrayT";
   }
   case Datatype::Record: {
     return "RecordT";
@@ -151,14 +129,7 @@ Datatype toDatatype(const string& value) {
       {"OCTETSTRINGT", Datatype::OctetString},
       {"TIMET", Datatype::Time},
       {"TIMESPANT", Datatype::TimeSpan},
-      {"BOOLEANT_ARRAYT", Datatype::Array_Boolean},
-      {"UINTEGERT_ARRAYT", Datatype::Array_UInteger},
-      {"INTEGERT_ARRAYT", Datatype::Array_Integer},
-      {"FLOAT32T_ARRAYT", Datatype::Array_Float32},
-      {"STRINGT_ARRAYT", Datatype::Array_String},
-      {"OCTETSTRINGT_ARRAYT", Datatype::Array_OctetString},
-      {"TIMET_ARRAYT", Datatype::Array_Time},
-      {"TIMESPANT_ARRAYT", Datatype::Array_TimeSpan},
+      {"ARRAYT", Datatype::Array},
       {"RECORDT", Datatype::Record},
       {"PROCESSDATAINUNIONT", Datatype::ProcessDataIn},
       {"PROCESSDATAOUTUNIONT", Datatype::ProcessDataOut}};
@@ -174,4 +145,16 @@ Datatype toDatatype(const string& value) {
       " can not be converted into IODD::Datatype enumeration");
 }
 
+size_t hash(const SimpleDatatype& value) {
+  return match(
+      value,
+      [](const BooleanT_Ptr& value) { return value->hash(); },
+      [](const UIntegerT_Ptr& value) { return value->hash(); },
+      [](const IntegerT_Ptr& value) { return value->hash(); },
+      [](const FloatT_Ptr& value) { return value->hash(); },
+      [](const OctetStringT_Ptr& value) { return value->hash(); },
+      [](const StringT_Ptr& value) { return value->hash(); },
+      [](const TimeT_Ptr& value) { return value->hash(); },
+      [](const TimeSpanT_Ptr& value) { return value->hash(); });
+}
 } // namespace IODD

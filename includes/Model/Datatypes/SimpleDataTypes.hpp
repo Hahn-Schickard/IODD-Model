@@ -23,14 +23,7 @@ enum class Datatype : uint8_t {
   OctetString = 5,
   Time = 6,
   TimeSpan = 7,
-  Array_UInteger = 10,
-  Array_Integer = 11,
-  Array_Float32 = 12,
-  Array_Boolean = 13,
-  Array_String = 14,
-  Array_OctetString = 15,
-  Array_Time = 16,
-  Array_TimeSpan = 17,
+  Array = 10,
   Record = 20,
   ProcessDataIn = 30,
   ProcessDataOut = 31
@@ -67,6 +60,8 @@ using SimpleDatatype = std::variant<BooleanT_Ptr,
 Datatype toDatatype(const SimpleDatatype& variant);
 
 Datatype toDatatype(const std::string& value);
+
+size_t hash(const SimpleDatatype& value);
 
 } // namespace IODD
 #endif //__IODD_STANDARD_DEFINES_SIMPLE_DATA_TYPES_HPP

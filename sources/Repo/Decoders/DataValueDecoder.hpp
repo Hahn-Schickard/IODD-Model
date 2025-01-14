@@ -51,20 +51,7 @@ TimeSpanT_Ptr decodeSimpleDataValue(
 SimpleDatatype decodeSimpleDataValue(
     Datatype type, const pugi::xml_node& node, const pugi::xml_node& locales);
 
-// clang-format off
-using ArrayValue = std::variant<
-    ArrayT_Ptr<BooleanT_Ptr>,
-    ArrayT_Ptr<UIntegerT_Ptr>,
-    ArrayT_Ptr<IntegerT_Ptr>,
-    ArrayT_Ptr<FloatT_Ptr>,
-    ArrayT_Ptr<OctetStringT_Ptr>,
-    ArrayT_Ptr<StringT_Ptr>,
-    ArrayT_Ptr<TimeT_Ptr>,
-    ArrayT_Ptr<TimeSpanT_Ptr>
->;
-// clang-format on
-
-ArrayValue decodeArrayValue(const DatatypesMap& datatypes_map,
+ArrayT_Ptr decodeArrayValue(const DatatypesMap& datatypes_map,
     const pugi::xml_node& node,
     const pugi::xml_node& locale);
 
