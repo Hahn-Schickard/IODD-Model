@@ -4,29 +4,17 @@ using namespace std;
 
 namespace IODD {
 
-ArrayT::ArrayT(Datatype type, size_t count, Values&& values)
-    : ArrayT(false, type, count, move(values)) {}
+ArrayT::ArrayT(const SimpleDatatype& type, size_t count)
+    : ArrayT(false, type, count) {}
 
-ArrayT::ArrayT(
-    bool subindex_access, Datatype type, size_t count, Values&& values)
-    : ComplexDataTypeT(subindex_access), type_(type), count_(count),
-      values_(move(values)) {}
+ArrayT::ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count)
+    : ComplexDataTypeT(subindex_access), type_(type), count_(count) {}
 
-void ArrayT::expand(const ArrayT& other) {
-  values_.insert(values_.end(), other.values_.begin(), other.values_.end());
-}
+void ArrayT::expand(const ArrayT& other) { IODD::expand(type_, other.type_); }
 
-size_t ArrayT::hash() const noexcept {
-  size_t result = 0;
-  for (const auto& value : values_) {
-    result += IODD::hash(value);
-  }
-  return result;
-}
+size_t ArrayT::hash() const noexcept { return IODD::hash(type_); }
 
 size_t ArrayT::count() const { return count_; }
 
-ArrayT::Values ArrayT::values() const { return values_; }
-
-Datatype ArrayT::type() const { return type_; }
+SimpleDatatype ArrayT::type() const { return type_; }
 } // namespace IODD

@@ -9,13 +9,11 @@
 namespace IODD {
 
 struct ArrayT : public ComplexDataTypeT {
-  using Values = std::vector<SimpleDatatype>;
-
   ArrayT() = default;
 
-  ArrayT(Datatype type, size_t count, Values&& values);
+  ArrayT(const SimpleDatatype& type, size_t count);
 
-  ArrayT(bool subindex_access, Datatype type, size_t count, Values&& values);
+  ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count);
 
   void expand(const ArrayT& other);
 
@@ -23,14 +21,11 @@ struct ArrayT : public ComplexDataTypeT {
 
   size_t count() const;
 
-  Values values() const;
-
-  Datatype type() const;
+  SimpleDatatype type() const;
 
 private:
-  Datatype type_;
+  SimpleDatatype type_;
   size_t count_;
-  Values values_;
 };
 
 using ArrayT_Ptr = std::shared_ptr<ArrayT>;
