@@ -22,6 +22,9 @@ build:fedora-latest:
   image:
     name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
+  before_script:
+    - dnf install perl-FindBin perl-File-Compare # required by opensll
+    - !reference [.build, before_script]
 
 build:windows-ltsc2019:
   extends: .build
