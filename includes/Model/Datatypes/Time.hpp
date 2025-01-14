@@ -7,6 +7,8 @@ namespace IODD {
 
 struct TimeT {
   size_t hash() const noexcept { return -1; }
+
+  size_t length() const { return 8; }
 };
 
 using TimeT_Ptr = std::shared_ptr<TimeT>;

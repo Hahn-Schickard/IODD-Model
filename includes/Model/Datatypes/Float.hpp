@@ -14,6 +14,8 @@ struct FloatT : public NumberT<float> {
   FloatT() = default;
 
   FloatT(NumberT<float>&& values) : NumberT(std::move(values)) {}
+
+  size_t length() const { return 4; }
 };
 
 using FloatT_Ptr = std::shared_ptr<FloatT>;

@@ -1,6 +1,7 @@
 #ifndef __IODD_STANDARD_DEFINES_FIXED_BIT_LENGTH_HPP
 #define __IODD_STANDARD_DEFINES_FIXED_BIT_LENGTH_HPP
 
+#include <cmath>
 #include <cstdint>
 #include <stdexcept>
 
@@ -20,6 +21,8 @@ template <size_t MIN, size_t MAX> struct FixedBitLength {
   }
 
   size_t bitLength() const { return bit_length_; }
+
+  size_t length() const { return ceil(bit_length_ / 8); }
 
 private:
   size_t bit_length_;

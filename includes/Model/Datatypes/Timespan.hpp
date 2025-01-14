@@ -6,6 +6,8 @@
 namespace IODD {
 struct TimeSpanT {
   size_t hash() const noexcept { return -2; }
+
+  size_t length() const { return 8; }
 };
 
 using TimeSpanT_Ptr = std::shared_ptr<TimeSpanT>;
