@@ -154,9 +154,9 @@ SimpleDatatypeValue decodeValue(
   return result;
 }
 
-std::vector<bool> toBitVector(const std::vector<uint8_t>& bytes) {
+vector<bool> toBitVector(const vector<uint8_t>& bytes) {
   constexpr uint8_t BYTE_SIZE = 8;
-  std::vector<bool> result;
+  vector<bool> result;
   result.reserve(bytes.size() * BYTE_SIZE);
   for (auto byte : bytes) {
     for (uint8_t bit = 0; bit < BYTE_SIZE; ++bit) {
@@ -166,10 +166,10 @@ std::vector<bool> toBitVector(const std::vector<uint8_t>& bytes) {
   return result;
 }
 
-std::vector<uint8_t> toByteVector(const std::vector<bool>& bits) {
+vector<uint8_t> toByteVector(const vector<bool>& bits) {
   constexpr uint8_t BYTE_SIZE = 8;
   // NOLINTNEXTLINE(readability-magic-numbers)
-  std::vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
+  vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
   for (size_t i = 0; i < bits.size(); ++i) {
     uint8_t byte_index = i / BYTE_SIZE;
     uint8_t bit_index = i % BYTE_SIZE;
@@ -178,32 +178,31 @@ std::vector<uint8_t> toByteVector(const std::vector<bool>& bits) {
   return result;
 }
 
-std::vector<uint8_t> bitwiseView(
-    const std::vector<uint8_t>& bytes, uint8_t subindex, size_t bit_length) {
+vector<uint8_t> bitwiseView(
+    const vector<uint8_t>& bytes, uint8_t subindex, size_t bit_length) {
   auto bits = toBitVector(bytes);
-  std::reverse(bits.begin(), bits.end());
+  reverse(bits.begin(), bits.end());
 
   size_t offset = subindex * bit_length;
   auto begining = bits.begin() + offset;
   auto end = begining + bit_length;
-  std::vector<bool> subbits(begining, end);
+  vector<bool> subbits(begining, end);
 
   return toByteVector(subbits);
 }
 
-std::vector<uint8_t> bytewiseView(
-    const std::vector<uint8_t>& bytes, uint8_t subindex, size_t byte_length) {
+vector<uint8_t> bytewiseView(
+    const vector<uint8_t>& bytes, uint8_t subindex, size_t byte_length) {
   auto offset = subindex * byte_length;
   auto tmp = bytes;
-  std::reverse(tmp.begin(), tmp.end());
+  reverse(tmp.begin(), tmp.end());
   auto begining = tmp.begin() + offset;
   auto end = begining + byte_length;
-  return std::vector<uint8_t>(begining, end);
+  return vector<uint8_t>(begining, end);
 }
 
-SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
-    const ArrayT_Ptr& type,
-    uint8_t subindex) {
+SimpleDatatypeValue decodeValue(
+    const vector<uint8_t>& bytes, const ArrayT_Ptr& type, uint8_t subindex) {
   if (subindex == 0) {
     throw runtime_error("Decoding ArrayT as a whole is not supported");
   } else {
@@ -216,7 +215,7 @@ SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
     auto result = match(type->type(), 
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
-        std::reverse(bits.begin(), bits.end());
+        reverse(bits.begin(), bits.end());
         return bits[subindex];
       },
       [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
@@ -235,7 +234,6 @@ SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
   }
 }
 
-SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
-    const RecordT_Ptr& type,
-    uint8_t subindex) {}
+SimpleDatatypeValue decodeValue(
+    const vector<uint8_t>& bytes, const RecordT_Ptr& type, uint8_t subindex) {}
 } // namespace IODD
