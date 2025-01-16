@@ -205,8 +205,7 @@ SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
     const ArrayT_Ptr& type,
     uint8_t subindex) {
   if (subindex == 0) {
-    // use the whole vector
-    return decodeValue(bytes, type->type());
+    throw runtime_error("Decoding ArrayT as a whole is not supported");
   } else {
     if (!type->subindexAccess()) {
       throw runtime_error("Given ArrayT does not support subindex access");
