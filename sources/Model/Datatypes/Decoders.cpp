@@ -178,6 +178,19 @@ std::vector<uint8_t> toByteVector(const std::vector<bool>& bits) {
   return result;
 }
 
+std::vector<uint8_t> bitwiseView(
+    const std::vector<uint8_t>& bytes, uint8_t subindex, size_t bit_length) {
+  auto bits = toBitVector(bytes);
+  std::reverse(bits.begin(), bits.end());
+
+  size_t offset = subindex * bit_length;
+  auto begining = bits.begin() + offset;
+  auto end = begining + bit_length;
+  std::vector<bool> subbits(begining, end);
+
+  return toByteVector(subbits);
+}
+
 SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
     const ArrayT_Ptr& type,
     uint8_t subindex) {
