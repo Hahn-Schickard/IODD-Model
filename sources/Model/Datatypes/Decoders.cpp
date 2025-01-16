@@ -212,36 +212,27 @@ SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
       throw runtime_error("Given ArrayT does not support subindex access");
     }
 
-    /*
-      if BooleanT, each subindex is a bit
-        1. reverse the input bytes
-        2. divide the subindex by 8
-        3. round it down to get the correct byte
-        4. if the calculated byte is 0:
-           4.1. get the first byte from the input vector
-           4.2. from the byte get the bit value at the given subindex
-        5. if the calculated byte is more than 0:
-          5.1. get the calculated byte from the vector
-          5.2. calculate the bit offset in the correct bit
-          5.3. from the calculated byte get the bit value at the calculated
-      offset
-
-      if UIntegerT or IntegerT
-        1. get the size of the type->type()->bitLength()
-        2. multiply it by subindex value to get the offset in bits
-        3. based on the offset bit count, find the start byte
-        4. based on size of the type->type()->length() find the last byte
-        5. reverse the input bytes
-        6. create a subvector by reading the offset value of the start byte
-
-      otherwise
-        1. get the size of the type->type()->length()
-        2. multiply it by subindex value to get the offset
-        3. reverse the input bytes
-        4. create a subvector starting from calculated offset and ending with
-      size of the type->type()
-        5. decode the new subvector as a SimpleDatatypeValue
-    */
+    --subindex; // decrement to use standard index notation
+    // clang-format off
+    auto result = match(type->type(), 
+      [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
+        auto bits = toBitVector(bytes);
+        std::reverse(bits.begin(), bits.end());
+        return bits[subindex];
+      },
+      [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
+        return decodeValue(
+          bitwiseView(bytes, subindex, type->bitLength()), type);
+      },
+      [bytes, subindex](const IntegerT_Ptr& type) -> SimpleDatatypeValue {
+        return decodeValue(
+          bitwiseView(bytes, subindex, type->bitLength()), type);
+      },
+      [bytes, subindex](const auto& type) -> SimpleDatatypeValue {
+        return decodeValue(bytewiseView(bytes, subindex, type->length()), type);
+      }
+    ); // clang-format on
+    return result;
   }
 }
 
