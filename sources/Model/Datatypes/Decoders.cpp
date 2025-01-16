@@ -168,6 +168,7 @@ std::vector<bool> toBitVector(const std::vector<uint8_t>& bytes) {
 
 std::vector<uint8_t> toByteVector(const std::vector<bool>& bits) {
   constexpr uint8_t BYTE_SIZE = 8;
+  // NOLINTNEXTLINE(readability-magic-numbers)
   std::vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
   for (size_t i = 0; i < bits.size(); ++i) {
     uint8_t byte_index = i / BYTE_SIZE;
