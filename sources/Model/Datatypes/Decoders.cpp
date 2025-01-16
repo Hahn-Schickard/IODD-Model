@@ -154,6 +154,29 @@ SimpleDatatypeValue decodeValue(
   return result;
 }
 
+std::vector<bool> toBitVector(const std::vector<uint8_t>& bytes) {
+  constexpr uint8_t BYTE_SIZE = 8;
+  std::vector<bool> result;
+  result.reserve(bytes.size() * BYTE_SIZE);
+  for (auto byte : bytes) {
+    for (uint8_t bit = 0; bit < BYTE_SIZE; ++bit) {
+      result.emplace_back((byte >> bit) & 1);
+    }
+  }
+  return result;
+}
+
+std::vector<uint8_t> toByteVector(const std::vector<bool>& bits) {
+  constexpr uint8_t BYTE_SIZE = 8;
+  std::vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
+  for (size_t i = 0; i < bits.size(); ++i) {
+    uint8_t byte_index = i / BYTE_SIZE;
+    uint8_t bit_index = i % BYTE_SIZE;
+    result[byte_index] |= (bits[i] << bit_index);
+  }
+  return result;
+}
+
 SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
     const ArrayT_Ptr& type,
     uint8_t subindex) {
@@ -164,6 +187,7 @@ SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
     if (!type->subindexAccess()) {
       throw runtime_error("Given ArrayT does not support subindex access");
     }
+
     /*
       if BooleanT, each subindex is a bit
         1. reverse the input bytes
