@@ -14,14 +14,14 @@ using namespace std;
 namespace IODD {
 
 // NOLINTBEGIN(readability-magic-numbers)
-bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr& type) {
+bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   if (bytes.size() != 1) {
     throw logic_error("");
   }
   return bytes[0] > 0;
 }
 
-uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr& type) {
+uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
   if (bytes.empty()) {
     throw logic_error("");
   }
@@ -31,7 +31,7 @@ uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr& type) {
   return HSCUL::toUnsignedInteger(bytes);
 }
 
-int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr& type) {
+int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
   if (bytes.empty()) {
     throw logic_error("");
   }
@@ -41,7 +41,7 @@ int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr& type) {
   return HSCUL::toSignedInteger(bytes);
 }
 
-float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr& type) {
+float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
   if (bytes.empty()) {
     throw logic_error("");
   }
@@ -51,7 +51,7 @@ float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr& type) {
   return HSCUL::toFloat(bytes);
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
+string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr&) {
   return HSCUL::hexify(bytes, false, " ");
 }
 
@@ -76,7 +76,7 @@ void shiftEpoch(chrono::time_point<chrono::system_clock, chrono::seconds>& t,
 static constexpr size_t _2pow32 = 4294967296;
 using Fractional = chrono::duration<int64_t, ratio<1, _2pow32>>;
 
-string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr& type) {
+string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   // NOLINTNEXTLINE(readability-identifier-naming)
   constexpr uint32_t next_epoch_marker = 0x9DFF4400;
   if (bytes.size() != 8) {
@@ -96,7 +96,7 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr& type) {
   return date::format("%FT%TZ", timepoint); // ISO 8601 DateTime
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr& type) {
+string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
   if (bytes.size() != 8) {
     throw logic_error(
         "Input must be 8 bytes long for correct TimeSpanT decoding");
