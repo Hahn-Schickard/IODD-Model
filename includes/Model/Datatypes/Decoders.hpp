@@ -30,5 +30,13 @@ std::string decodeValue(
 SimpleDatatypeValue decodeValue(
     const std::vector<uint8_t>& bytes, const SimpleDatatype& type);
 
+SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
+    const ArrayT_Ptr& type,
+    uint8_t subindex);
+
+SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
+    const RecordT_Ptr& type,
+    uint8_t subindex);
+
 } // namespace IODD
 #endif // __IODD_STANDARD_DEFINES_DECODERS_HPP

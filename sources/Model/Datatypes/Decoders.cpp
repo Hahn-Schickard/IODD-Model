@@ -153,4 +153,51 @@ SimpleDatatypeValue decodeValue(
 
   return result;
 }
+
+SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
+    const ArrayT_Ptr& type,
+    uint8_t subindex) {
+  if (subindex == 0) {
+    // use the whole vector
+    return decodeValue(bytes, type->type());
+  } else {
+    if (!type->subindexAccess()) {
+      throw runtime_error("Given ArrayT does not support subindex access");
+    }
+    /*
+      if BooleanT, each subindex is a bit
+        1. reverse the input bytes
+        2. divide the subindex by 8
+        3. round it down to get the correct byte
+        4. if the calculated byte is 0:
+           4.1. get the first byte from the input vector
+           4.2. from the byte get the bit value at the given subindex
+        5. if the calculated byte is more than 0:
+          5.1. get the calculated byte from the vector
+          5.2. calculate the bit offset in the correct bit
+          5.3. from the calculated byte get the bit value at the calculated
+      offset
+
+      if UIntegerT or IntegerT
+        1. get the size of the type->type()->bitLength()
+        2. multiply it by subindex value to get the offset in bits
+        3. based on the offset bit count, find the start byte
+        4. based on size of the type->type()->length() find the last byte
+        5. reverse the input bytes
+        6. create a subvector by reading the offset value of the start byte
+
+      otherwise
+        1. get the size of the type->type()->length()
+        2. multiply it by subindex value to get the offset
+        3. reverse the input bytes
+        4. create a subvector starting from calculated offset and ending with
+      size of the type->type()
+        5. decode the new subvector as a SimpleDatatypeValue
+    */
+  }
+}
+
+SimpleDatatypeValue decodeValue(const std::vector<uint8_t>& bytes,
+    const RecordT_Ptr& type,
+    uint8_t subindex) {}
 } // namespace IODD
