@@ -256,4 +256,27 @@ SimpleDatatypeValue decodeValue(
 
   return decodeValue(subvector, target->value());
 }
+
+SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
+    const DataValue& type,
+    optional<uint8_t> subindex) {
+  // clang-format off
+  auto result = match(type,
+      [bytes, subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
+        if (!subindex) {
+          throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
+        }
+        return decodeValue(bytes, type, subindex.value());
+      },
+      [bytes, subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
+        if (!subindex) {
+          throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
+        }
+        return decodeValue(bytes, type, subindex.value());
+      },
+      [bytes](const auto& type) -> SimpleDatatypeValue {
+        return decodeValue(bytes, type);
+      }); // clang-format on
+  return result;
+}
 } // namespace IODD
