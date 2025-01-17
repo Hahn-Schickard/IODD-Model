@@ -62,6 +62,7 @@ test:windows-ltsc2019:
     - windows-docker
   image:
     name: ${DOCKER_REGISTRY}/hs-conan-windows-ltsc2019:${IMAGE_VER}
+    entrypoint: ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
   dependencies:
     - build:windows-ltsc2019
 
