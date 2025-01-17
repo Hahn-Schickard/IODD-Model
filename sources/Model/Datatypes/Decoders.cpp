@@ -13,7 +13,8 @@ using namespace std;
 
 namespace IODD {
 
-// NOLINTBEGIN(readability-magic-numbers)
+static constexpr uint8_t BYTE_SIZE = 8;
+
 bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   if (bytes.size() != 1) {
     throw logic_error("");
@@ -25,7 +26,7 @@ uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
   if (bytes.empty()) {
     throw logic_error("");
   }
-  if (bytes.size() > 8) {
+  if (bytes.size() > BYTE_SIZE) {
     throw logic_error("");
   }
   return HSCUL::toUnsignedInteger(bytes);
@@ -35,7 +36,7 @@ int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
   if (bytes.empty()) {
     throw logic_error("");
   }
-  if (bytes.size() > 8) {
+  if (bytes.size() > BYTE_SIZE) {
     throw logic_error("");
   }
   return HSCUL::toSignedInteger(bytes);
@@ -62,6 +63,7 @@ string decodeValue(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
   return HSCUL::toString(bytes);
 }
 
+// NOLINTBEGIN(readability-magic-numbers)
 void shiftEpoch(chrono::time_point<chrono::system_clock, chrono::seconds>& t,
     bool next_epoch = false) {
   using namespace date;
@@ -79,7 +81,7 @@ using Fractional = chrono::duration<int64_t, ratio<1, _2pow32>>;
 string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   // NOLINTNEXTLINE(readability-identifier-naming)
   constexpr uint32_t next_epoch_marker = 0x9DFF4400;
-  if (bytes.size() != 8) {
+  if (bytes.size() != BYTE_SIZE) {
     throw logic_error("Input must be 8 bytes long for correct TimeT decoding");
   }
   auto it = bytes.rbegin();
@@ -97,7 +99,7 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
 }
 
 string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
-  if (bytes.size() != 8) {
+  if (bytes.size() != BYTE_SIZE) {
     throw logic_error(
         "Input must be 8 bytes long for correct TimeSpanT decoding");
   }
@@ -153,8 +155,6 @@ SimpleDatatypeValue decodeValue(
 
   return result;
 }
-
-static constexpr uint8_t BYTE_SIZE = 8;
 
 vector<bool> toBitVector(const vector<uint8_t>& bytes) {
   vector<bool> result;
