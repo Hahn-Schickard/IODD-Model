@@ -55,14 +55,10 @@ float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
   return HSCUL::toFloat(bytes);
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr&) {
-  if (bytes.empty()) {
-    throw invalid_argument(
-        "Input can not be empty for correct OctetStringT_Ptr decoding");
-  }
-  if (bytes.size() > 232) {
-    throw invalid_argument(
-        "Input can not exceed 232 bytes for correct OctetStringT_Ptr decoding");
+string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
+  if (bytes.size() != type->length()) {
+    throw invalid_argument("Input must match the specified type length for "
+                           "correct OctetStringT_Ptr decoding");
   }
   return HSCUL::hexify(bytes, false, " ");
 }
