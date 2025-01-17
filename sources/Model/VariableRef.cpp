@@ -142,6 +142,7 @@ VariableRef::VariableRef(const VariablePtr& variable,
 
 VariableRef::Value VariableRef::calculate(
     const VariableRef::Value& value) const {
+  // @TODO: use std::vector<uint8_t>& and Decoders.hpp
   checkValueType(variable_, value);
   if (isDecimal(format_)) {
     if (isNumericData(variable_->type())) {

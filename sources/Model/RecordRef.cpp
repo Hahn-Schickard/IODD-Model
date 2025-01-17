@@ -26,6 +26,7 @@ RecordRef::RecordRef(const VariablePtr& variable,
 uint8_t RecordRef::subindex() const { return subindex_; }
 
 VariableRef::Value RecordRef::calculate(const VariableRef::Value& value) const {
+  // @TODO: use std::vector<uint8_t>& and Decoders.hpp
   try {
     auto data_value = variable_->value();
     if (!holds_alternative<RecordT_Ptr>(data_value)) {
