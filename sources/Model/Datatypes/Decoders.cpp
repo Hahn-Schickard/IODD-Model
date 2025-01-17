@@ -224,15 +224,8 @@ vector<uint8_t> bytewiseView(
 
 SimpleDatatypeValue decodeValue(
     const vector<uint8_t>& bytes, const ArrayT_Ptr& type, uint8_t subindex) {
-  if (subindex == 0) {
-    throw runtime_error("Decoding ArrayT as a whole is not supported");
-  } else {
-    if (!type->subindexAccess()) {
-      throw runtime_error("Given ArrayT does not support subindex access");
-    }
-
-    --subindex; // decrement to use standard index notation
-    // clang-format off
+  --subindex; // decrement to use standard index notation
+  // clang-format off
     auto result = match(type->type(), 
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
@@ -251,8 +244,7 @@ SimpleDatatypeValue decodeValue(
         return decodeValue(bytewiseView(bytes, subindex, type->length()), type);
       }
     ); // clang-format on
-    return result;
-  }
+  return result;
 }
 
 size_t getBitLength(SimpleDatatype type) {
