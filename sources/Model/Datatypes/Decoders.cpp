@@ -238,6 +238,27 @@ SimpleDatatypeValue decodeValue(
   }
 }
 
+size_t getBitLength(SimpleDatatype type) {
+  auto result = match(
+      type,
+      [](const BooleanT_Ptr&) -> size_t { return 1; },
+      [](const UIntegerT_Ptr& type) -> size_t { return type->bitLength(); },
+      [](const IntegerT_Ptr& type) -> size_t { return type->bitLength(); },
+      [](const auto& type) -> size_t { return type->length() * BYTE_SIZE; });
+  return result;
+}
+
 SimpleDatatypeValue decodeValue(
-    const vector<uint8_t>& bytes, const RecordT_Ptr& type, uint8_t subindex) {}
+    const vector<uint8_t>& bytes, const RecordT_Ptr& type, uint8_t subindex) {
+  auto target = type->item(subindex);
+
+  auto bits = toBitVector(bytes);
+  auto beginning = bits.begin();
+  advance(beginning, target->offset());
+  auto end = beginning;
+  advance(end, getBitLength(target->value()));
+  auto subvector = toByteVector(vector<bool>(beginning, end));
+
+  return decodeValue(subvector, target->value());
+}
 } // namespace IODD
