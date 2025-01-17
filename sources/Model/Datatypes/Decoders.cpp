@@ -168,7 +168,7 @@ vector<bool> toBitVector(const vector<uint8_t>& bytes) {
 }
 
 vector<uint8_t> toByteVector(const vector<bool>& bits) {
-  // NOLINTNEXTLINE(readability-magic-numbers)
+  // NOLINTNEXTLINE(readability-magic-numbers)  round up for division
   vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
   for (size_t i = 0; i < bits.size(); ++i) {
     uint8_t byte_index = i / BYTE_SIZE;
