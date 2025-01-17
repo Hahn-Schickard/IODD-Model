@@ -154,8 +154,9 @@ SimpleDatatypeValue decodeValue(
   return result;
 }
 
+static constexpr uint8_t BYTE_SIZE = 8;
+
 vector<bool> toBitVector(const vector<uint8_t>& bytes) {
-  constexpr uint8_t BYTE_SIZE = 8;
   vector<bool> result;
   result.reserve(bytes.size() * BYTE_SIZE);
   for (auto byte : bytes) {
@@ -167,7 +168,6 @@ vector<bool> toBitVector(const vector<uint8_t>& bytes) {
 }
 
 vector<uint8_t> toByteVector(const vector<bool>& bits) {
-  constexpr uint8_t BYTE_SIZE = 8;
   // NOLINTNEXTLINE(readability-magic-numbers)
   vector<uint8_t> result((bits.size() + 7) / BYTE_SIZE);
   for (size_t i = 0; i < bits.size(); ++i) {
