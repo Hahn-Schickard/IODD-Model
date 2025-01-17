@@ -17,48 +17,64 @@ static constexpr uint8_t BYTE_SIZE = 8;
 
 bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   if (bytes.size() != 1) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input must be 8 bytes long for correct BooleanT decoding");
   }
   return bytes[0] > 0;
 }
 
 uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
   if (bytes.empty()) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input can not be empty for correct UIntegerT_Ptr decoding");
   }
   if (bytes.size() > BYTE_SIZE) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input can not exceed 8 bytes for correct UIntegerT_Ptr decoding");
   }
   return HSCUL::toUnsignedInteger(bytes);
 }
 
 int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
   if (bytes.empty()) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input can not be empty for correct IntegerT_Ptr decoding");
   }
   if (bytes.size() > BYTE_SIZE) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input can not exceed 8 bytes for correct IntegerT_Ptr decoding");
   }
   return HSCUL::toSignedInteger(bytes);
 }
 
 float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
-  if (bytes.empty()) {
-    throw logic_error("");
-  }
   if (bytes.size() != 4) {
-    throw logic_error("");
+    throw invalid_argument(
+        "Input must be 8 bytes long for correct FloatT_Ptr decoding");
   }
   return HSCUL::toFloat(bytes);
 }
 
 string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr&) {
+  if (bytes.empty()) {
+    throw invalid_argument(
+        "Input can not be empty for correct OctetStringT_Ptr decoding");
+  }
+  if (bytes.size() > 232) {
+    throw invalid_argument(
+        "Input can not exceed 232 bytes for correct OctetStringT_Ptr decoding");
+  }
   return HSCUL::hexify(bytes, false, " ");
 }
 
 string decodeValue(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
-  if (bytes.size() != type->length()) {
-    throw logic_error("");
+  if (bytes.empty()) {
+    throw invalid_argument(
+        "Input can not be empty for correct StringT_Ptr decoding");
+  }
+  if (bytes.size() > 232) {
+    throw invalid_argument(
+        "Input can not exceed 232 bytes for correct StringT_Ptr decoding");
   }
   return HSCUL::toString(bytes);
 }
@@ -82,7 +98,8 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   // NOLINTNEXTLINE(readability-identifier-naming)
   constexpr uint32_t next_epoch_marker = 0x9DFF4400;
   if (bytes.size() != BYTE_SIZE) {
-    throw logic_error("Input must be 8 bytes long for correct TimeT decoding");
+    throw invalid_argument(
+        "Input must be 8 bytes long for correct TimeT decoding");
   }
   auto it = bytes.rbegin();
   advance(it, 3);
@@ -100,7 +117,7 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
 
 string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
   if (bytes.size() != BYTE_SIZE) {
-    throw logic_error(
+    throw invalid_argument(
         "Input must be 8 bytes long for correct TimeSpanT decoding");
   }
   auto tmp = HSCUL::toSignedInteger(bytes);
