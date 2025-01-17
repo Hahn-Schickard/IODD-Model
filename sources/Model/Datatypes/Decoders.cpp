@@ -216,7 +216,7 @@ SimpleDatatypeValue decodeValue(
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
         reverse(bits.begin(), bits.end());
-        return bits[subindex];
+        return static_cast<bool>(bits[subindex]);
       },
       [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
         return decodeValue(
