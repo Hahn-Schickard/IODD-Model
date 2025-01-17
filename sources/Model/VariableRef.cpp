@@ -1,4 +1,5 @@
 #include "VariableRef.hpp"
+#include "Decoders.hpp"
 
 using namespace std;
 
@@ -84,7 +85,7 @@ void checkValueType(
 }
 
 float computeNumeric(
-    const VariableRef::Value& value, float gradient, float offset) {
+    const SimpleDatatypeValue& value, float gradient, float offset) {
   float f_value;
   match(
       value,
@@ -140,10 +141,8 @@ VariableRef::VariableRef(const VariablePtr& variable,
   }
 }
 
-VariableRef::Value VariableRef::calculate(
-    const VariableRef::Value& value) const {
-  // @TODO: use std::vector<uint8_t>& and Decoders.hpp
-  checkValueType(variable_, value);
+SimpleDatatypeValue VariableRef::calculate(
+    const SimpleDatatypeValue& value) const {
   if (isDecimal(format_)) {
     if (isNumericData(variable_->type())) {
       return computeNumeric(value, gradient_, offset_);
@@ -151,6 +150,12 @@ VariableRef::Value VariableRef::calculate(
   }
   // value does not need to be calculated, return it as is
   return value;
+}
+
+SimpleDatatypeValue VariableRef::calculate(
+    const std::vector<uint8_t>& bytes) const {
+  auto value = decodeValue(bytes, variable_->value());
+  return calculate(value);
 }
 
 NamedAttributePtr VariableRef::valueName(

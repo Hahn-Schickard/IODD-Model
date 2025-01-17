@@ -1,4 +1,5 @@
 #include "RecordRef.hpp"
+#include "Decoders.hpp"
 #include "Variant_Visitor.hpp"
 
 using namespace std;
@@ -25,20 +26,10 @@ RecordRef::RecordRef(const VariablePtr& variable,
 
 uint8_t RecordRef::subindex() const { return subindex_; }
 
-VariableRef::Value RecordRef::calculate(const VariableRef::Value& value) const {
-  // @TODO: use std::vector<uint8_t>& and Decoders.hpp
-  try {
-    auto data_value = variable_->value();
-    if (!holds_alternative<RecordT_Ptr>(data_value)) {
-      throw std::logic_error("Variable value is not a Record Type");
-    }
-    auto record = get<RecordT_Ptr>(data_value);
-    if (record->subindexAccess()) {
-      auto item = record->item(subindex_);
-    } else {
-    }
-  } catch (const logic_error& error) {
-  }
+SimpleDatatypeValue RecordRef::calculate(
+    const std::vector<uint8_t>& bytes) const {
+  auto value = decodeValue(bytes, variable_->value(), subindex_);
+  return VariableRef::calculate(value);
 }
 
 NamedAttributePtr RecordRef::valueName(const SimpleDatatypeValue& value) const {

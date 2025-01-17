@@ -58,7 +58,8 @@ struct VariableRef {
       DisplayFormat format = DisplayFormat::None,
       const std::optional<AccessRights>& access = std::nullopt);
 
-  virtual Value calculate(const Value& value) const;
+  virtual SimpleDatatypeValue calculate(
+      const std::vector<uint8_t>& bytes) const;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
@@ -83,6 +84,8 @@ struct VariableRef {
   float offset() const;
 
 protected:
+  SimpleDatatypeValue calculate(const SimpleDatatypeValue& value) const;
+
   VariablePtr variable_;
 
 private:
