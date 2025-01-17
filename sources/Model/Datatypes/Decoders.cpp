@@ -184,9 +184,11 @@ vector<uint8_t> bitwiseView(
   reverse(bits.begin(), bits.end());
 
   size_t offset = subindex * bit_length;
-  auto begining = bits.begin() + offset;
-  auto end = begining + bit_length;
-  vector<bool> subbits(begining, end);
+  auto beginning = bits.begin();
+  advance(beginning, offset);
+  auto end = beginning;
+  advance(end, bit_length);
+  vector<bool> subbits(beginning, end);
 
   return toByteVector(subbits);
 }
@@ -196,9 +198,11 @@ vector<uint8_t> bytewiseView(
   auto offset = subindex * byte_length;
   auto tmp = bytes;
   reverse(tmp.begin(), tmp.end());
-  auto begining = tmp.begin() + offset;
-  auto end = begining + byte_length;
-  return vector<uint8_t>(begining, end);
+  auto beginning = tmp.begin();
+  advance(beginning, offset);
+  auto end = beginning;
+  advance(end, byte_length);
+  return vector<uint8_t>(beginning, end);
 }
 
 SimpleDatatypeValue decodeValue(
