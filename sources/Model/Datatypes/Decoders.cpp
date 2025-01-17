@@ -173,7 +173,7 @@ vector<uint8_t> toByteVector(const vector<bool>& bits) {
   for (size_t i = 0; i < bits.size(); ++i) {
     uint8_t byte_index = i / BYTE_SIZE;
     uint8_t bit_index = i % BYTE_SIZE;
-    result[byte_index] |= (bits[i] << bit_index);
+    result[byte_index] |= (static_cast<uint8_t>(bits[i]) << bit_index);
   }
   return result;
 }
