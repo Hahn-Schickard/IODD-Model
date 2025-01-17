@@ -154,19 +154,9 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
 
 SimpleDatatypeValue decodeValue(
     const vector<uint8_t>& bytes, const SimpleDatatype& type) {
-  SimpleDatatypeValue result;
-  // clang-format off
-  // match(type, 
-  //   [&result, bytes](const BooleanT_Ptr& value) {
-  //     result = decodeValue(bytes, value);
-  //   }
-  // );
-  // clang-format on
-  match(type, [&result, bytes](const auto& value) {
-    result = decodeValue(bytes, value);
+  return match(type, [bytes](const auto& value) -> SimpleDatatypeValue {
+    return decodeValue(bytes, value);
   });
-
-  return result;
 }
 
 vector<bool> toBitVector(const vector<uint8_t>& bytes) {
