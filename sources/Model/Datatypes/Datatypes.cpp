@@ -11,18 +11,25 @@ void expand(DataValue& lhs, const DataValue& rhs) {
   }
   match(
       lhs,
-      [&rhs](BooleanT_Ptr value) { value->expand(*get<BooleanT_Ptr>(rhs)); },
-      [&rhs](UIntegerT_Ptr value) { value->expand(*get<UIntegerT_Ptr>(rhs)); },
-      [&rhs](IntegerT_Ptr value) { value->expand(*get<IntegerT_Ptr>(rhs)); },
-      [&rhs](FloatT_Ptr value) { value->expand(*get<FloatT_Ptr>(rhs)); },
-      [&rhs](OctetStringT_Ptr) { /* no expansion for OctetStringT */ },
-      [&rhs](StringT_Ptr) { /* no expansion for StringT */ },
-      [&rhs](TimeT_Ptr) { /* no expansion for TimeT */ },
-      [&rhs](TimeSpanT_Ptr) { /* no expansion for TimeSpanT */ },
+      [&rhs](const BooleanT_Ptr& value) {
+        value->expand(*get<BooleanT_Ptr>(rhs));
+      },
+      [&rhs](const UIntegerT_Ptr& value) {
+        value->expand(*get<UIntegerT_Ptr>(rhs));
+      },
+      [&rhs](const IntegerT_Ptr& value) {
+        value->expand(*get<IntegerT_Ptr>(rhs));
+      },
+      [&rhs](const FloatT_Ptr& value) { value->expand(*get<FloatT_Ptr>(rhs)); },
+      [&rhs](const OctetStringT_Ptr&) { /* no expansion for OctetStringT */ },
+      [&rhs](const StringT_Ptr&) { /* no expansion for StringT */ },
+      [&rhs](const TimeT_Ptr&) { /* no expansion for TimeT */ },
+      [&rhs](const TimeSpanT_Ptr&) { /* no expansion for TimeSpanT */ },
       // array types
-      [&rhs](ArrayT_Ptr value) { value->expand(*get<ArrayT_Ptr>(rhs)); },
+      [&rhs](const ArrayT_Ptr& value) { value->expand(*get<ArrayT_Ptr>(rhs)); },
       // record types
-      [&rhs](RecordT_Ptr value) { value->expand(*get<RecordT_Ptr>(rhs)); });
+      [&rhs](
+          const RecordT_Ptr& value) { value->expand(*get<RecordT_Ptr>(rhs)); });
 }
 
 template <typename T>
