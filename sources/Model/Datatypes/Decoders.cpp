@@ -68,9 +68,9 @@ string decodeValue(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
     throw invalid_argument(
         "Input can not be empty for correct StringT_Ptr decoding");
   }
-  if (bytes.size() > 232) {
-    throw invalid_argument(
-        "Input can not exceed 232 bytes for correct StringT_Ptr decoding");
+  if (bytes.size() > type->length()) {
+    throw invalid_argument("Input can not exceed the specified type length "
+                           "for correct StringT_Ptr decoding");
   }
   return HSCUL::toString(bytes);
 }
