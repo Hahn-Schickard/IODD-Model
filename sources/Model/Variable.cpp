@@ -75,6 +75,8 @@ bool Variable::holdsProcessData() const {
 DataValue Variable::value() const {
   if (value_) {
     return *value_;
+  } else if (process_data_) {
+    return process_data_->value();
   } else {
     throw runtime_error("Variable " + to_string(index_) + " " + name_.locale() +
         " does not use DataValue type");
