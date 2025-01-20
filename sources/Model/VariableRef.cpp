@@ -141,7 +141,7 @@ VariableRef::VariableRef(const VariablePtr& variable,
   }
 }
 
-SimpleDatatypeValue VariableRef::calculate(
+SimpleDatatypeValue VariableRef::decode(
     const SimpleDatatypeValue& value) const {
   if (isDecimal(format_)) {
     if (isNumericData(variable_->type())) {
@@ -152,10 +152,10 @@ SimpleDatatypeValue VariableRef::calculate(
   return value;
 }
 
-SimpleDatatypeValue VariableRef::calculate(
+SimpleDatatypeValue VariableRef::decode(
     const std::vector<uint8_t>& bytes) const {
   auto value = decodeValue(bytes, variable_->value());
-  return calculate(value);
+  return decode(value);
 }
 
 NamedAttributePtr VariableRef::valueName(

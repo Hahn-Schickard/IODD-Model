@@ -22,8 +22,7 @@ struct RecordRef : public VariableRef {
 
   uint8_t subindex() const;
 
-  SimpleDatatypeValue calculate(
-      const std::vector<uint8_t>& bytes) const override;
+  SimpleDatatypeValue decode(const std::vector<uint8_t>& bytes) const override;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 

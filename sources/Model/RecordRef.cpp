@@ -26,10 +26,9 @@ RecordRef::RecordRef(const VariablePtr& variable,
 
 uint8_t RecordRef::subindex() const { return subindex_; }
 
-SimpleDatatypeValue RecordRef::calculate(
-    const std::vector<uint8_t>& bytes) const {
+SimpleDatatypeValue RecordRef::decode(const std::vector<uint8_t>& bytes) const {
   auto value = decodeValue(bytes, variable_->value(), subindex_);
-  return VariableRef::calculate(value);
+  return VariableRef::decode(value);
 }
 
 NamedAttributePtr RecordRef::valueName(const SimpleDatatypeValue& value) const {
