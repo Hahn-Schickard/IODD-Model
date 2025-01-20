@@ -159,10 +159,9 @@ int main() {
     auto repo = makeRepository(filesystem::path("config"));
 
     cout << "IODD Repository has " << repo->size() << " descriptors" << endl;
-    for (const auto& descriptor : repo->getDescriptors()) {
-      cout << "Device descriptor for " << descriptor.first
-           << " device:" << endl;
-      printDescriptor(descriptor.second);
+    for (const auto& [id, descriptor] : repo->getDescriptors()) {
+      cout << "Device descriptor for " << id << " device:" << endl;
+      printDescriptor(descriptor);
     }
 
     vector<uint8_t> bytes = {0x00, 0xCD}; // fake input date
