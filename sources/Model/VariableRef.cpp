@@ -144,7 +144,9 @@ VariableRef::VariableRef(const VariablePtr& variable,
 SimpleDatatypeValue VariableRef::decode(
     const SimpleDatatypeValue& value) const {
   if (isDecimal(format_)) {
-    if (isNumericData(variable_->type())) {
+    if (isNumericData(variable_->type()) ||
+        isNumericComplexData(variable_->type()) ||
+        isProcessData(variable_->type())) {
       return computeNumeric(value, gradient_, offset_);
     }
   }
