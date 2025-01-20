@@ -184,7 +184,7 @@ vector<uint8_t> toByteVector(const vector<bool>& bits) {
 vector<uint8_t> bitwiseView(
     const vector<uint8_t>& bytes, uint8_t subindex, size_t bit_length) {
   auto bits = toBitVector(bytes);
-  reverse(bits.begin(), bits.end());
+  // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
 
   size_t offset = subindex * bit_length;
   auto beginning = bits.begin();
@@ -200,7 +200,7 @@ vector<uint8_t> bytewiseView(
     const vector<uint8_t>& bytes, uint8_t subindex, size_t byte_length) {
   auto offset = subindex * byte_length;
   auto tmp = bytes;
-  reverse(tmp.begin(), tmp.end());
+  // reverse(tmp.begin(), tmp.end()); // @TODO: is revere needed?
   auto beginning = tmp.begin();
   advance(beginning, offset);
   auto end = beginning;
@@ -215,7 +215,7 @@ SimpleDatatypeValue decodeValue(
     auto result = match(type->type(), 
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
-        reverse(bits.begin(), bits.end());
+        // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
         return static_cast<bool>(bits[subindex]);
       },
       [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
@@ -249,9 +249,11 @@ SimpleDatatypeValue decodeValue(
 
   auto bits = toBitVector(bytes);
   auto beginning = bits.begin();
-  advance(beginning, target->offset());
+  auto offset = target->offset();
+  advance(beginning, offset);
   auto end = beginning;
-  advance(end, getBitLength(target->value()));
+  auto bit_length = getBitLength(target->value());
+  advance(end, bit_length);
   auto subvector = toByteVector(vector<bool>(beginning, end));
 
   return decodeValue(subvector, target->value());
@@ -260,22 +262,24 @@ SimpleDatatypeValue decodeValue(
 SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
     const DataValue& type,
     optional<uint8_t> subindex) {
+  auto rbytes = bytes;
+  reverse(rbytes.begin(), rbytes.end());
   // clang-format off
   auto result = match(type,
-      [bytes, subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
+      [rbytes, subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
         }
-        return decodeValue(bytes, type, subindex.value());
+        return decodeValue(rbytes, type, subindex.value());
       },
-      [bytes, subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
+      [rbytes, subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
         }
-        return decodeValue(bytes, type, subindex.value());
+        return decodeValue(rbytes, type, subindex.value());
       },
-      [bytes](const auto& type) -> SimpleDatatypeValue {
-        return decodeValue(bytes, type);
+      [rbytes](const auto& type) -> SimpleDatatypeValue {
+        return decodeValue(rbytes, type);
       }); // clang-format on
   return result;
 }
