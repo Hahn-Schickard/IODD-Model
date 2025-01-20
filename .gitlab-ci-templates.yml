@@ -18,6 +18,7 @@ variables:
     - conan
   before_script:
     - conan remote add hahn-schickard ${CONAN_REMOTE}
+    - mkdir -p ${CONAN_HOME}/profiles
     - cp ~/.conan2/profiles/default ${CONAN_HOME}/profiles/default
     - conan profile path default
     - sed -i 's/^compiler.cppstd=.*/compiler.cppstd=17/' $(conan profile path default)
