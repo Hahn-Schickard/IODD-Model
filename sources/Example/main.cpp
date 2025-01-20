@@ -165,6 +165,20 @@ int main() {
       printDescriptor(descriptor.second);
     }
 
+    vector<uint8_t> bytes = {0x00, 0xCD}; // fake input date
+    auto descriptor = repo->getDescriptor("310", "375");
+    auto menu = descriptor->getObserverUI()->getMenu("M_MR_SR_Observe_C");
+
+    cout << "Found Device 310-375 Observer UI menu " << menu->id() << endl;
+
+    auto ref = menu->references()[0];
+    if (holds_alternative<RecordRefPtr>(ref)) {
+      auto record_ref = get<RecordRefPtr>(ref);
+      auto value = record_ref->decode(bytes);
+      cout << "Device 310-375 menu " << menu->id()
+           << " value: " << toString(value) << endl;
+    }
+
     exit(EXIT_SUCCESS);
   } catch (const exception& ex) {
     cerr << "Encountered an exception: " << ex.what() << endl;
