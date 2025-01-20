@@ -167,7 +167,7 @@ RecordItem_Ptr decodeRecordItem(const DatatypesMap& datatypes_map,
         getXMLAttribute("xsi:type", vector<string>{"SimpleDatatype"}, node)
             .as_string();
     auto type = toDatatype(type_string);
-    value = decodeSimpleDataValue(type, node, locales);
+    value = decodeSimpleDataValue(type, node.child("SimpleDatatype"), locales);
   } catch (const NodeNotFound& ex) {
     string datatype_ref_id =
         getXMLAttribute("datatypeId", vector<string>{"DatatypeRef"}, node)
