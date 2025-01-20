@@ -29,6 +29,7 @@ struct UserInterface {
   MenuPtr parameter() const;
   MenuPtr observation() const;
   MenuPtr diagnosis() const;
+  MenuPtr getMenu(const std::string& menu_id) const;
 
 private:
   UserRole role_;
@@ -36,6 +37,7 @@ private:
   MenuPtr parameter_;
   MenuPtr observation_;
   MenuPtr diagnosis_;
+  std::unordered_map<std::string, MenuPtr> menus_;
 };
 
 using UserInterfacePtr = std::shared_ptr<UserInterface>;
