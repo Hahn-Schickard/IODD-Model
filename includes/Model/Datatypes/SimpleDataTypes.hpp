@@ -48,6 +48,8 @@ std::string toString(Datatype type);
 using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
     std::variant<bool, uint64_t, int64_t, float, std::string>;
 
+std::string toString(const SimpleDatatypeValue& value);
+
 using SimpleDatatype = std::variant<BooleanT_Ptr,
     UIntegerT_Ptr,
     IntegerT_Ptr,

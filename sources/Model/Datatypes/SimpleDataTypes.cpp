@@ -119,6 +119,16 @@ string toString(Datatype type) {
   }
 }
 
+string toString(const SimpleDatatypeValue& value) {
+  return match(
+      value,
+      [](bool value) -> string { return value ? "True" : "False"; },
+      [](uint64_t value) -> string { return to_string(value); },
+      [](int64_t value) -> string { return to_string(value); },
+      [](float value) -> string { return to_string(value); },
+      [](string value) -> string { return value; });
+}
+
 Datatype toDatatype(const string& value) {
   const unordered_map<string, Datatype> data_types = {
       {"BOOLEANT", Datatype::Boolean},
