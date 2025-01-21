@@ -207,8 +207,7 @@ RecordT_Ptr decodeRecordValue(const DatatypesMap& datatypes_map,
       move(records));
 }
 
-Datatype decodeDatatype(
-    const xml_node& xml, const DatatypesMap& datatypes_map) {
+Datatype decodeDatatype(const xml_node& xml) {
   string type_string = getXMLAttribute("xsi:type", xml).as_string();
   return toDatatype(type_string);
 }
@@ -228,7 +227,7 @@ DataValue decodeDataValue(const xml_node& node,
     const xml_node& locales,
     const DatatypesMap&
         datatypes_map) { // @todo: check if DatatypesMap can be made into ptr
-  auto type = decodeDatatype(node, datatypes_map);
+  auto type = decodeDatatype(node);
   if (isArray(type)) {
     return decodeArrayValue(datatypes_map, node, locales);
   } else if (isRecord(type)) {

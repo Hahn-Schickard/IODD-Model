@@ -59,8 +59,7 @@ RecordT_Ptr decodeRecordValue(const DatatypesMap& datatypes_map,
     const pugi::xml_node& node,
     const pugi::xml_node& locales);
 
-Datatype decodeDatatype(
-    const pugi::xml_node& xml, const DatatypesMap& datatypes_map = {});
+Datatype decodeDatatype(const pugi::xml_node& xml);
 
 DatatypesMap decodeDatatypes(const pugi::xml_node& xml,
     const pugi::xml_node& locales,
