@@ -42,7 +42,8 @@ ProcessDataCollection decodeProcessData(const xml_node& xml,
     auto data_out = decodeProcessDataT(node, locales, datatypes, false);
     auto condition = decodeCondition(node, variables);
     result.emplace(id,
-        make_shared<ProcessDataUnion>(id, move(data_in), move(data_out), condition));
+        make_shared<ProcessDataUnion>(
+            id, move(data_in), move(data_out), condition));
   }
   return result;
 }
