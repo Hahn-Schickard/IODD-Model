@@ -20,7 +20,6 @@ variables:
     - conan remote add hahn-schickard ${CONAN_REMOTE}
     - mkdir -p ${CONAN_HOME}/profiles
     - cp ~/.conan2/profiles/default ${CONAN_HOME}/profiles/default # move original default profile into project scope
-    - sed -i 's/^compiler.cppstd=.*/compiler.cppstd=17/' $(conan profile path default)
   script:
     - mkdir build
     - cd build
