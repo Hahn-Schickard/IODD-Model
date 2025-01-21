@@ -164,6 +164,7 @@ int main() {
       printDescriptor(descriptor);
     }
 
+    // NOLINTNEXTLINE(readability-magic-numbers)
     vector<uint8_t> bytes = {0x00, 0xCD}; // fake input date
     auto descriptor = repo->getDescriptor("310", "375");
     auto menu = descriptor->getObserverUI()->getMenu("M_MR_SR_Observe_C");
