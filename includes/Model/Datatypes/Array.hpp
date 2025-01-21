@@ -17,8 +17,6 @@ struct ArrayT : public ComplexDataTypeT {
 
   void expand(const ArrayT& other);
 
-  size_t hash() const noexcept;
-
   size_t count() const;
 
   SimpleDatatype type() const;

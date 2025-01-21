@@ -64,8 +64,6 @@ Datatype toDatatype(const SimpleDatatype& variant);
 Datatype toDatatype(const std::string& value);
 
 void expand(SimpleDatatype& lhs, const SimpleDatatype& rhs);
-
-size_t hash(const SimpleDatatype& value);
-
 } // namespace IODD
+
 #endif //__IODD_STANDARD_DEFINES_SIMPLE_DATA_TYPES_HPP

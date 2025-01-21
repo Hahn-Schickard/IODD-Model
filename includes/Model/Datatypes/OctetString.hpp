@@ -15,8 +15,6 @@ struct OctetStringT {
     }
   }
 
-  size_t hash() const noexcept { return length_; }
-
   size_t length() const { return length_; }
 
 protected:
@@ -24,30 +22,6 @@ protected:
 };
 
 using OctetStringT_Ptr = std::shared_ptr<OctetStringT>;
-
-inline bool operator==(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() == rhs.hash();
-}
-
-inline bool operator!=(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() != rhs.hash();
-}
-
-inline bool operator<=(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() <= rhs.hash();
-}
-
-inline bool operator>=(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() >= rhs.hash();
-}
-
-inline bool operator<(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() < rhs.hash();
-}
-
-inline bool operator>(const OctetStringT& lhs, const OctetStringT& rhs) {
-  return lhs.hash() > rhs.hash();
-}
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_OCTET_STRING_T_HPP

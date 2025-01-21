@@ -12,8 +12,6 @@ ArrayT::ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count)
 
 void ArrayT::expand(const ArrayT& other) { IODD::expand(type_, other.type_); }
 
-size_t ArrayT::hash() const noexcept { return IODD::hash(type_); }
-
 size_t ArrayT::count() const { return count_; }
 
 SimpleDatatype ArrayT::type() const { return type_; }

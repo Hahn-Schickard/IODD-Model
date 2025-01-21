@@ -23,8 +23,6 @@ struct RecordItem {
       std::optional<AccessRights> access = std::nullopt,
       std::optional<TextID>&& desc = std::nullopt);
 
-  size_t hash() const noexcept;
-
   uint8_t subindex() const;
 
   uint16_t offset() const;
@@ -59,8 +57,6 @@ struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
 
   void expand(const RecordT& other);
 
-  size_t hash() const noexcept;
-
   RecordItems items() const;
 
   RecordItem_Ptr item(uint8_t subindex) const;
@@ -70,41 +66,6 @@ private:
 };
 
 using RecordT_Ptr = std::shared_ptr<RecordT>;
-
-inline bool operator==(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() == rhs.subindex()) && (lhs.value() == rhs.value()) &&
-      (lhs.name() == rhs.name()) && (lhs.access() == rhs.access()) &&
-      (lhs.description() == rhs.description());
-}
-
-inline bool operator!=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() != rhs.subindex()) && (lhs.value() != rhs.value()) &&
-      (lhs.name() != rhs.name()) && (lhs.access() != rhs.access()) &&
-      (lhs.description() != rhs.description());
-}
-
-inline bool operator<=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() <= rhs.subindex()) && (lhs.value() <= rhs.value()) &&
-      (lhs.name() <= rhs.name()) && (lhs.access() <= rhs.access()) &&
-      (lhs.description() <= rhs.description());
-}
-
-inline bool operator>=(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() >= rhs.subindex()) && (lhs.value() >= rhs.value()) &&
-      (lhs.name() >= rhs.name()) && (lhs.access() >= rhs.access()) &&
-      (lhs.description() >= rhs.description());
-}
-
-inline bool operator<(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() < rhs.subindex()) && (lhs.value() < rhs.value()) &&
-      (lhs.name() < rhs.name()) && (lhs.access() < rhs.access()) &&
-      (lhs.description() < rhs.description());
-}
-
-inline bool operator>(const RecordItem& lhs, const RecordItem& rhs) {
-  return (lhs.subindex() > rhs.subindex()) && (lhs.value() > rhs.value()) &&
-      (lhs.name() > rhs.name()) && (lhs.access() > rhs.access()) &&
-      (lhs.description() > rhs.description());
-}
 } // namespace IODD
+
 #endif //__IODD_STANDARD_DEFINES_RECORD_T_HPP

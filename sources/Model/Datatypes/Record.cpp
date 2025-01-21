@@ -18,8 +18,6 @@ RecordItem::RecordItem(uint8_t subindex,
       offset_(FixedBitLength<0, 1855>(offset).bitLength()), value_(move(value)),
       name_(move(name)), access_(access), desc_(move(desc)) {}
 
-size_t RecordItem::hash() const noexcept { return subindex_; }
-
 uint8_t RecordItem::subindex() const { return subindex_; }
 
 uint16_t RecordItem::offset() const { return offset_; }
@@ -43,14 +41,6 @@ RecordT::RecordT(uint16_t bit_length, bool subindex_access, RecordItems&& items)
 void RecordT::expand(const RecordT& other) {
   // existing key values should NOT be updated
   items_.insert(other.items_.begin(), other.items_.end());
-}
-
-size_t RecordT::hash() const noexcept {
-  size_t result = 0;
-  for (const auto& item : items_) {
-    result += item.second->hash();
-  }
-  return result;
 }
 
 RecordItems RecordT::items() const { return items_; }

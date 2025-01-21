@@ -22,8 +22,6 @@ string TextID::id() const { return id_; }
 
 string TextID::locale() const { return locale_; }
 
-size_t TextID::hash() const noexcept { return std::hash<string>{}(id_); }
-
 TextID::operator bool() const { return !id_.empty() && !locale_.empty(); }
 
 } // namespace IODD

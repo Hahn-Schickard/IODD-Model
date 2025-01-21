@@ -10,8 +10,6 @@ struct StringT : public OctetStringT {
 
   StringT(size_t length, bool utf = true) : OctetStringT(length), utf_(utf) {}
 
-  size_t hash() const noexcept { return (length_ < 1) | utf_; }
-
   bool utf() const { return utf_; }
 
 private:

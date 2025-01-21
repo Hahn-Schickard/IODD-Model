@@ -176,17 +176,4 @@ void expand(SimpleDatatype& lhs, const SimpleDatatype& rhs) {
       [&rhs](const TimeT_Ptr&) { /* no expansion for TimeT */ },
       [&rhs](const TimeSpanT_Ptr&) { /* no expansion for TimeSpanT */ });
 }
-
-size_t hash(const SimpleDatatype& value) {
-  return match(
-      value,
-      [](const BooleanT_Ptr& value) { return value->hash(); },
-      [](const UIntegerT_Ptr& value) { return value->hash(); },
-      [](const IntegerT_Ptr& value) { return value->hash(); },
-      [](const FloatT_Ptr& value) { return value->hash(); },
-      [](const OctetStringT_Ptr& value) { return value->hash(); },
-      [](const StringT_Ptr& value) { return value->hash(); },
-      [](const TimeT_Ptr& value) { return value->hash(); },
-      [](const TimeSpanT_Ptr& value) { return value->hash(); });
-}
 } // namespace IODD
