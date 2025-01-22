@@ -117,7 +117,7 @@ NamedAttributePtr getValueName(const DataValue& type,
         result = ptr.get();
       },
       // rest of types
-      [&](auto) {
+      [&](const auto&) {
         throw logic_error(toString(toDatatype(type)) +
             " does not support named value attribute lookup");
       });
