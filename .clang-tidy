@@ -11,6 +11,7 @@ Checks: >
   -modernize-pass-by-value,
   -bugprone-easily-swappable-parameters,
   performance-*,
+  -performance-avoid-endl,
   portability-*,
   readability-*,
   -readability-else-after-return,
