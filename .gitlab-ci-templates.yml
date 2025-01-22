@@ -116,6 +116,7 @@ variables:
     expire_in: 1 day
   allow_failure: true
 
+.lint:
   stage: check
   tags:
     - conan
