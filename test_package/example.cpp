@@ -11,7 +11,7 @@ int main() {
     auto mocked_variable = make_shared<Variable>(0,
         TextID("mock_var", "Mock variable"),
         AccessRights::ReadOnly,
-        BooleanT());
+        make_shared<BooleanT>());
     auto variables_mock = VariablesMap{{"mock", mocked_variable}};
     auto mocked_menu = make_shared<Menu>("Mocked UI",
         Menu::Refs{make_shared<VariableRef>(
@@ -25,7 +25,7 @@ int main() {
         make_shared<ProcessDataT>("V_PdInT",
             64,
             TextID("TI_PdIn_Name", "Process Data Input/Output"),
-            UIntegerT(64, NumberT<uint64_t>())));
+            make_shared<UIntegerT>(64, NumberT<uint64_t>())));
     auto mocked_uis = DeviceDescriptor::UserInterfaces{
         {UserRole::ObservationRole, move(mocked_ui)}};
 
