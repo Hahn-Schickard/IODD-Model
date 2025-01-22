@@ -134,6 +134,11 @@ static_analysis:
     - analyze_exe_memory:debian-bookworm
     - test_coverage
 
+trivy_scan:
+  extends: .trivy_scan
+  dependencies:
+    - build:debian-bookworm
+
 format:
   extends: .format
   image: ${DOCKER_REGISTRY}/hs-conan-debian-bookworm-slim:${IMAGE_VER}
