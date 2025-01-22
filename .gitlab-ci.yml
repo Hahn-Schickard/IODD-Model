@@ -136,7 +136,7 @@ static_analysis:
 
 trivy_scan:
   extends: .trivy_scan
-  dependencies:
+  needs:
     - build:debian-bookworm
 
 format:
