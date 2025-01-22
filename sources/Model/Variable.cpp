@@ -11,18 +11,18 @@ Variable::Variable(size_t index,
     AccessRights access,
     DataValue&& value,
     optional<TextID>&& desc,
-    optional<SimpleDatatypeValue> default_value,
+    const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
     bool excluded)
     : index_(index), name_(move(name)), access_(access), value_(move(value)),
-      desc_(move(desc)), default_(move(default_value)), dynamic_(dynamic),
+      desc_(move(desc)), default_(default_value), dynamic_(dynamic),
       modifies_others_(modifies_others), excluded_(excluded) {}
 
 Variable::Variable(const Variable& other,
-    optional<SimpleDatatypeValue> default_value,
-    optional<bool> excluded,
-    optional<DataValue> value)
+    const optional<SimpleDatatypeValue>& default_value,
+    const optional<bool>& excluded,
+    const optional<DataValue>& value)
     : index_(other.index_), name_(other.name_), access_(other.access_),
       value_(other.value_), desc_(other.desc_),
       default_((default_value ? default_value : other.default_)),
@@ -43,14 +43,14 @@ Variable::Variable(size_t index,
     AccessRights access,
     const ProcessDataTPtr& process_data,
     optional<TextID>&& desc,
-    optional<SimpleDatatypeValue> default_value,
+    const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
     bool excluded)
     : index_(index), name_(move(name)), access_(access),
-      process_data_(process_data), desc_(move(desc)),
-      default_(move(default_value)), dynamic_(dynamic),
-      modifies_others_(modifies_others), excluded_(excluded) {}
+      process_data_(process_data), desc_(move(desc)), default_(default_value),
+      dynamic_(dynamic), modifies_others_(modifies_others),
+      excluded_(excluded) {}
 
 Variable::Variable(const Variable& other, const ProcessDataTPtr& process_data)
     : index_(other.index_), name_(other.name_), access_(other.access_),

@@ -14,22 +14,22 @@ struct Variable {
       AccessRights access,
       DataValue&& value,
       std::optional<TextID>&& desc = std::nullopt,
-      std::optional<SimpleDatatypeValue> default_value = std::nullopt,
+      const std::optional<SimpleDatatypeValue>& default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
       bool excluded = false);
 
   Variable(const Variable& other,
-      std::optional<SimpleDatatypeValue> default_value,
-      std::optional<bool> excluded,
-      std::optional<DataValue> value);
+      const std::optional<SimpleDatatypeValue>& default_value,
+      const std::optional<bool>& excluded,
+      const std::optional<DataValue>& value);
 
   Variable(size_t index,
       TextID&& name,
       AccessRights access,
       const ProcessDataTPtr& process_data = nullptr,
       std::optional<TextID>&& desc = std::nullopt,
-      std::optional<SimpleDatatypeValue> default_value = std::nullopt,
+      const std::optional<SimpleDatatypeValue>& default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
       bool excluded = false);
