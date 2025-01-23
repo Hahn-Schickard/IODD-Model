@@ -62,7 +62,6 @@ test:windows-ltsc2019:
     - windows-docker
   image:
     name: ${DOCKER_REGISTRY}/hs-conan-windows-ltsc2019:${IMAGE_VER}
-    entrypoint: ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
   needs:
     - build:windows-ltsc2019
 
@@ -89,7 +88,7 @@ analyze_exe_memory:fedora-latest:
   image:
     name: ${DOCKER_REGISTRY}/hs-conan-fedora-latest:${IMAGE_VER}
     entrypoint: ["/bin/sh", "-c"]
-  needs: 
+  needs:
     - build:fedora-latest
 
 analyze_test_runner_memory:debian-bullseye:

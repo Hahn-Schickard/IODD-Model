@@ -20,7 +20,7 @@ variables:
     - conan remote add hahn-schickard ${CONAN_REMOTE}
     - mkdir -p ${CONAN_HOME}/profiles
     - cp ~/.conan2/profiles/default ${CONAN_HOME}/profiles/default # move original default profile into project scope
-    - conan lock create .
+    - conan lock create . # used by trivy for dependency license scanning
   script:
     - mkdir build
     - cd build
@@ -118,23 +118,23 @@ variables:
     expire_in: 1 day
   allow_failure: true
 
-.trivy_scan:                                                                                                                                                                   
-  stage: check                                                                                                                                                                 
-  image:                                                                                                                                                                       
-    name: aquasec/trivy:latest                                                                                                                                                 
-    entrypoint: [""]                                                                                                                                                           
-  script:   
-    - trivy --version                     
-    # cache cleanup is needed when scanning images with the same tags, it does not remove the database                                                                         
-    - trivy clean --scan-cache                                                         
-    # update vulnerabilities db                                                                                                                                                
-    - trivy image --download-db-only --no-progress --cache-dir .trivycache/            
-    # print UNKNOWN,LOW,MEDIUM severity                                                
-    - trivy fs --exit-code 0 --cache-dir .trivycache/ --no-progress --scanners vuln,misconfig,license --license-full --skip-dirs ".conan2/" --severity UNKNOWN,LOW,MEDIUM .   
-    # print and fail on HIGH,CRITICAL severity                                         
-    - trivy fs --exit-code 1 --cache-dir .trivycache/ --no-progress --scanners vuln,misconfig,license --license-full --skip-dirs ".conan2/" --severity HIGH,CRITICAL .        
-  cache:                                                                               
-    paths:                                                                             
+.trivy_scan:
+  stage: check
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy --version
+    # cache cleanup is needed when scanning images with the same tags, it does not remove the database
+    - trivy clean --scan-cache
+    # update vulnerabilities db
+    - trivy image --download-db-only --no-progress --cache-dir .trivycache/
+    # print UNKNOWN,LOW,MEDIUM severity
+    - trivy fs --exit-code 0 --cache-dir .trivycache/ --no-progress --scanners vuln,misconfig,license --license-full --skip-dirs ".conan2/" --severity UNKNOWN,LOW,MEDIUM .
+    # print and fail on HIGH,CRITICAL severity
+    - trivy fs --exit-code 1 --cache-dir .trivycache/ --no-progress --scanners vuln,misconfig,license --license-full --skip-dirs ".conan2/" --severity HIGH,CRITICAL .
+  cache:
+    paths:
       - .trivycache/
 
 .lint:
@@ -188,7 +188,8 @@ variables:
     - PROJECT_NAME=$(python3 ./utility/.getProjectName.py)
   script:
     - conan remote add upload_repo ${CONAN_REMOTE}
-    - conan profile detect --force
+    - mkdir -p ${CONAN_HOME}/profiles
+    - cp ~/.conan2/profiles/default ${CONAN_HOME}/profiles/default # move original default profile into project scope
     - conan create . --version=${VERSION} --user=hahn-schickard --channel=stable --build=missing -s:h compiler.cppstd=17 -s:b compiler.cppstd=17
     - conan upload -r upload_repo --confirm ${PROJECT_NAME}/${VERSION}@hahn-schickard/stable
   rules:
