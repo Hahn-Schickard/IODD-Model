@@ -46,8 +46,6 @@ struct Variable {
 
   DataValue value() const;
 
-  template <class T> T variantValue() const;
-
   NamedAttributePtr valueName(const SimpleDatatypeValue& value,
       std::optional<uint8_t> subindex = std::nullopt) const;
 
