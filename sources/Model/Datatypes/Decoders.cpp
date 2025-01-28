@@ -15,7 +15,7 @@ namespace IODD {
 
 static constexpr uint8_t BYTE_SIZE = 8;
 
-bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
+bool decode(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   if (bytes.size() != 1) {
     throw invalid_argument(
         "Input must be 8 bytes long for correct BooleanT decoding");
@@ -23,7 +23,7 @@ bool decodeValue(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   return bytes[0] > 0;
 }
 
-uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
+uint64_t decode(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
   if (bytes.empty()) {
     throw invalid_argument(
         "Input can not be empty for correct UIntegerT_Ptr decoding");
@@ -35,7 +35,7 @@ uint64_t decodeValue(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
   return HSCUL::toUnsignedInteger(bytes);
 }
 
-int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
+int64_t decode(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
   if (bytes.empty()) {
     throw invalid_argument(
         "Input can not be empty for correct IntegerT_Ptr decoding");
@@ -47,7 +47,7 @@ int64_t decodeValue(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
   return HSCUL::toSignedInteger(bytes);
 }
 
-float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
+float decode(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
   if (bytes.size() != 4) {
     throw invalid_argument(
         "Input must be 8 bytes long for correct FloatT_Ptr decoding");
@@ -55,7 +55,7 @@ float decodeValue(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
   return HSCUL::toFloat(bytes);
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
+string decode(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
   if (bytes.size() != type->length()) {
     throw invalid_argument("Input must match the specified type length for "
                            "correct OctetStringT_Ptr decoding");
@@ -63,7 +63,7 @@ string decodeValue(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
   return HSCUL::hexify(bytes, false, " ");
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
+string decode(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
   if (bytes.empty()) {
     throw invalid_argument(
         "Input can not be empty for correct StringT_Ptr decoding");
@@ -90,7 +90,7 @@ void shiftEpoch(chrono::time_point<chrono::system_clock, chrono::seconds>& t,
 static constexpr size_t _2pow32 = 4294967296;
 using Fractional = chrono::duration<int64_t, ratio<1, _2pow32>>;
 
-string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
+string decode(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   // NOLINTNEXTLINE(readability-identifier-naming)
   constexpr uint32_t next_epoch_marker = 0x9DFF4400;
   if (bytes.size() != BYTE_SIZE) {
@@ -111,7 +111,7 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   return date::format("%FT%TZ", timepoint); // ISO 8601 DateTime
 }
 
-string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
+string decode(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
   if (bytes.size() != BYTE_SIZE) {
     throw invalid_argument(
         "Input must be 8 bytes long for correct TimeSpanT decoding");
@@ -152,10 +152,10 @@ string decodeValue(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
 }
 // NOLINTEND(readability-magic-numbers)
 
-SimpleDatatypeValue decodeValue(
+SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const SimpleDatatype& type) {
   return match(type, [bytes](const auto& value) -> SimpleDatatypeValue {
-    return decodeValue(bytes, value);
+    return decode(bytes, value);
   });
 }
 
@@ -208,7 +208,7 @@ vector<uint8_t> bytewiseView(
   return vector<uint8_t>(beginning, end);
 }
 
-SimpleDatatypeValue decodeValue(
+SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const ArrayT_Ptr& type, uint8_t subindex) {
   --subindex; // decrement to use standard index notation
   // clang-format off
@@ -219,15 +219,15 @@ SimpleDatatypeValue decodeValue(
         return static_cast<bool>(bits[subindex]);
       },
       [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
-        return decodeValue(
+        return decode(
           bitwiseView(bytes, subindex, type->bitLength()), type);
       },
       [bytes, subindex](const IntegerT_Ptr& type) -> SimpleDatatypeValue {
-        return decodeValue(
+        return decode(
           bitwiseView(bytes, subindex, type->bitLength()), type);
       },
       [bytes, subindex](const auto& type) -> SimpleDatatypeValue {
-        return decodeValue(bytewiseView(bytes, subindex, type->length()), type);
+        return decode(bytewiseView(bytes, subindex, type->length()), type);
       }
     ); // clang-format on
   return result;
@@ -243,7 +243,7 @@ size_t getBitLength(SimpleDatatype type) {
   return result;
 }
 
-SimpleDatatypeValue decodeValue(
+SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const RecordT_Ptr& type, uint8_t subindex) {
   auto target = type->item(subindex);
 
@@ -256,7 +256,27 @@ SimpleDatatypeValue decodeValue(
   advance(end, bit_length);
   auto subvector = toByteVector(vector<bool>(beginning, end));
 
-  return decodeValue(subvector, target->value());
+  return decode(subvector, target->value());
+}
+
+// @TODO: Reuse fro Repo/Decoders/DataValueDecoder.hpp
+template <class... Args> struct VariantCaster {
+  std::variant<Args...> v;
+
+  template <class... ToArgs> operator std::variant<ToArgs...>() const {
+    return std::visit(
+        [](auto&& arg) -> std::variant<ToArgs...> { return arg; }, v);
+  }
+};
+
+template <class... Args>
+auto variantCast(const std::variant<Args...>& v) -> VariantCaster<Args...> {
+  return {v};
+}
+
+SimpleDatatypeValue decodeValue(
+    const std::vector<uint8_t>& bytes, const SimpleDatatype& type) {
+  return decodeValue(bytes, variantCast(type), std::nullopt);
 }
 
 SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
@@ -270,16 +290,16 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
         }
-        return decodeValue(rbytes, type, subindex.value());
+        return decode(rbytes, type, subindex.value());
       },
       [rbytes, subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
         }
-        return decodeValue(rbytes, type, subindex.value());
+        return decode(rbytes, type, subindex.value());
       },
       [rbytes](const auto& type) -> SimpleDatatypeValue {
-        return decodeValue(rbytes, type);
+        return decode(rbytes, type);
       }); // clang-format on
   return result;
 }
