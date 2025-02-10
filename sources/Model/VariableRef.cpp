@@ -88,7 +88,7 @@ float computeNumeric(
     const SimpleDatatypeValue& value, float gradient, float offset) {
   float f_value;
   match(
-      value,
+      value(),
       [](bool) {
         throw logic_error("Decoded result can not be represented as boolean");
       },
@@ -147,7 +147,7 @@ SimpleDatatypeValue VariableRef::decode(
     if (isNumericData(variable_->type()) ||
         isNumericComplexData(variable_->type()) ||
         isProcessData(variable_->type())) {
-      return computeNumeric(value, gradient_, offset_);
+      return SimpleDatatypeValue(computeNumeric(value, gradient_, offset_));
     }
   }
   // value does not need to be calculated, return it as is

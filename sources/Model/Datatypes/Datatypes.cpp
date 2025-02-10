@@ -34,8 +34,9 @@ void expand(DataValue& lhs, const DataValue& rhs) {
 
 template <typename T>
 T getSimpleDatatypeValue(const SimpleDatatypeValue& variant) {
-  if (auto* value = std::get_if<T>(&variant)) {
-    return *value;
+  auto variant_value = variant();
+  if (holds_alternative<T>(variant_value)) {
+    return get<T>(variant_value);
   } else {
     throw std::invalid_argument(
         "Simple value variant does not hold the requested type");

@@ -45,10 +45,19 @@ bool isProcessData(Datatype type);
 
 std::string toString(Datatype type);
 
-using SimpleDatatypeValue = // TimeT and TimeSpanT are stored as strings
-    std::variant<bool, uint64_t, int64_t, float, std::string>;
+struct SimpleDatatypeValue {
+  using Value = // TimeT and TimeSpanT are stored as strings
+      std::variant<bool, uint64_t, int64_t, float, std::string>;
 
-std::string toString(const SimpleDatatypeValue& value);
+  explicit SimpleDatatypeValue(Value&& value);
+
+  Value operator()() const;
+
+  std::string asString() const;
+
+private:
+  Value value_;
+};
 
 using SimpleDatatype = std::variant<BooleanT_Ptr,
     UIntegerT_Ptr,

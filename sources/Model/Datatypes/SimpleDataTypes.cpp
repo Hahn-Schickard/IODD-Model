@@ -119,14 +119,19 @@ string toString(Datatype type) {
   }
 }
 
-string toString(const SimpleDatatypeValue& value) {
+SimpleDatatypeValue::SimpleDatatypeValue(SimpleDatatypeValue::Value&& value)
+    : value_(move(value)) {}
+
+SimpleDatatypeValue::Value SimpleDatatypeValue::operator()() const {
+  return value_;
+}
+
+string SimpleDatatypeValue::asString() const {
   return match(
-      value,
+      value_,
       [](bool value) -> string { return value ? "True" : "False"; },
-      [](uint64_t value) -> string { return to_string(value); },
-      [](int64_t value) -> string { return to_string(value); },
-      [](float value) -> string { return to_string(value); },
-      [](string value) -> string { return value; });
+      [](string value) -> string { return value; },
+      [](auto value) -> string { return to_string(value); });
 }
 
 Datatype toDatatype(const string& value) {

@@ -86,16 +86,16 @@ SimpleDatatypeValue decodeDefaultValue(
     Datatype type, const xml_attribute& attribute) {
   switch (type) {
   case Datatype::Boolean: {
-    return attribute.as_bool();
+    return SimpleDatatypeValue(attribute.as_bool());
   }
   case Datatype::UInteger: {
-    return (uint64_t)attribute.as_ullong();
+    return SimpleDatatypeValue((uint64_t)attribute.as_ullong());
   }
   case Datatype::Integer: {
-    return (int64_t)attribute.as_llong();
+    return SimpleDatatypeValue((int64_t)attribute.as_llong());
   }
   case Datatype::Float32: {
-    return attribute.as_float();
+    return SimpleDatatypeValue(attribute.as_float());
   }
     // NOLINTNEXTLINE(bugprone-branch-clone)
   case Datatype::String: {
@@ -108,7 +108,7 @@ SimpleDatatypeValue decodeDefaultValue(
     [[fallthrough]];
   }
   case Datatype::OctetString: {
-    return attribute.as_string();
+    return SimpleDatatypeValue(attribute.as_string());
   }
   default: {
     throw invalid_argument(toString(type) + " is not a simple data type");

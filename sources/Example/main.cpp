@@ -176,7 +176,7 @@ int main() {
       auto record_ref = get<RecordRefPtr>(ref);
       auto value = record_ref->decode(bytes);
       cout << "Device 310-375 menu " << menu->id()
-           << " value: " << toString(value) << endl;
+           << " value: " << value.asString() << endl;
     }
 
     exit(EXIT_SUCCESS);

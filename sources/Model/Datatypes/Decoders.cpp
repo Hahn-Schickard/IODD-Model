@@ -155,7 +155,7 @@ string decode(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
 SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const SimpleDatatype& type) {
   return match(type, [bytes](const auto& value) -> SimpleDatatypeValue {
-    return decode(bytes, value);
+    return SimpleDatatypeValue(decode(bytes, value));
   });
 }
 
@@ -216,18 +216,18 @@ SimpleDatatypeValue decode(
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
         // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
-        return static_cast<bool>(bits[subindex]);
+        return SimpleDatatypeValue(static_cast<bool>(bits[subindex]));
       },
       [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
-        return decode(
-          bitwiseView(bytes, subindex, type->bitLength()), type);
+        return SimpleDatatypeValue(decode(
+          bitwiseView(bytes, subindex, type->bitLength()), type));
       },
       [bytes, subindex](const IntegerT_Ptr& type) -> SimpleDatatypeValue {
-        return decode(
-          bitwiseView(bytes, subindex, type->bitLength()), type);
+        return SimpleDatatypeValue(decode(
+          bitwiseView(bytes, subindex, type->bitLength()), type));
       },
       [bytes, subindex](const auto& type) -> SimpleDatatypeValue {
-        return decode(bytewiseView(bytes, subindex, type->length()), type);
+        return SimpleDatatypeValue(decode(bytewiseView(bytes, subindex, type->length()), type));
       }
     ); // clang-format on
   return result;
@@ -299,7 +299,7 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
         return decode(rbytes, type, subindex.value());
       },
       [&bytes](const auto& type) -> SimpleDatatypeValue {
-        return decode(bytes, type);
+        return SimpleDatatypeValue(decode(bytes, type));
       }); // clang-format on
   return result;
 }
