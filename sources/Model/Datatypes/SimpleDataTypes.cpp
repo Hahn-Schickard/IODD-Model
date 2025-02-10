@@ -11,18 +11,16 @@ using namespace std;
 namespace IODD {
 
 Datatype toDatatype(const SimpleDatatype& variant) {
-  Datatype result;
-  match(
+  return match(
       variant,
-      [&](const BooleanT_Ptr&) { result = Datatype::Boolean; },
-      [&](const UIntegerT_Ptr&) { result = Datatype::UInteger; },
-      [&](const IntegerT_Ptr&) { result = Datatype::Integer; },
-      [&](const FloatT_Ptr&) { result = Datatype::Float32; },
-      [&](const OctetStringT_Ptr&) { result = Datatype::OctetString; },
-      [&](const StringT_Ptr&) { result = Datatype::String; },
-      [&](const TimeT_Ptr&) { result = Datatype::Time; },
-      [&](const TimeSpanT_Ptr&) { result = Datatype::TimeSpan; });
-  return result;
+      [](const BooleanT_Ptr&) { return Datatype::Boolean; },
+      [](const UIntegerT_Ptr&) { return Datatype::UInteger; },
+      [](const IntegerT_Ptr&) { return Datatype::Integer; },
+      [](const FloatT_Ptr&) { return Datatype::Float32; },
+      [](const OctetStringT_Ptr&) { return Datatype::OctetString; },
+      [](const StringT_Ptr&) { return Datatype::String; },
+      [](const TimeT_Ptr&) { return Datatype::Time; },
+      [](const TimeSpanT_Ptr&) { return Datatype::TimeSpan; });
 }
 
 bool isNumericData(Datatype type) {
