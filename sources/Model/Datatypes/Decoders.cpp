@@ -286,20 +286,20 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
   reverse(rbytes.begin(), rbytes.end());
   // clang-format off
   auto result = match(type,
-      [rbytes, subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
+      [&rbytes, &subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
         }
         return decode(rbytes, type, subindex.value());
       },
-      [rbytes, subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
+      [&rbytes, &subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
         }
         return decode(rbytes, type, subindex.value());
       },
-      [rbytes](const auto& type) -> SimpleDatatypeValue {
-        return decode(rbytes, type);
+      [&bytes](const auto& type) -> SimpleDatatypeValue {
+        return decode(bytes, type);
       }); // clang-format on
   return result;
 }
