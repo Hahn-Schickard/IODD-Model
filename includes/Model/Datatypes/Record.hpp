@@ -29,6 +29,8 @@ struct RecordItem {
 
   SimpleDatatype value() const;
 
+  Datatype type() const;
+
   TextID name() const;
 
   std::optional<AccessRights> access() const;

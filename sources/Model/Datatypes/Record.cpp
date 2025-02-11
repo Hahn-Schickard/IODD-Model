@@ -24,6 +24,8 @@ uint16_t RecordItem::offset() const { return offset_; }
 
 SimpleDatatype RecordItem::value() const { return value_; }
 
+Datatype RecordItem::type() const { return toDatatype(value_); }
+
 TextID RecordItem::name() const { return name_; }
 
 optional<AccessRights> RecordItem::access() const { return access_; }
