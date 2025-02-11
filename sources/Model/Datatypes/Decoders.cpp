@@ -64,13 +64,12 @@ string decode(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
 }
 
 string decode(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
-  if (bytes.empty()) {
-    throw invalid_argument(
-        "Input can not be empty for correct StringT_Ptr decoding");
-  }
   if (bytes.size() > type->length()) {
     throw invalid_argument("Input can not exceed the specified type length "
                            "for correct StringT_Ptr decoding");
+  }
+  if (bytes.empty()) {
+    return string();
   }
   return HSCUL::toString(bytes);
 }
