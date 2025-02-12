@@ -57,7 +57,7 @@ RepositoryPtr makeRepository(const filesystem::path& dir) {
   auto std_variables_map =
       decodeStdDefinitions(dir / "IODD-StandardDefinitions.xml");
   auto descriptors =
-      decodeDescriptors(std_units_map, std_variables_map, dir / "descriptors");
+      decodeDescriptors(std_units_map, std_variables_map, dir / "iodds");
 
   return make_unique<Repository>(
       move(std_units_map), move(std_variables_map), move(descriptors));
