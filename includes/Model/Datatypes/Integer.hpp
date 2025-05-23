@@ -4,6 +4,7 @@
 #include "Primitives/FixedBitLength.hpp"
 #include "Primitives/Number.hpp"
 
+#include <cstdint>
 #include <unordered_set>
 
 namespace IODD {

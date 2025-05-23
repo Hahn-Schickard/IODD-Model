@@ -5,6 +5,7 @@
 #include "Record.hpp"
 #include "SimpleDataTypes.hpp"
 
+#include <cstdint>
 #include <unordered_map>
 #include <variant>
 

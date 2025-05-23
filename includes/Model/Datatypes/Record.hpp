@@ -6,6 +6,7 @@
 #include "Primitives/TextID.hpp"
 #include "SimpleDataTypes.hpp"
 
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <unordered_map>

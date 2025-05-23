@@ -10,6 +10,7 @@
 #include "Timespan.hpp"
 #include "UInteger.hpp"
 
+#include <cstdint>
 #include <variant>
 
 namespace IODD {
