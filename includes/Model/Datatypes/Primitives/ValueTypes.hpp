@@ -3,6 +3,7 @@
 
 #include "NamedAttribute.hpp"
 
+#include <cstdint>
 #include <optional>
 
 namespace IODD {
