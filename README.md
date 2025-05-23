@@ -1,5 +1,3 @@
-<img src="docs/images/vendor-logo.png" alt="" width="200"/>
-
 # IO-Link IO Device Descriptor Model and XML Parser Library
 
 ## Description
@@ -109,16 +107,3 @@ In case you need to specify C++ standard, run the following command in project r
 ```bash
 conan create . --version=${VERSION} --user=${USER} --channel=${CHANEL} --build=missing -s:h compiler.cppstd=17 -s:b compiler.cppstd=17
 ```
-
-## Project utility tools
-
-This project comes with integrated utility scripts written in python3 to check code coverage with **gcov** and **lcov**, check for memory leaks with **valgrind** and generate documentation with **Doxygen**. You can use these by running the following:
-
-* `python3 utility/run-lcov.py --help` - to learn how to use **lcov** wrapper
-* `python3 utility/run-valgrind.py --help` - to learn how to use **valgrind** wrapper
-* `python3 utility/run-clang-tidy.py --help` - to learn how to use **run-clang-tidy** wrapper
-* `python3 utility/run-clang-format.py --help` - to learn how to use **run-clang-format** wrapper
-
-Hidden files and scripts within utility directory are used by CI/CD pipeline or as configuration files for the wrappers.
-
-This directory is typically maintained via [Project-Configurator](https://git.hahn-schickard.de/hahn-schickard/software-sollutions/application-engineering/internal/project-configurator) program and SHOULD not be modified manually. Any modifications SHOULD be done in [Project Template](https://git.hahn-schickard.de/hahn-schickard/software-sollutions/application-engineering/internal/project-template/-/tree/cpp) repository instead and updated via [Project-Configurator](https://git.hahn-schickard.de/hahn-schickard/software-sollutions/application-engineering/internal/project-configurator) once released.

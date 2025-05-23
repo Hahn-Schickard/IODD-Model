@@ -53,14 +53,20 @@ class PackageConan(ConanFile):
         # @+ START USER REQUIREMENTS
         self.requires("pugixml/1.14")
         self.requires("date/3.0.1")
-        self.requires(
-            "variant_visitor/[~0.1]@hahn-schickard/stable", headers=True, transitive_headers=True)
-        self.requires("hscul/[~0.3]@hahn-schickard/stable", headers=True,
-                      libs=True, transitive_headers=True, transitive_libs=True)  
+        self.requires("variant_visitor/[~0.1]@hahn-schickard/stable",
+                      headers=True,
+                      transitive_headers=True
+        )
+        self.requires("hscul/[~0.3]@hahn-schickard/stable",
+                      headers=True,
+                      libs=True,
+                      transitive_headers=True,
+                      transitive_libs=True
+        )  
         # @- END USER REQUIREMENTS
 
     def build_requirements(self):
-        self.test_requires("gtest/[~1.11]")
+        self.test_requires("gtest/[~1.16]")
 
     def configure(self):
         # @+ START USER REQUIREMENTS OPTION CONFIGURATION
