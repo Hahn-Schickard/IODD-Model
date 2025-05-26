@@ -8,7 +8,7 @@ PROJECT_NAME           = "IO-Link IO Device Descriptor Model and XML Parser Libr
 PROJECT_NUMBER         =
 PROJECT_BRIEF          = ""
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       = docs/code_documentation
+OUTPUT_DIRECTORY       = docs/manual
 CREATE_SUBDIRS         = YES
 ALLOW_UNICODE_NAMES    = NO
 OUTPUT_LANGUAGE        = English
@@ -181,7 +181,7 @@ INPUT_FILTER           =
 FILTER_PATTERNS        =
 FILTER_SOURCE_FILES    = YES
 FILTER_SOURCE_PATTERNS =
-USE_MDFILE_AS_MAINPAGE = docs/code_documentation/main.md
+USE_MDFILE_AS_MAINPAGE = docs/manual/main.md
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
 #---------------------------------------------------------------------------
@@ -206,7 +206,7 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html/
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = docs/code_documentation/header.html
+HTML_HEADER            = docs/doxygen-awesome-css/header.html
 HTML_FOOTER            =
 HTML_STYLESHEET        =
 HTML_EXTRA_STYLESHEET  = docs/doxygen-awesome-css/doxygen-awesome.css

@@ -3,6 +3,7 @@
 
 #include "ValueTypes.hpp"
 
+#include <cstdint>
 #include <unordered_set>
 
 namespace IODD {
