@@ -51,7 +51,7 @@ class PackageConan(ConanFile):
 
     def requirements(self):
         # @+ START USER REQUIREMENTS
-        self.requires("pugixml/1.14")
+        self.requires("pugixml/1.15")
         self.requires("date/3.0.1")
         self.requires("variant_visitor/[~0.1]@hahn-schickard/stable",
                       headers=True,
