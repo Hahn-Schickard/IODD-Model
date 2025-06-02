@@ -5,7 +5,6 @@
 #include "Primitives/FixedBitLength.hpp"
 
 #include <cstdint>
-#include <cstdint>
 #include <optional>
 #include <string>
 
