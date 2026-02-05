@@ -126,8 +126,8 @@ SimpleDatatypeValue::Value SimpleDatatypeValue::operator()() const {
 string SimpleDatatypeValue::asString() const {
   return Variant_Visitor::match(
       value_,
-      [](bool value) { return value ? "True" : "False"; },
-      [](string value) { return value; },
+      [](bool value) -> string { return value ? "True" : "False"; },
+      [](const string& value) { return value; },
       [](auto value) { return to_string(value); });
 }
 
