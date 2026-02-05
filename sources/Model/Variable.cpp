@@ -124,10 +124,10 @@ bool Variable::modifiesOthers() const { return modifies_others_; }
 bool Variable::excluded() const { return excluded_; }
 
 VariablePtr findVariable(const string& id, const VariablesMap& variables) {
-  auto it = variables.find(id);
-  if (it != variables.end()) {
+  if (auto it = variables.find(id); it != variables.end()) {
     return it->second;
+  } else {
+    throw out_of_range(id + " variable does not exist");
   }
-  throw out_of_range(id + " variable does not exist");
 }
 } // namespace IODD
