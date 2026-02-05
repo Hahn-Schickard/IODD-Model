@@ -1,4 +1,8 @@
-set(TARGET ${PROJECT_NAME})
+#@+ ======================== User TARGET NAME configuration ============================
+set(THIS Model)
+#@- =========================== END OF USER CONFIGURATION ===============================
+
+set(TARGET ${PROJECT_NAME}_${THIS})
 
 #@+ =========================== User TARGET configuration ===============================
 list(APPEND THIS_INCLUDES_DIRS

@@ -13,7 +13,7 @@ if(CMAKE_CONAN)
 endif()
 
 #@+ ======================== User PROJECT_NAME configuration ============================
-set(THIS IODD_Model)
+set(THIS IODD)
 #@- =========================== END OF USER CONFIGURATION ===============================
 
 project(${THIS} CXX)

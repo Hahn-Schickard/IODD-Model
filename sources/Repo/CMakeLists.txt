@@ -20,7 +20,7 @@ target_sources(${TARGET}
 
 target_link_libraries(${TARGET}
     PUBLIC
-        ${PROJECT_NAME}
+        ${PROJECT_NAME}_Model
     PRIVATE
         pugixml::pugixml
         Variant_Visitor::Variant_Visitor
