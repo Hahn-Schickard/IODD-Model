@@ -102,9 +102,9 @@ SimpleDatatype decodeSimpleDataValue(
   }
   case Datatype::TimeSpan: {
     return decodeSimpleDataValue<TimeSpanT_Ptr>(node, locales);
+  }
   default: {
     throw invalid_argument(toString(type) + " is not a simple data type");
-  }
   }
   }
 }
