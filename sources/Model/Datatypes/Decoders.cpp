@@ -244,10 +244,9 @@ string decode(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
 
 SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const SimpleDatatype& type) {
-  return Variant_Visitor::match(
-      type, [bytes](const auto& value) -> SimpleDatatypeValue {
-        return SimpleDatatypeValue(decode(bytes, value));
-      });
+  return Variant_Visitor::match(type, [bytes](const auto& value) {
+    return SimpleDatatypeValue(decode(bytes, value));
+  });
 }
 
 vector<bool> toBitVector(const vector<uint8_t>& bytes) {
@@ -303,25 +302,24 @@ SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const ArrayT_Ptr& type, uint8_t subindex) {
   --subindex; // decrement to use standard index notation
   // clang-format off
-    auto result = Variant_Visitor::match(type->type(), 
-      [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
+    return Variant_Visitor::match(type->type(), 
+      [bytes, subindex](const BooleanT_Ptr&){
         auto bits = toBitVector(bytes);
         // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
         return SimpleDatatypeValue(static_cast<bool>(bits[subindex]));
       },
-      [bytes, subindex](const UIntegerT_Ptr& type) -> SimpleDatatypeValue {
+      [bytes, subindex](const UIntegerT_Ptr& type){
         return SimpleDatatypeValue(decode(
           bitwiseView(bytes, subindex, type->bitLength()), type));
       },
-      [bytes, subindex](const IntegerT_Ptr& type) -> SimpleDatatypeValue {
+      [bytes, subindex](const IntegerT_Ptr& type){
         return SimpleDatatypeValue(decode(
           bitwiseView(bytes, subindex, type->bitLength()), type));
       },
-      [bytes, subindex](const auto& type) -> SimpleDatatypeValue {
+      [bytes, subindex](const auto& type){
         return SimpleDatatypeValue(decode(bytewiseView(bytes, subindex, type->length()), type));
       }
     ); // clang-format on
-  return result;
 }
 
 size_t getBitLength(SimpleDatatype type) {
@@ -376,22 +374,21 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
   auto rbytes = bytes;
   reverse(rbytes.begin(), rbytes.end());
   // clang-format off
-  auto result = Variant_Visitor::match(type,
-      [&rbytes, &subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
+  return Variant_Visitor::match(type,
+      [&rbytes, &subindex](const ArrayT_Ptr& type){
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
         }
         return decode(rbytes, type, subindex.value());
       },
-      [&rbytes, &subindex](const RecordT_Ptr& type) -> SimpleDatatypeValue {
+      [&rbytes, &subindex](const RecordT_Ptr& type){
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
         }
         return decode(rbytes, type, subindex.value());
       },
-      [&bytes](const auto& type) -> SimpleDatatypeValue {
+      [&bytes](const auto& type){
         return SimpleDatatypeValue(decode(bytes, type));
       }); // clang-format on
-  return result;
 }
 } // namespace IODD
