@@ -109,10 +109,10 @@ SimpleDatatype decodeSimpleDataValue(
   }
 }
 
-SimpleDatatype getSimpleDatatype(DataValue value) {
+SimpleDatatype getSimpleDatatype(DataValue variant_value) {
   SimpleDatatype result;
   Variant_Visitor::match(
-      value,
+      variant_value,
       [&result](const BooleanT_Ptr& value) { result = value; },
       [&result](const UIntegerT_Ptr& value) { result = value; },
       [&result](const IntegerT_Ptr& value) { result = value; },
