@@ -8,8 +8,6 @@
 #include <pugixml.hpp>
 #include <stdexcept>
 
-using namespace std;
-
 namespace IODD {
 std::unordered_set<SingleValuePtr<bool>> decodeBoolSingleValues(
     const pugi::xml_node& node, const pugi::xml_node& locales);
@@ -35,7 +33,8 @@ NumberT<float>::ValueRanges decodeFloatValueRanges(
 template <typename T>
 NumberT<T> decodeNumericValues(
     const pugi::xml_node& /* node */, const pugi::xml_node& /* locales */) {
-  throw runtime_error("Failed to decode Numeric Value. Unsupported data type");
+  throw std::runtime_error(
+      "Failed to decode Numeric Value. Unsupported data type");
 }
 
 template <>
