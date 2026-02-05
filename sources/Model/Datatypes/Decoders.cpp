@@ -31,21 +31,21 @@ intmax_t toSignedInteger(vector<uint8_t> bytes) {
     throw overflow_error(error_msg);
   }
 
-  const uint8_t MSB_MASK = 0x80;
-  const uint8_t NEGATIVE_MARKER = 0xFF;
+  const uint8_t msb_mask = 0x80;
+  const uint8_t negative_marker = 0xFF;
   auto padding_size = sizeof(intmax_t) - bytes.size();
 
   if (!isLittleEndian() && padding_size != 0) {
     // msb
-    if ((bytes.front() & MSB_MASK) == MSB_MASK) {
+    if ((bytes.front() & msb_mask) == msb_mask) {
       // negative integer
-      bytes.insert(bytes.begin(), padding_size, NEGATIVE_MARKER);
+      bytes.insert(bytes.begin(), padding_size, negative_marker);
     }
   } else {
     // lsb
-    if ((bytes.back() & MSB_MASK) == MSB_MASK) {
+    if ((bytes.back() & msb_mask) == msb_mask) {
       // negative integer
-      bytes.insert(bytes.end(), padding_size, NEGATIVE_MARKER);
+      bytes.insert(bytes.end(), padding_size, negative_marker);
     }
   }
 
