@@ -15,8 +15,8 @@ optional<Condition> decodeCondition(
     auto var = findVariable(var_id, variables);
 
     std::optional<uint8_t> condition_subindex = nullopt;
-    auto subindex_attribute = condition_xml.attribute("subindex");
-    if (subindex_attribute.empty()) {
+    if (auto subindex_attribute = condition_xml.attribute("subindex");
+        subindex_attribute.empty()) {
       condition_subindex = subindex_attribute.as_uint();
     }
 
