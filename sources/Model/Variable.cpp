@@ -27,9 +27,9 @@ Variable::Variable(const Variable& other,
       value_(other.value_), desc_(other.desc_),
       default_(default_value ? default_value : other.default_),
       dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
-      excluded_(excluded ? excluded : other.excluded_) {
-  if (value_) {
-    if (value) {
+      excluded_(excluded.has_value() ? excluded : other.excluded_) {
+  if (value_.has_value()) {
+    if (value.has_value()) {
       expand(value_.value(), *value);
     }
   } else {
