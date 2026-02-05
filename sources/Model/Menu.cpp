@@ -7,7 +7,7 @@ Menu::Menu(const string& id,
     vector<Ref>&& references,
     optional<TextID>&& name,
     const optional<Condition>& condition)
-    : id_(id), references_(references), name_(move(name)),
+    : id_(id), references_(move(references)), name_(move(name)),
       condition_(condition) {
   if (id_.empty()) {
     throw invalid_argument("Menu ID can not be empty");
