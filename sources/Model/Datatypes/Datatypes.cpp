@@ -91,42 +91,24 @@ NamedAttributePtr getValueName(const RecordT& record,
 NamedAttributePtr getValueName(const DataValue& type,
     const SimpleDatatypeValue& value,
     std::optional<uint8_t> subindex) {
-  // use raw pointer to avoid shared_ptr memory leak in lambda capture
-  NamedAttribute* result = nullptr;
-  Variant_Visitor::match(
-      type,
-      // Simple Types
-      [&result, &value](const BooleanT_Ptr& value_type) {
-        auto ptr = getValueName<BooleanT>(*value_type, value);
-        result = ptr.get();
-      },
-      [&result, &value](const UIntegerT_Ptr& value_type) {
-        auto ptr = getValueName<UIntegerT>(*value_type, value);
-        result = ptr.get();
-      },
-      [&result, &value](const IntegerT_Ptr& value_type) {
-        auto ptr = getValueName<IntegerT>(*value_type, value);
-        result = ptr.get();
-      },
-      [&result, &value](const FloatT_Ptr& value_type) {
-        auto ptr = getValueName<FloatT>(*value_type, value);
-        result = ptr.get();
-      },
-      // Record Types
-      [&result, &value, subindex](const RecordT_Ptr& value_type) {
-        auto ptr = getValueName(*value_type, subindex, value);
-        result = ptr.get();
-      },
-      // rest of types
-      [&type](const auto&) {
-        throw logic_error(toString(toDatatype(type)) +
-            " does not support named value attribute lookup");
-      });
-  if (result != nullptr) {
-    // TODO: Does this cause seg faults?
-    return shared_ptr<NamedAttribute>(result);
+  if (holds_alternative<BooleanT_Ptr>(type)) {
+    auto value_type = get<BooleanT_Ptr>(type);
+    return getValueName<BooleanT>(*value_type, value);
+  } else if (holds_alternative<BooleanT_Ptr>(type)) {
+    auto value_type = get<UIntegerT_Ptr>(type);
+    return getValueName<UIntegerT>(*value_type, value);
+  } else if (holds_alternative<BooleanT_Ptr>(type)) {
+    auto value_type = get<IntegerT_Ptr>(type);
+    return getValueName<IntegerT>(*value_type, value);
+  } else if (holds_alternative<BooleanT_Ptr>(type)) {
+    auto value_type = get<FloatT_Ptr>(type);
+    return getValueName<FloatT>(*value_type, value);
+  } else if (holds_alternative<BooleanT_Ptr>(type)) {
+    auto value_type = get<RecordT_Ptr>(type);
+    return getValueName(*value_type, subindex, value);
   } else {
-    throw runtime_error("Given simple value does not have a matching name");
+    throw logic_error(toString(toDatatype(type)) +
+        " does not support named value attribute lookup");
   }
 }
 
