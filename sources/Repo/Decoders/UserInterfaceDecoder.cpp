@@ -31,8 +31,8 @@ unordered_map<string, string> decodeMenuIDs(const xml_node& xml) {
 }
 
 DisplayFormat decodeDisplayFormat(const xml_node& xml) {
-  auto format_attribute = xml.attribute("displayFormat");
-  if (!format_attribute.empty()) {
+  if (auto format_attribute = xml.attribute("displayFormat");
+      !format_attribute.empty()) {
     unordered_map<string, DisplayFormat> format_types{
         {"Dec", DisplayFormat::Dec},
         {"Dec.0", DisplayFormat::Dec0},
