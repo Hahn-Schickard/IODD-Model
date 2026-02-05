@@ -380,7 +380,7 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
   // clang-format off
   return Variant_Visitor::match(type,
       [&rbytes, &subindex](const ArrayT_Ptr& value_type){
-        if (!subindex) {
+        if (!subindex.has_value()) {
           throw invalid_argument(
             "Subindex value is required for correct ArrayT_Ptr decoding"
           );
@@ -388,7 +388,7 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
         return decode(rbytes, value_type, subindex.value());
       },
       [&rbytes, &subindex](const RecordT_Ptr& value_type){
-        if (!subindex) {
+        if (!subindex.has_value()) {
           throw invalid_argument(
             "Subindex value is required for correct RecordT_Ptr decoding"
           );
