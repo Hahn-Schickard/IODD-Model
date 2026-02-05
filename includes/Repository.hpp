@@ -9,12 +9,12 @@
 
 namespace IODD {
 struct Repository {
-  Repository(UnitsMapPtr&& units,
-      DatatypesMapPtr&& datatypes,
+  Repository(const UnitsMapPtr& units,
+      const DatatypesMapPtr& datatypes,
       VariablesMap&& std_variables,
       DescriptorsMap&& descriptors);
 
-  Repository(UnitsMapPtr&& units,
+  Repository(const UnitsMapPtr& units,
       std::pair<DatatypesMapPtr, VariablesMap> std_defines,
       DescriptorsMap&& descriptors);
 
