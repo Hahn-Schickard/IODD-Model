@@ -11,7 +11,8 @@ namespace IODD {
 struct NamedAttribute {
   NamedAttribute() = default;
 
-  NamedAttribute(std::optional<TextID>&& name) : name_(std::move(name)) {}
+  explicit NamedAttribute(std::optional<TextID>&& name)
+      : name_(std::move(name)) {}
 
   std::optional<TextID> name() { return name_; }
 

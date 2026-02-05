@@ -49,7 +49,7 @@ struct VariableRef {
       const std::optional<TextID>& description = std::nullopt,
       const std::optional<TextID>& action_started_msg = std::nullopt);
 
-  VariableRef(const VariablePtr& variable,
+  explicit VariableRef(const VariablePtr& variable,
       const std::optional<float>& gradient = std::nullopt,
       const std::optional<float>& offset = std::nullopt,
       const UnitPtr& unit = nullptr,

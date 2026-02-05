@@ -17,7 +17,7 @@ struct IntegerT : public FixedBitLength<2, 64>, public NumberT<int64_t> {
   IntegerT(uint8_t bits, NumberT<int64_t>&& values)
       : FixedBitLength(bits), NumberT(std::move(values)) {}
 
-  IntegerT(NumberT<int64_t>&& values) // used as expansion
+  explicit IntegerT(NumberT<int64_t>&& values) // used as expansion
       : FixedBitLength(64), NumberT(std::move(values)) {}
 };
 

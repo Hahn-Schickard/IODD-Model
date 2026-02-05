@@ -10,7 +10,7 @@
 namespace IODD {
 
 struct ProcessDataUnion {
-  ProcessDataUnion(const std::string& id,
+  explicit ProcessDataUnion(const std::string& id,
       ProcessDataTPtr&& in = nullptr,
       ProcessDataTPtr&& out = nullptr,
       const std::optional<Condition>& condition = std::nullopt);

@@ -11,7 +11,7 @@ struct BooleanT {
 
   BooleanT() = default;
 
-  BooleanT(std::unordered_set<SingleValuePtr<bool>>&& values);
+  explicit BooleanT(std::unordered_set<SingleValuePtr<bool>>&& values);
 
   void expand(const BooleanT& other);
 

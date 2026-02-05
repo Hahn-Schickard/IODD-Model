@@ -11,7 +11,7 @@ namespace IODD {
 template <typename T> struct SingleValue : public NamedAttribute {
   SingleValue() = default;
 
-  SingleValue(T value);
+  explicit SingleValue(T value);
 
   SingleValue(T value, std::optional<TextID>&& name);
 

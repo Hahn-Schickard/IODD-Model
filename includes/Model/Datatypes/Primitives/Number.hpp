@@ -14,9 +14,9 @@ template <typename T> struct NumberT {
 
   NumberT() = default;
 
-  NumberT(SingleValues&& values);
+  explicit NumberT(SingleValues&& values);
 
-  NumberT(ValueRanges&& ranges);
+  explicit NumberT(ValueRanges&& ranges);
 
   NumberT(SingleValues&& values, ValueRanges&& ranges);
 

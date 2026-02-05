@@ -7,7 +7,7 @@ namespace IODD {
 struct ComplexDataTypeT {
   ComplexDataTypeT() = default;
 
-  ComplexDataTypeT(bool subindex_access_support)
+  explicit ComplexDataTypeT(bool subindex_access_support)
       : subindex_access_(subindex_access_support) {}
 
   bool subindexAccess() const { return subindex_access_; }

@@ -10,7 +10,7 @@ namespace IODD {
 template <size_t MIN, size_t MAX> struct FixedBitLength {
   FixedBitLength() = default;
 
-  FixedBitLength(uint8_t bits) : bit_length_(bits) {
+  explicit FixedBitLength(uint8_t bits) : bit_length_(bits) {
     if (bit_length_ < MIN) {
       throw std::invalid_argument(
           "Bit length can not be smaller than " + std::to_string(MIN));
