@@ -79,6 +79,7 @@ class PackageConan(ConanFile):
         self.options["gtest/*"].shared = True
         self.options["date/*"].header_only = True
         self.options["date/*"].tz_db = "system"
+        self.options["pugixml/*"].header_only = True
         # @- END USER REQUIREMENTS OPTION CONFIGURATION
 
     def layout(self):
