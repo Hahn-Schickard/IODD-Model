@@ -4,10 +4,10 @@ using namespace std;
 
 namespace IODD {
 ProcessDataUnion::ProcessDataUnion(const string& id,
-    ProcessDataTPtr&& in,
-    ProcessDataTPtr&& out,
+    const ProcessDataTPtr& in,
+    const ProcessDataTPtr& out,
     const optional<Condition>& condition)
-    : id_(id), in_(move(in)), out_(move(out)), condition_(condition) {
+    : id_(id), in_(in), out_(out), condition_(condition) {
   if (!in_ && !out_) {
     throw invalid_argument("Neither ProcessDataIn nor ProcessDataOut is set. "
                            "Atleast one is required");
