@@ -25,9 +25,9 @@ Variable::Variable(const Variable& other,
     const optional<DataValue>& value)
     : index_(other.index_), name_(other.name_), access_(other.access_),
       value_(other.value_), desc_(other.desc_),
-      default_((default_value ? default_value : other.default_)),
+      default_(default_value ? default_value : other.default_),
       dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
-      excluded_((excluded ? excluded : other.excluded_)) {
+      excluded_(excluded ? excluded : other.excluded_) {
   if (value_) {
     if (value) {
       expand(value_.value(), *value);
