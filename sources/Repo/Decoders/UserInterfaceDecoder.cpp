@@ -87,7 +87,7 @@ VariableRefPtr decodeVariableRef(const UnitsMapPtr& units,
 
     return make_shared<VariableRef>(
         variable, button_value, description, action_msg);
-  } catch (const NodeNotFound& ex) {
+  } catch (const NodeNotFound&) {
     auto gradient = decodeFloatAttribute(xml, "gradient");
     auto offset = decodeFloatAttribute(xml, "offset");
     auto unit = decodeUnitPtr(units, xml);
@@ -117,7 +117,7 @@ RecordRefPtr decodeRecordRef(const UnitsMapPtr& units,
 
     return make_shared<RecordRef>(
         variable, subindex, button_value, description, action_msg);
-  } catch (const NodeNotFound& ex) {
+  } catch (const NodeNotFound&) {
     auto gradient = decodeFloatAttribute(xml, "gradient");
     auto offset = decodeFloatAttribute(xml, "offset");
     auto unit = decodeUnitPtr(units, xml);
@@ -171,7 +171,7 @@ MenuPtr decodeOptionalMenu(const string& menu_name,
     const xml_node& locales) {
   try {
     return decodeMenu(units, variables, menu_ids.at(menu_name), xml, locales);
-  } catch (const out_of_range& ex) {
+  } catch (const out_of_range&) {
     return nullptr;
   }
 }

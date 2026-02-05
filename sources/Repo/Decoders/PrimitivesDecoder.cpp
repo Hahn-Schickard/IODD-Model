@@ -29,7 +29,7 @@ optional<AccessRights> decodeAccessRights(const xml_node& node) {
     } else {
       return nullopt; // @todo: handle malformed access string
     }
-  } catch (const AttributeNotFound& ex) {
+  } catch (const AttributeNotFound&) {
     return nullopt;
   }
 }
@@ -41,7 +41,7 @@ optional<TextID> decodeLocalizedText(
     try {
       return decodeLocalization(
           locales, getXMLAttribute("textId", name_node).as_string());
-    } catch (const exception& ex) {
+    } catch (const exception&) {
       throw runtime_error(
           "Could not get localization for " + child_name + " field");
     }

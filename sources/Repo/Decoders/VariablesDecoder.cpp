@@ -39,7 +39,7 @@ VariablesMap decodeVariables(const xml_node& xml,
         try {
           auto datatype_xml = getXMLNode("Datatype", variable);
           data_value = decodeDataValue(datatype_xml, locales, datatypes);
-        } catch (const NodeNotFound& ex) {
+        } catch (const NodeNotFound&) {
           string datatype_ref_id =
               getXMLAttribute("datatypeId", getXMLNode("DatatypeRef", variable))
                   .as_string();
