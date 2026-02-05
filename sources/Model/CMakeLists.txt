@@ -1,65 +1,49 @@
-cmake_minimum_required(VERSION 3.6)
+set(TARGET ${PROJECT_NAME})
 
-#@+ ======================== User MODULE NAME configuration ============================
-set(THIS Model)
-#@- =========================== END OF USER CONFIGURATION ===============================
-
-set(MODULE ${PROJECT_NAME}_${THIS})
-
+#@+ =========================== User TARGET configuration ===============================
 list(APPEND THIS_INCLUDES_DIRS
             ${INCLUDES_DIR}/Model
             ${INCLUDES_DIR}/Model/Datatypes
             ${INCLUDES_DIR}/Model/Datatypes/Primitives
 )
 
-file(GLOB sources_list "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
+file(GLOB SOURCEFILES "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
                        "${CMAKE_CURRENT_LIST_DIR}/Datatypes/*.cpp"
                        "${CMAKE_CURRENT_LIST_DIR}/Datatypes/Primitives/*.cpp"
 )
 
 INCLUDE_DIRS_AND_FILES("${THIS_INCLUDES_DIRS}" THIS_INCLUDES)
 
-add_library(${MODULE})
-
-target_sources(${MODULE}
-               PRIVATE
-               ${THIS_INCLUDES}
-               ${sources_list}
+add_library(${TARGET} OBJECT)
+target_sources(${TARGET}
+    PUBLIC          
+        ${THIS_INCLUDES}
+    PRIVATE
+        ${SOURCEFILES}
 )
 
-#@+ ======================== User DEPENDENCIES configuration ============================
-target_link_libraries(${MODULE}
-                      PRIVATE #Private dependencies
-                      date::date
-                      HSCUL::HSCUL
-                      PUBLIC  #Public dependencies
-                      Variant_Visitor::Variant_Visitor
+target_link_libraries(${TARGET}
+    PRIVATE
+        date::date
+        HSCUL::HSCUL
+        Variant_Visitor::Variant_Visitor
+)
+
+target_include_directories(${TARGET} 
+    INTERFACE
+        $<BUILD_INTERFACE:${INCLUDES_DIR}/Model>
+        $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes>
+        $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes/Primitives>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
 )
 #@- =========================== END OF USER CONFIGURATION ===============================
 
-target_include_directories(${MODULE} INTERFACE
-                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model>
-                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes>
-                           $<BUILD_INTERFACE:${INCLUDES_DIR}/Model/Datatypes/Primitives>
-                           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
-)
+target_compile_features(${TARGET} PUBLIC cxx_std_17)
 
-target_compile_features(${MODULE} PUBLIC cxx_std_17)
+PRINT_TARGET_PROPERTIES(${TARGET})
 
-PRINT_TARGET_PROPERTIES(${MODULE})
-
-install(
-    TARGETS ${MODULE}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-install(
-    FILES ${THIS_INCLUDES}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-)
+INSTALL_TARGET(${TARGET})
 
 install(
     DIRECTORY ${INCLUDES_DIR}/Model

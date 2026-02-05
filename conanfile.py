@@ -65,8 +65,7 @@ class PackageConan(ConanFile):
         )
         self.requires(
             "variant_visitor/[~0.2]@hahn-schickard/stable",
-            headers=True,
-            transitive_headers=True
+            visible=False
         )
         self.requires(
             "hscul/[~0.3]@hahn-schickard/stable",
