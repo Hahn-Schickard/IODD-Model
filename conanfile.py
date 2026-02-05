@@ -6,11 +6,6 @@ import re
 import os
 
 
-def to_camel_case(input: str):
-    words = input.replace("_", " ").split()
-    return '_'.join(word.capitalize() for word in words)
-
-
 class PackageConan(ConanFile):
     # @+ START USER META CONFIG
     license = "Apache 2.0"
@@ -23,6 +18,10 @@ class PackageConan(ConanFile):
                        "fPIC": True}
     default_user = "Hahn-Schickard"
     # @- END USER META CONFIG
+    exports = [
+        "CMakeLists.txt",
+        "conanfile.py"
+    ]
     exports_sources = [
         "cmake*",
         "includes*",
@@ -34,16 +33,21 @@ class PackageConan(ConanFile):
         # @- END USER EXPORTS
     ]
     generators = "CMakeDeps"
+    package_type = "library"
     short_paths = True
 
     @property
     def cwd(self):
         return os.path.dirname(os.path.realpath(__file__))
 
+    @property
+    def full_name(self):
+        content = load(self, path=os.path.join(
+            self.recipe_folder, 'CMakeLists.txt'))
+        return re.search('set\(THIS (.*)\)', content).group(1).strip()
+
     def set_name(self):
-        content = load(self, path=os.path.join(self.cwd, 'CMakeLists.txt'))
-        name = re.search('set\(THIS (.*)\)', content).group(1)
-        self.name = name.strip().lower()
+        self.name = self.full_name.lower()
 
     def validate(self):
         if self.settings.compiler.get_safe("cppstd"):
@@ -67,10 +71,14 @@ class PackageConan(ConanFile):
 
     def build_requirements(self):
         self.test_requires("gtest/[~1.16]")
+        # @+ START USER BUILD REQUIREMENTS
+        # @- END USER BUILD REQUIREMENTS
 
     def configure(self):
         # @+ START USER REQUIREMENTS OPTION CONFIGURATION
-        pass
+        self.options["gtest/*"].shared = True
+        self.options["date/*"].header_only = True
+        self.options["date/*"].tz_db = "system"
         # @- END USER REQUIREMENTS OPTION CONFIGURATION
 
     def layout(self):
@@ -82,11 +90,13 @@ class PackageConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.user_presets_path = False
         tc.variables['STATIC_CODE_ANALYSIS'] = False
         tc.variables['RUN_TESTS'] = False
         tc.variables['COVERAGE_TRACKING'] = False
         tc.variables['CMAKE_CONAN'] = False
-        tc.cache_variables["CMAKE_POLICY_DEFAULT_CMP0077"] = "NEW"
+        # @+ START USER CMAKE OPTIONS
+        # @- END USER CMAKE OPTIONS
         tc.generate()
 
     def build(self):
@@ -105,8 +115,7 @@ class PackageConan(ConanFile):
         self.cpp_info.libs = collect_libs(self)
         self.cpp_info.set_property("cmake_find_mode", "both")
         # @+ START USER DEFINES
-        project_name = self.name.upper()
         # @- END USER DEFINES
-        self.cpp_info.set_property("cmake_file_name", project_name)
-        cmake_target_name = project_name + "::" + project_name
+        self.cpp_info.set_property("cmake_file_name", self.full_name)
+        cmake_target_name = self.full_name + "::" + self.full_name
         self.cpp_info.set_property("cmake_target_name", cmake_target_name)

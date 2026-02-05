@@ -6,10 +6,10 @@ find_package(IODD CONFIG REQUIRED)
 add_executable(example example.cpp)
 target_link_libraries(example IODD::IODD)
 
-add_custom_command(TARGET example POST_BUILD 
+add_custom_command(TARGET example POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                         ${PROJECT_SOURCE_DIR}/../config
-                        $<TARGET_FILE_DIR:example>/config 
+                        $<TARGET_FILE_DIR:example>/config
                     COMMENT "Copying configuration files."
                         VERBATIM
 )
