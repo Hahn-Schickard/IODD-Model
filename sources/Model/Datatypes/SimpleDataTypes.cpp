@@ -1,6 +1,6 @@
 #include "SimpleDataTypes.hpp"
 
-#include <Variant_Visitor.hpp>
+#include <Variant_Visitor/Visitor.hpp>
 
 #include <algorithm>
 #include <regex>
@@ -11,7 +11,7 @@ using namespace std;
 namespace IODD {
 
 Datatype toDatatype(const SimpleDatatype& variant) {
-  return match(
+  return Variant_Visitor::match(
       variant,
       [](const BooleanT_Ptr&) { return Datatype::Boolean; },
       [](const UIntegerT_Ptr&) { return Datatype::UInteger; },
@@ -125,7 +125,7 @@ SimpleDatatypeValue::Value SimpleDatatypeValue::operator()() const {
 }
 
 string SimpleDatatypeValue::asString() const {
-  return match(
+  return Variant_Visitor::match(
       value_,
       [](bool value) -> string { return value ? "True" : "False"; },
       [](string value) -> string { return value; },
@@ -162,7 +162,7 @@ void expand(SimpleDatatype& lhs, const SimpleDatatype& rhs) {
   if (lhs.index() != rhs.index()) {
     throw logic_error("Expanded data type does not match variable datatype");
   }
-  match(
+  Variant_Visitor::match(
       lhs,
       [&rhs](const BooleanT_Ptr& value) {
         value->expand(*get<BooleanT_Ptr>(rhs));

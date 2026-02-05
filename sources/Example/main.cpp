@@ -1,6 +1,6 @@
 #include "Repository.hpp"
 
-#include "Variant_Visitor.hpp"
+#include <Variant_Visitor/Visitor.hpp>
 
 #include <iostream>
 
@@ -40,7 +40,7 @@ void printButton(const VariableRefPtr& ref, const size_t offset) {
   }
 
   cout << endl << pad(offset) << "This button sends";
-  match(
+  Variant_Visitor::match(
       ref->buttonValue(),
       [](bool value) { cout << " boolean value: " << boolalpha << value; },
       [](uint64_t value) { cout << " unsigned value: " << value; },
@@ -99,7 +99,7 @@ void printMenu(const MenuPtr& menu, const size_t offset) {
   printCondition(menu->condition(), offset + PADDING_SIZE);
   for (const auto& sub_menu : menu->references()) {
     cout << padDot(offset + PADDING_SIZE) << " ";
-    match(
+    Variant_Visitor::match(
         sub_menu,
         [&offset](const VariableRefPtr& variable_ref) {
           printVarRef(variable_ref, offset + PADDING_SIZE);

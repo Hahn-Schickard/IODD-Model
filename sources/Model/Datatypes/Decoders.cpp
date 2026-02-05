@@ -3,7 +3,7 @@
 #include <HSCUL/FloatingPoint.hpp>
 #include <HSCUL/Integer.hpp>
 #include <HSCUL/String.hpp>
-#include <Variant_Visitor.hpp>
+#include <Variant_Visitor/Visitor.hpp>
 #include <date/date.h>
 
 #include <algorithm>
@@ -153,9 +153,10 @@ string decode(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
 
 SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const SimpleDatatype& type) {
-  return match(type, [bytes](const auto& value) -> SimpleDatatypeValue {
-    return SimpleDatatypeValue(decode(bytes, value));
-  });
+  return Variant_Visitor::match(
+      type, [bytes](const auto& value) -> SimpleDatatypeValue {
+        return SimpleDatatypeValue(decode(bytes, value));
+      });
 }
 
 vector<bool> toBitVector(const vector<uint8_t>& bytes) {
@@ -211,7 +212,7 @@ SimpleDatatypeValue decode(
     const vector<uint8_t>& bytes, const ArrayT_Ptr& type, uint8_t subindex) {
   --subindex; // decrement to use standard index notation
   // clang-format off
-    auto result = match(type->type(), 
+    auto result = Variant_Visitor::match(type->type(), 
       [bytes, subindex](const BooleanT_Ptr&) -> SimpleDatatypeValue {
         auto bits = toBitVector(bytes);
         // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
@@ -233,7 +234,7 @@ SimpleDatatypeValue decode(
 }
 
 size_t getBitLength(SimpleDatatype type) {
-  auto result = match(
+  auto result = Variant_Visitor::match(
       type,
       [](const BooleanT_Ptr&) -> size_t { return 1; },
       [](const UIntegerT_Ptr& type) -> size_t { return type->bitLength(); },
@@ -284,7 +285,7 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
   auto rbytes = bytes;
   reverse(rbytes.begin(), rbytes.end());
   // clang-format off
-  auto result = match(type,
+  auto result = Variant_Visitor::match(type,
       [&rbytes, &subindex](const ArrayT_Ptr& type) -> SimpleDatatypeValue {
         if (!subindex) {
           throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");

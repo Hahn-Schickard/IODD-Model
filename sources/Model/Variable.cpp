@@ -1,6 +1,6 @@
 #include "Variable.hpp"
 
-#include "Variant_Visitor.hpp"
+#include <Variant_Visitor/Visitor.hpp>
 
 using namespace std;
 

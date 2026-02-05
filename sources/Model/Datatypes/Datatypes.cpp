@@ -1,6 +1,6 @@
 #include "Datatypes.hpp"
 
-#include "Variant_Visitor.hpp"
+#include <Variant_Visitor/Visitor.hpp>
 
 using namespace std;
 
@@ -9,7 +9,7 @@ void expand(DataValue& lhs, const DataValue& rhs) {
   if (lhs.index() != rhs.index()) {
     throw logic_error("Expanded data type does not match variable datatype");
   }
-  match(
+  Variant_Visitor::match(
       lhs,
       [&rhs](const BooleanT_Ptr& value) {
         value->expand(*get<BooleanT_Ptr>(rhs));
@@ -93,7 +93,7 @@ NamedAttributePtr getValueName(const DataValue& type,
     std::optional<uint8_t> subindex) {
   // use raw pointer to avoid shared_ptr memory leak in lambda capture
   NamedAttribute* result = nullptr;
-  match(
+  Variant_Visitor::match(
       type,
       // Simple Types
       [&result, &value](const BooleanT_Ptr& value_type) {
@@ -132,7 +132,7 @@ NamedAttributePtr getValueName(const DataValue& type,
 
 Datatype toDatatype(const DataValue& variant) {
   Datatype result;
-  match(
+  Variant_Visitor::match(
       variant,
       [&](const BooleanT_Ptr&) { result = Datatype::Boolean; },
       [&](const UIntegerT_Ptr&) { result = Datatype::UInteger; },

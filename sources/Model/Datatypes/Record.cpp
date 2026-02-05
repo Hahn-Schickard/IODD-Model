@@ -1,6 +1,6 @@
 #include "Record.hpp"
 
-#include <Variant_Visitor.hpp>
+#include <Variant_Visitor/Visitor.hpp>
 #include <stdexcept>
 
 using namespace std;

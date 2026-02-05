@@ -1,6 +1,8 @@
 #include "VariableRef.hpp"
 #include "Decoders.hpp"
 
+#include <Variant_Visitor/Visitor.hpp>
+
 using namespace std;
 
 namespace IODD {
@@ -18,7 +20,7 @@ bool isHexadecimal(DisplayFormat format) {
 
 Datatype buttonValueToDatatype(const VariableRef::ButtonValue& value) {
   Datatype result;
-  match(
+  Variant_Visitor::match(
       value,
       [&result](bool) { result = Datatype::Boolean; },
       [&result](uint64_t) { result = Datatype::UInteger; },
@@ -87,7 +89,7 @@ void checkValueType(
 float computeNumeric(
     const SimpleDatatypeValue& value, float gradient, float offset) {
   float f_value;
-  match(
+  Variant_Visitor::match(
       value(),
       [](bool) {
         throw logic_error("Decoded result can not be represented as boolean");
