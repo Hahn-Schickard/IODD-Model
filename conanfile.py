@@ -67,13 +67,6 @@ class PackageConan(ConanFile):
             "variant_visitor/[~0.2]@hahn-schickard/stable",
             visible=False
         )
-        self.requires(
-            "hscul/[~0.3]@hahn-schickard/stable",
-            headers=True,
-            libs=True,
-            transitive_headers=True,
-            transitive_libs=True
-        )
         # @- END USER REQUIREMENTS
 
     def build_requirements(self):

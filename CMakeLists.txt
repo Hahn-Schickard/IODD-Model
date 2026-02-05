@@ -58,7 +58,6 @@ find_package(GTest REQUIRED)
 find_package(pugixml REQUIRED)
 find_package(date REQUIRED)
 find_package(Variant_Visitor REQUIRED)
-find_package(HSCUL REQUIRED)
 #@- =========================== END OF USER CONFIGURATION ===============================
 
 if(CMAKE_CONAN)

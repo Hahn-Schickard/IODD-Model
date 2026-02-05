@@ -25,7 +25,6 @@ target_sources(${TARGET}
 target_link_libraries(${TARGET}
     PRIVATE
         date::date
-        HSCUL::HSCUL
         Variant_Visitor::Variant_Visitor
 )
 

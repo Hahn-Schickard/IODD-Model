@@ -1,12 +1,11 @@
 #include "Decoders.hpp"
 
-#include <HSCUL/FloatingPoint.hpp>
-#include <HSCUL/Integer.hpp>
-#include <HSCUL/String.hpp>
 #include <Variant_Visitor/Visitor.hpp>
 #include <date/date.h>
 
 #include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
 using namespace std;
@@ -14,6 +13,98 @@ using namespace std;
 namespace IODD {
 
 static constexpr uint8_t BYTE_SIZE = 8;
+
+bool isLittleEndian() {
+  unsigned int i = 1;
+  // if dereferenced pointer starts with a 1, system is little endian, because
+  // little endian systems are LSB first, and in this simple case the LSB is 1
+  return (*((char*)&i) != 0);
+}
+
+intmax_t toSignedInteger(vector<uint8_t> bytes) {
+  if (bytes.size() > sizeof(intmax_t)) {
+    string error_msg = "Given byte array does not fit into largest "
+                       "available signed integer. "
+                       "Largest signed integer is " +
+        to_string(sizeof(intmax_t)) + " bytes long, but your given array is " +
+        to_string(bytes.size()) + " bytes long";
+    throw overflow_error(error_msg);
+  }
+
+  const uint8_t MSB_MASK = 0x80;
+  const uint8_t NEGATIVE_MARKER = 0xFF;
+  auto padding_size = sizeof(intmax_t) - bytes.size();
+
+  if (!isLittleEndian() && padding_size != 0) {
+    // msb
+    if ((bytes.front() & MSB_MASK) == MSB_MASK) {
+      // negative integer
+      bytes.insert(bytes.begin(), padding_size, NEGATIVE_MARKER);
+    }
+  } else {
+    // lsb
+    if ((bytes.back() & MSB_MASK) == MSB_MASK) {
+      // negative integer
+      bytes.insert(bytes.end(), padding_size, NEGATIVE_MARKER);
+    }
+  }
+
+  intmax_t result = 0;
+  copy(bytes.begin(), bytes.end(), reinterpret_cast<uint8_t*>(&result));
+  return result;
+}
+
+size_t toUnsignedInteger(vector<uint8_t> bytes) {
+  if (bytes.size() > sizeof(size_t)) {
+    string error_msg = "Given byte array does not fit into largest "
+                       "available unsigned integer. "
+                       "Largest unsigned integer is " +
+        to_string(sizeof(size_t)) + " bytes long, but your given array is " +
+        to_string(bytes.size()) + " bytes long";
+    throw overflow_error(error_msg);
+  }
+  size_t result = 0;
+  copy(bytes.begin(), bytes.end(), reinterpret_cast<uint8_t*>(&result));
+  return result;
+}
+
+float toFloat(vector<uint8_t> bytes) {
+  if (bytes.size() != sizeof(float)) {
+    string error_msg =
+        "Given byte array is not the size of a float type. Float is " +
+        to_string(sizeof(float)) +
+        " bytes long, while given byte array is: " + to_string(bytes.size()) +
+        " bytes long";
+    throw length_error(error_msg);
+  }
+  float result;
+  copy(bytes.begin(), bytes.end(), reinterpret_cast<uint8_t*>(&result));
+  return result;
+}
+
+string hexify(vector<uint8_t> bytes,
+    bool single_prefix = true,
+    const string& separator = "") {
+  stringstream ss;
+  ss << hex << setfill('0');
+  if (single_prefix) {
+    ss << "0x";
+  }
+  for (auto it = bytes.begin(); it != bytes.end(); ++it) {
+    if (!single_prefix) {
+      ss << "0x" << setw(2);
+    }
+    ss << static_cast<unsigned>(*it);
+    if (next(it) != bytes.end()) {
+      ss << separator;
+    }
+  }
+  return ss.str();
+}
+
+string toString(vector<uint8_t> bytes) {
+  return string(bytes.begin(), bytes.end());
+}
 
 bool decode(const vector<uint8_t>& bytes, const BooleanT_Ptr&) {
   if (bytes.size() != 1) {
@@ -32,7 +123,7 @@ uint64_t decode(const vector<uint8_t>& bytes, const UIntegerT_Ptr&) {
     throw invalid_argument(
         "Input can not exceed 8 bytes for correct UIntegerT_Ptr decoding");
   }
-  return HSCUL::toUnsignedInteger(bytes);
+  return toUnsignedInteger(bytes);
 }
 
 int64_t decode(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
@@ -44,7 +135,7 @@ int64_t decode(const vector<uint8_t>& bytes, const IntegerT_Ptr&) {
     throw invalid_argument(
         "Input can not exceed 8 bytes for correct IntegerT_Ptr decoding");
   }
-  return HSCUL::toSignedInteger(bytes);
+  return toSignedInteger(bytes);
 }
 
 float decode(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
@@ -52,7 +143,7 @@ float decode(const vector<uint8_t>& bytes, const FloatT_Ptr&) {
     throw invalid_argument(
         "Input must be 8 bytes long for correct FloatT_Ptr decoding");
   }
-  return HSCUL::toFloat(bytes);
+  return toFloat(bytes);
 }
 
 string decode(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
@@ -60,7 +151,7 @@ string decode(const vector<uint8_t>& bytes, const OctetStringT_Ptr& type) {
     throw invalid_argument("Input must match the specified type length for "
                            "correct OctetStringT_Ptr decoding");
   }
-  return HSCUL::hexify(bytes, false, " ");
+  return hexify(bytes, false, " ");
 }
 
 string decode(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
@@ -71,7 +162,7 @@ string decode(const vector<uint8_t>& bytes, const StringT_Ptr& type) {
   if (bytes.empty()) {
     return string();
   }
-  return HSCUL::toString(bytes);
+  return toString(bytes);
 }
 
 // NOLINTBEGIN(readability-magic-numbers)
@@ -98,13 +189,13 @@ string decode(const vector<uint8_t>& bytes, const TimeT_Ptr&) {
   }
   auto it = bytes.rbegin();
   advance(it, 3);
-  auto seconds = HSCUL::toUnsignedInteger(vector<uint8_t>(bytes.rbegin(), it));
+  auto seconds = toUnsignedInteger(vector<uint8_t>(bytes.rbegin(), it));
   auto timepoint_s = chrono::time_point<chrono::system_clock, chrono::seconds>(
       chrono::seconds(seconds));
   shiftEpoch(timepoint_s, (seconds < next_epoch_marker));
 
   advance(it, 1);
-  auto subseconds = HSCUL::toUnsignedInteger(vector<uint8_t>(it, bytes.rend()));
+  auto subseconds = toUnsignedInteger(vector<uint8_t>(it, bytes.rend()));
 
   auto timepoint = timepoint_s + Fractional(subseconds);
   return date::format("%FT%TZ", timepoint); // ISO 8601 DateTime
@@ -115,7 +206,7 @@ string decode(const vector<uint8_t>& bytes, const TimeSpanT_Ptr&) {
     throw invalid_argument(
         "Input must be 8 bytes long for correct TimeSpanT decoding");
   }
-  auto tmp = HSCUL::toSignedInteger(bytes);
+  auto tmp = toSignedInteger(bytes);
   auto time_span = Fractional(tmp);
 
   string result = (time_span < Fractional(0) ? "-" : "");
