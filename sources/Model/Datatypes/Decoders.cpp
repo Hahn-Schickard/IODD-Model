@@ -308,16 +308,20 @@ SimpleDatatypeValue decode(
         // reverse(bits.begin(), bits.end()); // @TODO: is revere needed?
         return SimpleDatatypeValue(static_cast<bool>(bits[subindex]));
       },
-      [bytes, subindex](const UIntegerT_Ptr& type){
+      [bytes, subindex](const UIntegerT_Ptr& value_type){
         return SimpleDatatypeValue(decode(
-          bitwiseView(bytes, subindex, type->bitLength()), type));
+          bitwiseView(bytes, subindex, value_type->bitLength()), value_type)
+        );
       },
-      [bytes, subindex](const IntegerT_Ptr& type){
+      [bytes, subindex](const IntegerT_Ptr& value_type){
         return SimpleDatatypeValue(decode(
-          bitwiseView(bytes, subindex, type->bitLength()), type));
+          bitwiseView(bytes, subindex, value_type->bitLength()), value_type)
+        );
       },
-      [bytes, subindex](const auto& type){
-        return SimpleDatatypeValue(decode(bytewiseView(bytes, subindex, type->length()), type));
+      [bytes, subindex](const auto& value_type){
+        return SimpleDatatypeValue(
+          decode(bytewiseView(bytes, subindex, value_type->length()), value_type)
+        );
       }
     ); // clang-format on
 }
@@ -375,20 +379,24 @@ SimpleDatatypeValue decodeValue(const vector<uint8_t>& bytes,
   reverse(rbytes.begin(), rbytes.end());
   // clang-format off
   return Variant_Visitor::match(type,
-      [&rbytes, &subindex](const ArrayT_Ptr& type){
+      [&rbytes, &subindex](const ArrayT_Ptr& value_type){
         if (!subindex) {
-          throw invalid_argument("Subindex value is required for correct ArrayT_Ptr decoding");
+          throw invalid_argument(
+            "Subindex value is required for correct ArrayT_Ptr decoding"
+          );
         }
-        return decode(rbytes, type, subindex.value());
+        return decode(rbytes, value_type, subindex.value());
       },
-      [&rbytes, &subindex](const RecordT_Ptr& type){
+      [&rbytes, &subindex](const RecordT_Ptr& value_type){
         if (!subindex) {
-          throw invalid_argument("Subindex value is required for correct RecordT_Ptr decoding");
+          throw invalid_argument(
+            "Subindex value is required for correct RecordT_Ptr decoding"
+          );
         }
-        return decode(rbytes, type, subindex.value());
+        return decode(rbytes, value_type, subindex.value());
       },
-      [&bytes](const auto& type){
-        return SimpleDatatypeValue(decode(bytes, type));
+      [&bytes](const auto& value_type){
+        return SimpleDatatypeValue(decode(bytes, value_type));
       }); // clang-format on
 }
 } // namespace IODD
