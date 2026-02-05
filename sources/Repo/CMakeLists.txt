@@ -6,7 +6,7 @@ set(TARGET ${PROJECT_NAME}_${THIS})
 
 #@+ =========================== User TARGET configuration ===============================
 file(GLOB THIS_INCLUDES ${INCLUDES_DIR}/*.hpp)
-file(GLOB SOURCEFILES "${CMAKE_CURRENT_LIST_DIR}/*.?pp"
+file(GLOB SOURCEFILES "${CMAKE_CURRENT_LIST_DIR}/*.cpp"
                        "${CMAKE_CURRENT_LIST_DIR}/Decoders/*.?pp"
 )
 
