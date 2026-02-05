@@ -97,24 +97,24 @@ NamedAttributePtr getValueName(const DataValue& type,
       type,
       // Simple Types
       [&result, &value](const BooleanT_Ptr& value_type) {
-        auto ptr = move(getValueName<BooleanT>(*value_type, value));
+        auto ptr = getValueName<BooleanT>(*value_type, value);
         result = ptr.get();
       },
       [&result, &value](const UIntegerT_Ptr& value_type) {
-        auto ptr = move(getValueName<UIntegerT>(*value_type, value));
+        auto ptr = getValueName<UIntegerT>(*value_type, value);
         result = ptr.get();
       },
       [&result, &value](const IntegerT_Ptr& value_type) {
-        auto ptr = move(getValueName<IntegerT>(*value_type, value));
+        auto ptr = getValueName<IntegerT>(*value_type, value);
         result = ptr.get();
       },
       [&result, &value](const FloatT_Ptr& value_type) {
-        auto ptr = move(getValueName<FloatT>(*value_type, value));
+        auto ptr = getValueName<FloatT>(*value_type, value);
         result = ptr.get();
       },
       // Record Types
       [&result, &value, subindex](const RecordT_Ptr& value_type) {
-        auto ptr = move(getValueName(*value_type, subindex, value));
+        auto ptr = getValueName(*value_type, subindex, value);
         result = ptr.get();
       },
       // rest of types
