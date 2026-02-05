@@ -21,10 +21,10 @@ void expand(DataValue& lhs, const DataValue& rhs) {
         value->expand(*get<IntegerT_Ptr>(rhs));
       },
       [&rhs](const FloatT_Ptr& value) { value->expand(*get<FloatT_Ptr>(rhs)); },
-      [&rhs](const OctetStringT_Ptr&) { /* no expansion for OctetStringT */ },
-      [&rhs](const StringT_Ptr&) { /* no expansion for StringT */ },
-      [&rhs](const TimeT_Ptr&) { /* no expansion for TimeT */ },
-      [&rhs](const TimeSpanT_Ptr&) { /* no expansion for TimeSpanT */ },
+      [](const OctetStringT_Ptr&) { /* no expansion for OctetStringT */ },
+      [](const StringT_Ptr&) { /* no expansion for StringT */ },
+      [](const TimeT_Ptr&) { /* no expansion for TimeT */ },
+      [](const TimeSpanT_Ptr&) { /* no expansion for TimeSpanT */ },
       // array types
       [&rhs](const ArrayT_Ptr& value) { value->expand(*get<ArrayT_Ptr>(rhs)); },
       // record types
