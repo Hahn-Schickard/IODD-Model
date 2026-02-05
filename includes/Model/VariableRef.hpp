@@ -56,6 +56,8 @@ struct VariableRef {
       DisplayFormat format = DisplayFormat::None,
       const std::optional<AccessRights>& access = std::nullopt);
 
+  virtual ~VariableRef() = default;
+
   virtual SimpleDatatypeValue decode(const std::vector<uint8_t>& bytes) const;
 
   NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;

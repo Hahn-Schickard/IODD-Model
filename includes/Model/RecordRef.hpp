@@ -20,6 +20,8 @@ struct RecordRef : public VariableRef {
       DisplayFormat format = DisplayFormat::None,
       const std::optional<AccessRights>& access = std::nullopt);
 
+  ~RecordRef() override = default;
+
   uint8_t subindex() const;
 
   SimpleDatatypeValue decode(const std::vector<uint8_t>& bytes) const override;
