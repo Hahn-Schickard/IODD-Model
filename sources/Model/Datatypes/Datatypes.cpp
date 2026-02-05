@@ -131,21 +131,19 @@ NamedAttributePtr getValueName(const DataValue& type,
 }
 
 Datatype toDatatype(const DataValue& variant) {
-  Datatype result;
-  Variant_Visitor::match(
+  return Variant_Visitor::match(
       variant,
-      [&](const BooleanT_Ptr&) { result = Datatype::Boolean; },
-      [&](const UIntegerT_Ptr&) { result = Datatype::UInteger; },
-      [&](const IntegerT_Ptr&) { result = Datatype::Integer; },
-      [&](const FloatT_Ptr&) { result = Datatype::Float32; },
-      [&](const OctetStringT_Ptr&) { result = Datatype::OctetString; },
-      [&](const StringT_Ptr&) { result = Datatype::String; },
-      [&](const TimeT_Ptr&) { result = Datatype::Time; },
-      [&](const TimeSpanT_Ptr&) { result = Datatype::TimeSpan; },
+      [](const BooleanT_Ptr&) { return Datatype::Boolean; },
+      [](const UIntegerT_Ptr&) { return Datatype::UInteger; },
+      [](const IntegerT_Ptr&) { return Datatype::Integer; },
+      [](const FloatT_Ptr&) { return Datatype::Float32; },
+      [](const OctetStringT_Ptr&) { return Datatype::OctetString; },
+      [](const StringT_Ptr&) { return Datatype::String; },
+      [](const TimeT_Ptr&) { return Datatype::Time; },
+      [](const TimeSpanT_Ptr&) { return Datatype::TimeSpan; },
       // array types
-      [&](const ArrayT_Ptr&) { result = Datatype::Array; },
+      [](const ArrayT_Ptr&) { return Datatype::Array; },
       // record types
-      [&](const RecordT_Ptr&) { result = Datatype::Record; });
-  return result;
+      [](const RecordT_Ptr&) { return Datatype::Record; });
 }
 } // namespace IODD
