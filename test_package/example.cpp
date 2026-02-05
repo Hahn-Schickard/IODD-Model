@@ -1,4 +1,5 @@
-#include "IODD/Repository.hpp"
+#include <IODD/Model/DeviceDescriptor.hpp>
+#include <IODD/Repository.hpp>
 
 #include <iostream>
 
