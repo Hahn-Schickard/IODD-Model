@@ -60,7 +60,7 @@ struct VariableRef {
 
   virtual SimpleDatatypeValue decode(const std::vector<uint8_t>& bytes) const;
 
-  NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
+  virtual NamedAttributePtr valueName(const SimpleDatatypeValue& value) const;
 
   DisplayFormat displayFormat() const;
 
