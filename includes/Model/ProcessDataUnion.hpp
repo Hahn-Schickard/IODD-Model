@@ -15,6 +15,8 @@ struct ProcessDataUnion {
       const ProcessDataTPtr& out = nullptr,
       const std::optional<Condition>& condition = std::nullopt);
 
+  ~ProcessDataUnion() = default;
+
   std::string id() const;
 
   ProcessDataTPtr inData() const;

@@ -36,6 +36,8 @@ struct Variable {
 
   Variable(const Variable& other, const ProcessDataTPtr& process_data);
 
+  ~Variable() = default;
+
   size_t index() const;
 
   TextID name() const;

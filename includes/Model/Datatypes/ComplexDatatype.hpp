@@ -10,6 +10,8 @@ struct ComplexDataTypeT {
   explicit ComplexDataTypeT(bool subindex_access_support)
       : subindex_access_(subindex_access_support) {}
 
+  ~ComplexDataTypeT() = default;
+
   bool subindexAccess() const { return subindex_access_; }
 
 private:

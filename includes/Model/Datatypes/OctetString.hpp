@@ -15,6 +15,8 @@ struct OctetStringT {
     }
   }
 
+  ~OctetStringT() = default;
+
   size_t length() const { return length_; }
 
 protected:

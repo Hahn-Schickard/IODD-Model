@@ -15,6 +15,8 @@ struct FloatT : public NumberT<float> {
 
   explicit FloatT(NumberT<float>&& values) : NumberT(std::move(values)) {}
 
+  ~FloatT() = default;
+
   size_t length() const { return 4; }
 };
 

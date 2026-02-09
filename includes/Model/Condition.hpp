@@ -16,6 +16,8 @@ struct Condition {
       const std::optional<uint8_t>& subindex,
       uint8_t value);
 
+  ~Condition() = default;
+
   VariablePtr variable() const;
 
   std::optional<uint8_t> subindex() const;

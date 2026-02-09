@@ -13,6 +13,8 @@ struct BooleanT {
 
   explicit BooleanT(std::unordered_set<SingleValuePtr<bool>>&& values);
 
+  ~BooleanT() = default;
+
   void expand(const BooleanT& other);
 
   NamedAttributePtr getName(bool value) const;

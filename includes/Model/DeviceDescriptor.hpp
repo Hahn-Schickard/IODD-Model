@@ -14,6 +14,8 @@ struct DeviceIdentity {
       uint32_t device_id,
       const TextID& device_name);
 
+  ~DeviceIdentity() = default;
+
   std::string getIdentifier() const;
 
   uint16_t getVendorId() const;
@@ -48,6 +50,8 @@ struct DeviceDescriptor : public DeviceIdentity {
       VariablesMap&& variables,
       ProcessDataCollection&& process_data,
       UserInterfaces&& interfaces);
+
+  ~DeviceDescriptor() = default;
 
   VariablePtr getVariable(const std::string& id) const;
 

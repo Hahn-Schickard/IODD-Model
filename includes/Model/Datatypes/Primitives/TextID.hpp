@@ -8,6 +8,8 @@ namespace IODD {
 struct TextID {
   TextID(const std::string& id, const std::string& locale);
 
+  ~TextID() = default;
+
   std::string id() const;
 
   std::string locale() const;

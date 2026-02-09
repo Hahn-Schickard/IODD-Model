@@ -19,6 +19,8 @@ struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<uint64_t> {
 
   explicit UIntegerT(NumberT<uint64_t>&& values) // used as expansion
       : FixedBitLength(64), NumberT(std::move(values)) {}
+
+  ~UIntegerT() = default;
 };
 
 using UIntegerT_Ptr = std::shared_ptr<UIntegerT>;

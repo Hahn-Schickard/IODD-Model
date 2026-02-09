@@ -19,6 +19,8 @@ struct IntegerT : public FixedBitLength<2, 64>, public NumberT<int64_t> {
 
   explicit IntegerT(NumberT<int64_t>&& values) // used as expansion
       : FixedBitLength(64), NumberT(std::move(values)) {}
+
+  ~IntegerT() = default;
 };
 
 using IntegerT_Ptr = std::shared_ptr<IntegerT>;

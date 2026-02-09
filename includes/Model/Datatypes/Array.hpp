@@ -15,6 +15,8 @@ struct ArrayT : public ComplexDataTypeT {
 
   ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count);
 
+  ~ArrayT() = default;
+
   void expand(const ArrayT& other);
 
   size_t count() const;

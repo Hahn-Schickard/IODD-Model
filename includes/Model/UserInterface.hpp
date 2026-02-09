@@ -24,6 +24,8 @@ struct UserInterface {
       const MenuPtr& observation,
       const MenuPtr& diagnosis);
 
+  ~UserInterface() = default;
+
   UserRole role() const;
   MenuPtr identification() const;
   MenuPtr parameter() const;

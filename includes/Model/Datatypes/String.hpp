@@ -11,6 +11,8 @@ struct StringT : public OctetStringT {
   explicit StringT(size_t length, bool utf = true)
       : OctetStringT(length), utf_(utf) {}
 
+  ~StringT() = default;
+
   bool utf() const { return utf_; }
 
 private:

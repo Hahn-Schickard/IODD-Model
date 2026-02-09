@@ -18,6 +18,8 @@ struct Unit : public NamedAttribute {
 
   Unit(uint16_t code, const std::string& abbr, std::optional<TextID>&& name);
 
+  ~Unit() = default;
+
   uint16_t code() const;
 
   std::string abbr() const;

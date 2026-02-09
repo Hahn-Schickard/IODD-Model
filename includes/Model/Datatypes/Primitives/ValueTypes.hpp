@@ -15,6 +15,8 @@ template <typename T> struct SingleValue : public NamedAttribute {
 
   SingleValue(T value, std::optional<TextID>&& name);
 
+  ~SingleValue() = default;
+
   size_t hash() const noexcept;
 
   T value() const;
@@ -36,6 +38,8 @@ template <typename T> struct ValueRange : public NamedAttribute {
   ValueRange(T lower, T upper);
 
   ValueRange(T lower, T upper, std::optional<TextID>&& name);
+
+  ~ValueRange() = default;
 
   bool inRange(T value) const noexcept;
 

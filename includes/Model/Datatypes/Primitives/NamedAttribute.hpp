@@ -14,6 +14,8 @@ struct NamedAttribute {
   explicit NamedAttribute(std::optional<TextID>&& name)
       : name_(std::move(name)) {}
 
+  ~NamedAttribute() = default;
+
   std::optional<TextID> name() { return name_; }
 
 private:

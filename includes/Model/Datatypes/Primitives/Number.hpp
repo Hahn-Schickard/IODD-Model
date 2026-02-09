@@ -20,6 +20,8 @@ template <typename T> struct NumberT {
 
   NumberT(SingleValues&& values, ValueRanges&& ranges);
 
+  ~NumberT() = default;
+
   NamedAttributePtr getName(T value) const;
 
   void expand(const NumberT& other);

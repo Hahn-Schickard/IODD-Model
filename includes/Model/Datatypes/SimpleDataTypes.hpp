@@ -52,6 +52,8 @@ struct SimpleDatatypeValue {
 
   explicit SimpleDatatypeValue(Value&& value);
 
+  ~SimpleDatatypeValue() = default;
+
   Value operator()() const;
 
   std::string asString() const;

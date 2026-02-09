@@ -20,6 +20,8 @@ template <size_t MIN, size_t MAX> struct FixedBitLength {
     }
   }
 
+  ~FixedBitLength() = default;
+
   size_t bitLength() const { return bit_length_; }
 
   size_t length() const { return ceil(bit_length_ / 8); }

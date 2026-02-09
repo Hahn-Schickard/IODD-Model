@@ -21,6 +21,8 @@ struct Menu {
       std::optional<TextID>&& name = std::nullopt,
       const std::optional<Condition>& condition = std::nullopt);
 
+  ~Menu() = default;
+
   size_t size() const;
 
   std::string id() const;

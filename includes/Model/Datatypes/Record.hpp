@@ -24,6 +24,8 @@ struct RecordItem {
       std::optional<AccessRights> access = std::nullopt,
       std::optional<TextID>&& desc = std::nullopt);
 
+  ~RecordItem() = default;
+
   uint8_t subindex() const;
 
   uint16_t offset() const;
@@ -57,6 +59,8 @@ struct RecordT : public FixedBitLength<1, 1856>, public ComplexDataTypeT {
   RecordT(uint16_t bit_length, RecordItems&& items);
 
   RecordT(uint16_t bit_length, bool subindex_access, RecordItems&& items);
+
+  ~RecordT() = default;
 
   void expand(const RecordT& other);
 

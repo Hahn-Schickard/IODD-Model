@@ -14,6 +14,8 @@ struct ProcessDataT : FixedBitLength<1, 256> {
   ProcessDataT(
       const std::string& id, uint16_t bits, TextID&& name, DataValue&& value);
 
+  ~ProcessDataT() = default;
+
   std::string id() const;
 
   TextID name() const;
