@@ -45,9 +45,12 @@ UserInterface::UserInterface(UserRole role,
     const MenuPtr& identification,
     const MenuPtr& parameter,
     const MenuPtr& observation,
-    const MenuPtr& diagnosis)
-    : role_(role), identification_(identification), parameter_(parameter),
-      observation_(observation), diagnosis_(diagnosis) {
+    const MenuPtr& diagnosis) :
+    role_(role),
+    identification_(identification),
+    parameter_(parameter),
+    observation_(observation),
+    diagnosis_(diagnosis) {
   addMenu(menus_, identification_);
   addMenu(menus_, parameter_);
   addMenu(menus_, observation_);

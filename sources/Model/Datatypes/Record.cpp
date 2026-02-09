@@ -12,11 +12,14 @@ RecordItem::RecordItem(uint8_t subindex,
     SimpleDatatype&& value,
     const TextIDPtr& name,
     optional<AccessRights> access,
-    const TextIDPtr& desc)
-    : subindex_(subindex),
-      // NOLINTNEXTLINE(readability-magic-numbers)
-      offset_(FixedBitLength<0, 1855>(offset).bitLength()), value_(move(value)),
-      name_(name), access_(access), desc_(desc) {
+    const TextIDPtr& desc) :
+    subindex_(subindex),
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    offset_(FixedBitLength<0, 1855>(offset).bitLength()),
+    value_(move(value)),
+    name_(name),
+    access_(access),
+    desc_(desc) {
   if (!name) {
     throw invalid_argument("RecordItem must have a name");
   }
@@ -43,11 +46,12 @@ TextIDPtr RecordItem::tryDescription() const {
   return desc_;
 }
 
-RecordT::RecordT(uint16_t bit_length, RecordItems&& items)
-    : RecordT(bit_length, false, move(items)) {}
+RecordT::RecordT(uint16_t bit_length, RecordItems&& items) :
+    RecordT(bit_length, false, move(items)) {}
 
-RecordT::RecordT(uint16_t bit_length, bool subindex_access, RecordItems&& items)
-    : FixedBitLength(bit_length), // clang-format off
+RecordT::RecordT(
+    uint16_t bit_length, bool subindex_access, RecordItems&& items) :
+    FixedBitLength(bit_length), // clang-format off
         ComplexDataTypeT(subindex_access),
         items_(move(items)) {} // clang-format on
 

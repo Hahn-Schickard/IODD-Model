@@ -116,8 +116,8 @@ string toString(Datatype type) {
   }
 }
 
-SimpleDatatypeValue::SimpleDatatypeValue(SimpleDatatypeValue::Value&& value)
-    : value_(move(value)) {}
+SimpleDatatypeValue::SimpleDatatypeValue(SimpleDatatypeValue::Value&& value) :
+    value_(move(value)) {}
 
 SimpleDatatypeValue::Value SimpleDatatypeValue::operator()() const {
   return value_;

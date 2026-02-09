@@ -13,7 +13,8 @@ struct FloatT : public NumberT<float> {
 
   FloatT() = default;
 
-  explicit FloatT(NumberT<float>&& values) : NumberT(std::move(values)) {}
+  explicit FloatT(NumberT<float>&& values) :
+      NumberT(std::move(values)) {}
 
   ~FloatT() = default;
 

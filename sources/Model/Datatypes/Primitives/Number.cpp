@@ -7,16 +7,18 @@ using namespace std;
 namespace IODD {
 
 template <typename T>
-NumberT<T>::NumberT(NumberT<T>::SingleValues&& values)
-    : values_(move(values)) {}
+NumberT<T>::NumberT(NumberT<T>::SingleValues&& values) :
+    values_(move(values)) {}
 
 template <typename T>
-NumberT<T>::NumberT(NumberT<T>::ValueRanges&& ranges) : ranges_(move(ranges)) {}
+NumberT<T>::NumberT(NumberT<T>::ValueRanges&& ranges) :
+    ranges_(move(ranges)) {}
 
 template <typename T>
 NumberT<T>::NumberT(
-    NumberT<T>::SingleValues&& values, NumberT<T>::ValueRanges&& ranges)
-    : values_(move(values)), ranges_(move(ranges)) {}
+    NumberT<T>::SingleValues&& values, NumberT<T>::ValueRanges&& ranges) :
+    values_(move(values)),
+    ranges_(move(ranges)) {}
 
 template <typename T> NamedAttributePtr NumberT<T>::getName(T value) const {
   if (auto it = values_.find(make_shared<SingleValue<T>>(value));

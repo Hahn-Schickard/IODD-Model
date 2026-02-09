@@ -6,11 +6,14 @@ using namespace std;
 
 namespace IODD {
 
-template <typename T> SingleValue<T>::SingleValue(T value) : value_(value) {}
+template <typename T>
+SingleValue<T>::SingleValue(T value) :
+    value_(value) {}
 
 template <typename T>
-SingleValue<T>::SingleValue(T value, const TextIDPtr& name)
-    : NamedAttribute(name), value_(value) {}
+SingleValue<T>::SingleValue(T value, const TextIDPtr& name) :
+    NamedAttribute(name),
+    value_(value) {}
 
 template <typename T> size_t SingleValue<T>::hash() const noexcept {
   return std::hash<T>{}(value_);
@@ -19,15 +22,19 @@ template <typename T> size_t SingleValue<T>::hash() const noexcept {
 template <typename T> T SingleValue<T>::value() const { return value_; }
 
 template <typename T>
-ValueRange<T>::ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
+ValueRange<T>::ValueRange(T lower, T upper) :
+    lower_(lower),
+    upper_(upper) {
   if (upper_ <= lower_) {
     throw invalid_argument("Upper bound must be larger than lower bound");
   }
 }
 
 template <typename T>
-ValueRange<T>::ValueRange(T lower, T upper, const TextIDPtr& name)
-    : NamedAttribute(name), lower_(lower), upper_(upper) {}
+ValueRange<T>::ValueRange(T lower, T upper, const TextIDPtr& name) :
+    NamedAttribute(name),
+    lower_(lower),
+    upper_(upper) {}
 
 template <typename T> bool ValueRange<T>::inRange(T value) const noexcept {
   return (value > lower_) && (value < upper_);

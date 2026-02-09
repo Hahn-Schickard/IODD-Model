@@ -36,9 +36,9 @@ bool isBinary(DisplayFormat format);
 bool isHexadecimal(DisplayFormat format);
 
 struct VariableRefHasNoActionMsg : public std::runtime_error {
-  VariableRefHasNoActionMsg()
-      : runtime_error(
-            "Requested variable reference does not have an action message") {}
+  VariableRefHasNoActionMsg() :
+      runtime_error(
+          "Requested variable reference does not have an action message") {}
 };
 
 struct VariableRef {

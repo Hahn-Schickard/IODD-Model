@@ -6,8 +6,8 @@ using namespace std;
 
 namespace IODD {
 
-BooleanT::BooleanT(unordered_set<SingleValuePtr<bool>>&& values)
-    : values_(move(values)) {}
+BooleanT::BooleanT(unordered_set<SingleValuePtr<bool>>&& values) :
+    values_(move(values)) {}
 
 void BooleanT::expand(const BooleanT& other) {
   for (const auto& value : other.values_) {

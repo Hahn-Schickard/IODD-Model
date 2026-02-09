@@ -15,9 +15,9 @@
 namespace IODD {
 
 struct RecordItemNotDescribed : public std::runtime_error {
-  explicit RecordItemNotDescribed(const std::string& name)
-      : runtime_error(
-            "Requested record item " + name + " does not have a description") {}
+  explicit RecordItemNotDescribed(const std::string& name) :
+      runtime_error(
+          "Requested record item " + name + " does not have a description") {}
 };
 
 struct RecordItem {

@@ -24,9 +24,11 @@ string makeDeviceIdentity(const string& vendor_id, const string& device_id) {
 Repository::Repository(const UnitsMapPtr& units,
     const DatatypesMapPtr& datatypes,
     const VariablesMap& std_variables,
-    DescriptorsMap&& descriptors)
-    : units_(units), datatypes_(datatypes), std_variables_(std_variables),
-      descriptors_(move(descriptors)) {}
+    DescriptorsMap&& descriptors) :
+    units_(units),
+    datatypes_(datatypes),
+    std_variables_(std_variables),
+    descriptors_(move(descriptors)) {}
 
 Repository::~Repository() {
   descriptors_.clear();

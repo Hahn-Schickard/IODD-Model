@@ -8,8 +8,9 @@ namespace IODD {
 struct StringT : public OctetStringT {
   StringT() = default;
 
-  explicit StringT(size_t length, bool utf = true)
-      : OctetStringT(length), utf_(utf) {}
+  explicit StringT(size_t length, bool utf = true) :
+      OctetStringT(length),
+      utf_(utf) {}
 
   ~StringT() = default;
 

@@ -8,7 +8,8 @@ namespace IODD {
 struct OctetStringT {
   OctetStringT() = default;
 
-  explicit OctetStringT(size_t length) : length_(length) {
+  explicit OctetStringT(size_t length) :
+      length_(length) {
     constexpr uint8_t MAX_STRING_SIZE = 232;
     if (length > MAX_STRING_SIZE) {
       throw std::invalid_argument("Strings can not exceed 232 bytes in length");

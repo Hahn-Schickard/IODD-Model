@@ -9,9 +9,9 @@
 namespace IODD {
 
 struct VariableNotDescribed : public std::runtime_error {
-  explicit VariableNotDescribed(size_t index)
-      : runtime_error("Requested variable " + std::to_string(index) +
-            " does not have a description") {}
+  explicit VariableNotDescribed(size_t index) :
+      runtime_error("Requested variable " + std::to_string(index) +
+          " does not have a description") {}
 };
 
 struct Variable {

@@ -10,29 +10,29 @@
 #include <vector>
 
 struct NodeNotFound : public std::runtime_error {
-  NodeNotFound(const pugi::xml_document& doc, const std::string& name)
-      : runtime_error(
-            std::string(doc.name()) + " does not have " + name + " xml node") {}
+  NodeNotFound(const pugi::xml_document& doc, const std::string& name) :
+      runtime_error(
+          std::string(doc.name()) + " does not have " + name + " xml node") {}
 
-  NodeNotFound(const std::filesystem::path& path, const std::string& name)
-      : runtime_error(path.string() + " does not have " + name + " xml node") {}
+  NodeNotFound(const std::filesystem::path& path, const std::string& name) :
+      runtime_error(path.string() + " does not have " + name + " xml node") {}
 
   NodeNotFound(const std::filesystem::path& path,
       const pugi::xml_node& parent,
-      const std::string& name)
-      : runtime_error(path.string() + "  Doc parent node " +
-            std::string(parent.name()) + " does not have " + name +
-            " xml node") {}
+      const std::string& name) :
+      runtime_error(path.string() + "  Doc parent node " +
+          std::string(parent.name()) + " does not have " + name + " xml node") {
+  }
 
-  NodeNotFound(const pugi::xml_node& parent, const std::string& name)
-      : runtime_error("Parent node " + std::string(parent.name()) +
-            " does not have " + name + " xml node") {}
+  NodeNotFound(const pugi::xml_node& parent, const std::string& name) :
+      runtime_error("Parent node " + std::string(parent.name()) +
+          " does not have " + name + " xml node") {}
 };
 
 struct AttributeNotFound : public std::runtime_error {
-  AttributeNotFound(const pugi::xml_node& node, const std::string& name)
-      : runtime_error("XML Node " + std::string(node.name()) +
-            " does not have " + name + " attribute") {}
+  AttributeNotFound(const pugi::xml_node& node, const std::string& name) :
+      runtime_error("XML Node " + std::string(node.name()) + " does not have " +
+          name + " attribute") {}
 };
 
 pugi::xml_document getXML(const std::filesystem::path& path);

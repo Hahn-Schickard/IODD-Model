@@ -110,9 +110,11 @@ float computeNumeric(
 VariableRef::VariableRef(const VariablePtr& variable,
     ButtonValue value,
     const TextIDPtr& description,
-    const TextIDPtr& action_started_msg)
-    : variable_(variable), value_(value), desc_(description),
-      action_msg_(action_started_msg) {
+    const TextIDPtr& action_started_msg) :
+    variable_(variable),
+    value_(value),
+    desc_(description),
+    action_msg_(action_started_msg) {
   if (variable_->type() != Datatype::Boolean &&
       variable_->type() != Datatype::UInteger &&
       variable_->type() != Datatype::Integer) {
@@ -130,8 +132,10 @@ VariableRef::VariableRef(const VariablePtr& variable,
     const optional<float>& offset,
     const UnitPtr& unit,
     DisplayFormat format,
-    const optional<AccessRights>& access)
-    : variable_(variable), unit_(unit), format_(format) {
+    const optional<AccessRights>& access) :
+    variable_(variable),
+    unit_(unit),
+    format_(format) {
   if (gradient.has_value()) {
     gradient_ = gradient.value();
   }

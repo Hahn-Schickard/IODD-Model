@@ -14,20 +14,30 @@ Variable::Variable(size_t index,
     const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
-    bool excluded)
-    : index_(index), name_(name), access_(access), value_(move(value)),
-      desc_(desc), default_(default_value), dynamic_(dynamic),
-      modifies_others_(modifies_others), excluded_(excluded) {}
+    bool excluded) :
+    index_(index),
+    name_(name),
+    access_(access),
+    value_(move(value)),
+    desc_(desc),
+    default_(default_value),
+    dynamic_(dynamic),
+    modifies_others_(modifies_others),
+    excluded_(excluded) {}
 
 Variable::Variable(const Variable& other,
     const optional<SimpleDatatypeValue>& default_value,
     const optional<bool>& excluded,
-    const optional<DataValue>& value)
-    : index_(other.index_), name_(other.name_), access_(other.access_),
-      value_(other.value_), desc_(other.desc_),
-      default_(default_value ? default_value : other.default_),
-      dynamic_(other.dynamic_), modifies_others_(other.modifies_others_),
-      excluded_(excluded.has_value() ? excluded : other.excluded_) {
+    const optional<DataValue>& value) :
+    index_(other.index_),
+    name_(other.name_),
+    access_(other.access_),
+    value_(other.value_),
+    desc_(other.desc_),
+    default_(default_value ? default_value : other.default_),
+    dynamic_(other.dynamic_),
+    modifies_others_(other.modifies_others_),
+    excluded_(excluded.has_value() ? excluded : other.excluded_) {
   if (value_.has_value()) {
     if (value.has_value()) {
       expand(value_.value(), *value);
@@ -46,20 +56,31 @@ Variable::Variable(size_t index,
     const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
-    bool excluded)
-    : index_(index), name_(name), access_(access), process_data_(process_data),
-      desc_(desc), default_(default_value), dynamic_(dynamic),
-      modifies_others_(modifies_others), excluded_(excluded) {
+    bool excluded) :
+    index_(index),
+    name_(name),
+    access_(access),
+    process_data_(process_data),
+    desc_(desc),
+    default_(default_value),
+    dynamic_(dynamic),
+    modifies_others_(modifies_others),
+    excluded_(excluded) {
   if (!name_) {
     throw invalid_argument(
         "Variable " + to_string(index) + " must have a valid name");
   }
 }
 
-Variable::Variable(const Variable& other, const ProcessDataTPtr& process_data)
-    : index_(other.index_), name_(other.name_), access_(other.access_),
-      process_data_(process_data), desc_(other.desc_), dynamic_(other.dynamic_),
-      modifies_others_(other.modifies_others_), excluded_(other.excluded_) {
+Variable::Variable(const Variable& other, const ProcessDataTPtr& process_data) :
+    index_(other.index_),
+    name_(other.name_),
+    access_(other.access_),
+    process_data_(process_data),
+    desc_(other.desc_),
+    dynamic_(other.dynamic_),
+    modifies_others_(other.modifies_others_),
+    excluded_(other.excluded_) {
   if (!process_data_) {
     throw invalid_argument("ProcessDataTPtr can not be empty");
   }

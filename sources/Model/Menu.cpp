@@ -6,9 +6,11 @@ namespace IODD {
 Menu::Menu(const string& id,
     vector<Ref>&& references,
     const TextIDPtr& name,
-    const optional<Condition>& condition)
-    : id_(id), references_(move(references)), name_(name),
-      condition_(condition) {
+    const optional<Condition>& condition) :
+    id_(id),
+    references_(move(references)),
+    name_(name),
+    condition_(condition) {
   if (id_.empty()) {
     throw invalid_argument("Menu ID can not be empty");
   }

@@ -7,9 +7,11 @@ namespace IODD {
 DeviceIdentity::DeviceIdentity(uint16_t vendor_id,
     const string& vendor_name,
     uint32_t device_id,
-    const TextIDPtr& device_name)
-    : vendor_id_(vendor_id), vendor_name_(vendor_name), device_id_(device_id),
-      device_name_(device_name) {
+    const TextIDPtr& device_name) :
+    vendor_id_(vendor_id),
+    vendor_name_(vendor_name),
+    device_id_(device_id),
+    device_name_(device_name) {
   if (!device_name_) {
     throw invalid_argument(
         "Failed to create DeviceIdentity. Device name can not be empty");
@@ -42,22 +44,24 @@ DeviceDescriptor::DeviceDescriptor(uint16_t vendor_id,
     const UnitsMapPtr& units,
     VariablesMap&& variables,
     ProcessDataCollection&& process_data,
-    UserInterfaces&& interfaces)
-    : DeviceDescriptor(
-          DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
-          units,
-          move(variables),
-          move(process_data),
-          move(interfaces)) {}
+    UserInterfaces&& interfaces) :
+    DeviceDescriptor(
+        DeviceIdentity(vendor_id, vendor_name, device_id, device_name),
+        units,
+        move(variables),
+        move(process_data),
+        move(interfaces)) {}
 
 DeviceDescriptor::DeviceDescriptor(DeviceIdentity&& identity,
     const UnitsMapPtr& units,
     VariablesMap&& variables,
     ProcessDataCollection&& process_data,
-    UserInterfaces&& interfaces)
-    : DeviceIdentity(move(identity)), units_(units),
-      variables_(move(variables)), process_data_(move(process_data)),
-      interfaces_(move(interfaces)) {
+    UserInterfaces&& interfaces) :
+    DeviceIdentity(move(identity)),
+    units_(units),
+    variables_(move(variables)),
+    process_data_(move(process_data)),
+    interfaces_(move(interfaces)) {
   if (units_->empty()) {
     throw invalid_argument(
         "Failed to create DeviceDescriptor. Units can not be empty");

@@ -14,11 +14,14 @@ struct UIntegerT : public FixedBitLength<2, 64>, public NumberT<uint64_t> {
 
   UIntegerT() = default;
 
-  UIntegerT(uint8_t bits, NumberT<uint64_t>&& values)
-      : FixedBitLength(bits), NumberT(std::move(values)) {}
+  UIntegerT(uint8_t bits, NumberT<uint64_t>&& values) :
+      FixedBitLength(bits),
+      NumberT(std::move(values)) {}
 
   explicit UIntegerT(NumberT<uint64_t>&& values) // used as expansion
-      : FixedBitLength(64), NumberT(std::move(values)) {}
+      :
+      FixedBitLength(64),
+      NumberT(std::move(values)) {}
 
   ~UIntegerT() = default;
 };

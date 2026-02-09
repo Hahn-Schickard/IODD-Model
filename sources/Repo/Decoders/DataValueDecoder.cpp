@@ -136,7 +136,7 @@ ArrayT_Ptr decodeArrayValue(const DatatypesMap& datatypes_map,
     type =
         decodeSimpleDataValue(toDatatype(type_string), simple_datatype, locale);
   } else if (auto datatype_ref = node.child("DatatypeRef");
-      !datatype_ref.empty()) {
+             !datatype_ref.empty()) {
     string id = datatype_ref.attribute("datatypeId").as_string();
     if (auto it = datatypes_map.find(id); it != datatypes_map.end()) {
       type = getSimpleDatatype(it->second);

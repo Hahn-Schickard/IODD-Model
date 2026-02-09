@@ -4,11 +4,13 @@ using namespace std;
 
 namespace IODD {
 
-ArrayT::ArrayT(const SimpleDatatype& type, size_t count)
-    : ArrayT(false, type, count) {}
+ArrayT::ArrayT(const SimpleDatatype& type, size_t count) :
+    ArrayT(false, type, count) {}
 
-ArrayT::ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count)
-    : ComplexDataTypeT(subindex_access), type_(type), count_(count) {}
+ArrayT::ArrayT(bool subindex_access, const SimpleDatatype& type, size_t count) :
+    ComplexDataTypeT(subindex_access),
+    type_(type),
+    count_(count) {}
 
 void ArrayT::expand(const ArrayT& other) { IODD::expand(type_, other.type_); }
 
