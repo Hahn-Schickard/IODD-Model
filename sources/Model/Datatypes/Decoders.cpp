@@ -326,9 +326,9 @@ SimpleDatatypeValue decode(
     ); // clang-format on
 }
 
-size_t getBitLength(SimpleDatatype type) {
+size_t getBitLength(SimpleDatatype data_type) {
   auto result = Variant_Visitor::match(
-      type,
+      data_type,
       [](const BooleanT_Ptr&) -> size_t { return 1; },
       [](const UIntegerT_Ptr& type) -> size_t { return type->bitLength(); },
       [](const IntegerT_Ptr& type) -> size_t { return type->bitLength(); },

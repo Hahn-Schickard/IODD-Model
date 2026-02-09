@@ -142,9 +142,9 @@ void printDescriptor(const DeviceDescriptorPtr& descriptor) {
   cout << pad() << "It has " << descriptor->variableCount()
        << " variables:" << endl;
 
-  for (const auto& var : descriptor->getVariables()) {
-    cout << padDot() << "Variable: " << var.first;
-    printVariable(var.second, 1);
+  for (const auto& [name, variable] : descriptor->getVariables()) {
+    cout << padDot() << "Variable: " << name;
+    printVariable(variable, 1);
     cout << endl;
   }
 
