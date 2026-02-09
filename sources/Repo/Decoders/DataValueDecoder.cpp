@@ -121,8 +121,7 @@ SimpleDatatype getSimpleDatatype(DataValue variant_value) {
       [&result](const StringT_Ptr& value) { result = value; },
       [&result](const TimeT_Ptr& value) { result = value; },
       [&result](const TimeSpanT_Ptr& value) { result = value; },
-      [&result](
-          const auto&) { throw runtime_error("Not a simple data type"); });
+      [](const auto&) { throw runtime_error("Not a simple data type"); });
   return result;
 }
 
