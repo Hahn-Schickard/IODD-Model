@@ -14,8 +14,8 @@
 namespace IODD {
 
 struct MenuHasNoName : public std::runtime_error {
-  explicit MenuHasNoName(const std::string& id)
-      : runtime_error("Requested menu " + id + " is not named") {}
+  explicit MenuHasNoName(const std::string& id) :
+      runtime_error("Requested menu " + id + " is not named") {}
 };
 
 struct Menu {
