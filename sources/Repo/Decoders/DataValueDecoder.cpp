@@ -157,7 +157,7 @@ RecordItem_Ptr decodeRecordItem(const DatatypesMap& datatypes_map,
   SimpleDatatype value;
 
   auto name_locale = decodeLocalizedText("Name", node, locales);
-  if (!name_locale.has_value()) {
+  if (!name_locale) {
     throw runtime_error("Missing RecordItem name localization");
   }
 
@@ -184,12 +184,8 @@ RecordItem_Ptr decodeRecordItem(const DatatypesMap& datatypes_map,
   auto offset = node.attribute("bitOffset").as_ullong();
   auto access = decodeAccessRights(node);
   auto desc = decodeLocalizedText("Description", node, locales);
-  return make_shared<RecordItem>(subindex,
-      offset,
-      move(value),
-      move(name_locale.value()),
-      access,
-      move(desc));
+  return make_shared<RecordItem>(
+      subindex, offset, move(value), name_locale, access, desc);
 }
 
 RecordT_Ptr decodeRecordValue(const DatatypesMap& datatypes_map,

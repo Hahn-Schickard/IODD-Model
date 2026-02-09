@@ -7,10 +7,16 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <variant>
 #include <vector>
 
 namespace IODD {
+
+struct MenuHasNoName : public std::runtime_error {
+  explicit MenuHasNoName(const std::string& id)
+      : runtime_error("Requested menu " + id + " is not named") {}
+};
 
 struct Menu {
   using Ref = std::variant<VariableRefPtr, RecordRefPtr, std::shared_ptr<Menu>>;
@@ -18,7 +24,7 @@ struct Menu {
 
   Menu(const std::string& id,
       Refs&& references,
-      std::optional<TextID>&& name = std::nullopt,
+      const TextIDPtr& name = nullptr,
       const std::optional<Condition>& condition = std::nullopt);
 
   ~Menu() = default;
@@ -29,14 +35,16 @@ struct Menu {
 
   Refs references() const;
 
-  std::optional<TextID> name() const;
+  TextIDPtr name() const;
+
+  TextIDPtr tryName() const;
 
   std::optional<Condition> condition() const;
 
 private:
   std::string id_;
   Refs references_;
-  std::optional<TextID> name_;
+  TextIDPtr name_;
   std::optional<Condition> condition_;
 };
 

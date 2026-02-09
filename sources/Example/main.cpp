@@ -15,7 +15,7 @@ string padDot(size_t times = 1) { return pad(times) + "•" + pad(); }
 
 void printVariable(const VariablePtr& var, const size_t offset = 0) {
   cout << pad(offset) << var->index() << " " << toString(var->type()) << " "
-       << var->name().locale();
+       << var->name()->locale();
 }
 
 void printCondition(const optional<Condition>& condition, const size_t offset) {
@@ -52,12 +52,12 @@ void printRefRepresentation(const VariableRefPtr& ref, const size_t offset) {
   if (ref->isButton()) {
     printButton(ref, offset);
   } else {
-    if (auto unit = ref->unit()) {
+    if (const auto& unit = ref->unit()) {
       cout << pad(offset) << "It measures";
-      if (auto name = unit->name()) {
+      if (const auto& name = unit->name()) {
         cout << " " << name->locale();
       }
-      auto symbol = unit->abbr();
+      const auto& symbol = unit->abbr();
       cout << " in " << symbol << endl;
     }
     if (isDecimal(ref->displayFormat())) {
@@ -137,7 +137,7 @@ void printUI(const UserInterfacePtr& ui) {
 }
 
 void printDescriptor(const DeviceDescriptorPtr& descriptor) {
-  cout << pad() << "Device " << descriptor->getDeviceName().locale()
+  cout << pad() << "Device " << descriptor->getDeviceName()->locale()
        << " is manufactured by " << descriptor->getVendorName() << endl;
   cout << pad() << "It has " << descriptor->variableCount()
        << " variables:" << endl;
@@ -165,8 +165,6 @@ int main() {
       printDescriptor(descriptor);
     }
 
-    // NOLINTNEXTLINE(readability-magic-numbers)
-    vector<uint8_t> bytes = {0x00, 0xCD}; // fake input data
     auto descriptor = repo->getDescriptor("310", "375");
     auto menu = descriptor->getObserverUI()->getMenu("M_MR_SR_Observe_C");
 
@@ -174,12 +172,15 @@ int main() {
 
     auto ref = menu->references()[0];
     if (holds_alternative<RecordRefPtr>(ref)) {
+      // NOLINTNEXTLINE(readability-magic-numbers)
+      vector<uint8_t> bytes = {0x00, 0xCD}; // fake input data
       auto record_ref = get<RecordRefPtr>(ref);
       auto value = record_ref->decode(bytes);
       cout << "Device 310-375 menu " << menu->id()
            << " value: " << value.asString() << endl;
     }
 
+    repo.reset();
     exit(EXIT_SUCCESS);
   } catch (const exception& ex) {
     cerr << "Encountered an exception: " << ex.what() << endl;

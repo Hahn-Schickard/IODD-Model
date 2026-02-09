@@ -109,8 +109,8 @@ float computeNumeric(
 
 VariableRef::VariableRef(const VariablePtr& variable,
     ButtonValue value,
-    const optional<TextID>& description,
-    const optional<TextID>& action_started_msg)
+    const TextIDPtr& description,
+    const TextIDPtr& action_started_msg)
     : variable_(variable), value_(value), desc_(description),
       action_msg_(action_started_msg) {
   if (variable_->type() != Datatype::Boolean &&
@@ -182,13 +182,27 @@ VariableRef::ButtonValue VariableRef::buttonValue() const {
     return value_.value();
   } else {
     throw runtime_error(
-        variable_->name().locale() + " VariableRef is not a button");
+        variable_->name()->locale() + " VariableRef is not a button");
   }
 }
 
-optional<TextID> VariableRef::description() const { return desc_; }
+TextIDPtr VariableRef::description() const { return desc_; }
 
-optional<TextID> VariableRef::actionMessage() const { return action_msg_; }
+TextIDPtr VariableRef::tryDescription() const {
+  if (!desc_) {
+    throw VariableNotDescribed(variable_->index());
+  }
+  return desc_;
+}
+
+TextIDPtr VariableRef::actionMessage() const { return action_msg_; }
+
+TextIDPtr VariableRef::tryActionMessage() const {
+  if (!action_msg_) {
+    throw VariableRefHasNoActionMsg();
+  }
+  return action_msg_;
+}
 
 float VariableRef::gradient() const { return gradient_; }
 

@@ -11,14 +11,16 @@
 namespace IODD {
 
 struct ProcessDataT : FixedBitLength<1, 256> {
-  ProcessDataT(
-      const std::string& id, uint16_t bits, TextID&& name, DataValue&& value);
+  ProcessDataT(const std::string& id,
+      uint16_t bits,
+      const TextIDPtr& name,
+      DataValue&& value);
 
   ~ProcessDataT() = default;
 
   std::string id() const;
 
-  TextID name() const;
+  TextIDPtr name() const;
 
   DataValue value() const;
 
@@ -29,7 +31,7 @@ struct ProcessDataT : FixedBitLength<1, 256> {
 
 private:
   std::string id_;
-  TextID name_;
+  TextIDPtr name_;
   DataValue value_;
 };
 

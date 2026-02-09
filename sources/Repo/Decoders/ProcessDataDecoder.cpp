@@ -20,8 +20,7 @@ ProcessDataTPtr decodeProcessDataT(const xml_node& xml,
     auto value =
         decodeDataValue(getXMLNode("Datatype", node), locales, *datatypes);
     if (auto name = decodeLocalizedText("Name", node, locales)) {
-      return make_shared<ProcessDataT>(
-          id, bits, move(name.value()), move(value));
+      return make_shared<ProcessDataT>(id, bits, name, move(value));
     } else {
       throw runtime_error(
           "Invalid " + target_name + " " + id + ". Missing name element");

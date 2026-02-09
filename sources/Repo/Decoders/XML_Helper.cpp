@@ -89,8 +89,7 @@ xml_attribute getXMLAttribute(
         " XML node. Attribute name argument can not be empty");
   }
 
-  auto result = node.attribute(attribute_name.c_str());
-  if (!result.empty()) {
+  if (auto result = node.attribute(attribute_name.c_str()); !result.empty()) {
     return result;
   } else {
     throw AttributeNotFound(node, attribute_name);

@@ -8,12 +8,12 @@
 #include <pugixml.hpp>
 
 namespace IODD {
-TextID decodeLocalization(
+TextIDPtr decodeLocalization(
     const pugi::xml_node& locales, const std::string& text_id);
 
 std::optional<AccessRights> decodeAccessRights(const pugi::xml_node& node);
 
-std::optional<TextID> decodeLocalizedText(const std::string& child_name,
+TextIDPtr decodeLocalizedText(const std::string& child_name,
     const pugi::xml_node& node,
     const pugi::xml_node& locales);
 } // namespace IODD

@@ -6,8 +6,8 @@ namespace IODD {
 
 Unit::Unit(uint16_t code, const string& abbr) : code_(code), abbr_(abbr) {}
 
-Unit::Unit(uint16_t code, const string& abbr, optional<TextID>&& name)
-    : NamedAttribute(move(name)), code_(code), abbr_(abbr) {}
+Unit::Unit(const TextIDPtr& name, uint16_t code, const string& abbr)
+    : NamedAttribute(name), code_(code), abbr_(abbr) {}
 
 uint16_t Unit::code() const { return code_; }
 

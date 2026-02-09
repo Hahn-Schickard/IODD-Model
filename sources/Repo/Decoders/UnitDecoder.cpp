@@ -15,16 +15,17 @@ UnitsMapPtr decodeUnits(const filesystem::path& path) {
       vector<string>{"ExternalTextCollection", "PrimaryLanguage"}, xml, path);
   auto units_collection = getXMLNode("UnitCollection", xml, path);
 
-  for (const auto& unit : units_collection.children("Unit")) {
+  for (const auto& unit_node : units_collection.children("Unit")) {
     try {
-      auto code = getXMLAttribute("code", unit).as_uint();
-      string abbr = getXMLAttribute("abbr", unit).as_string();
-      string id = getXMLAttribute("textId", unit).as_string();
-      result->emplace(
-          code, make_shared<Unit>(code, abbr, decodeLocalization(locales, id)));
+      auto code = getXMLAttribute("code", unit_node).as_uint();
+      string abbr = getXMLAttribute("abbr", unit_node).as_string();
+      string id = getXMLAttribute("textId", unit_node).as_string();
+      auto locale = decodeLocalization(locales, id);
+      auto unit = make_shared<Unit>(locale, code, abbr);
+      result->emplace(code, move(unit));
     } catch (const AttributeNotFound& ex) {
       throw runtime_error("Failed to decode unit " +
-          to_string(unit.offset_debug()) + " from " + path.string() +
+          to_string(unit_node.offset_debug()) + " from " + path.string() +
           " due to exception: " + string(ex.what()));
     }
   }

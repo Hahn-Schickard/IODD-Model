@@ -35,6 +35,12 @@ bool isBinary(DisplayFormat format);
 
 bool isHexadecimal(DisplayFormat format);
 
+struct VariableRefHasNoActionMsg : public std::runtime_error {
+  VariableRefHasNoActionMsg()
+      : runtime_error(
+            "Requested variable reference does not have an action message") {}
+};
+
 struct VariableRef {
   using Value = std::variant<bool,
       uint64_t,
@@ -46,8 +52,8 @@ struct VariableRef {
 
   VariableRef(const VariablePtr& variable,
       ButtonValue value,
-      const std::optional<TextID>& description = std::nullopt,
-      const std::optional<TextID>& action_started_msg = std::nullopt);
+      const TextIDPtr& description = nullptr,
+      const TextIDPtr& action_started_msg = nullptr);
 
   explicit VariableRef(const VariablePtr& variable,
       const std::optional<float>& gradient = std::nullopt,
@@ -74,9 +80,13 @@ struct VariableRef {
 
   ButtonValue buttonValue() const;
 
-  std::optional<TextID> description() const;
+  TextIDPtr description() const;
 
-  std::optional<TextID> actionMessage() const;
+  TextIDPtr tryDescription() const;
+
+  TextIDPtr actionMessage() const;
+
+  TextIDPtr tryActionMessage() const;
 
   float gradient() const;
 
@@ -89,8 +99,8 @@ protected:
 
 private:
   std::optional<ButtonValue> value_ = std::nullopt;
-  std::optional<TextID> desc_ = std::nullopt;
-  std::optional<TextID> action_msg_ = std::nullopt;
+  TextIDPtr desc_ = nullptr;
+  TextIDPtr action_msg_ = nullptr;
 
   float gradient_ = 1.0;
   float offset_ = 0.0;

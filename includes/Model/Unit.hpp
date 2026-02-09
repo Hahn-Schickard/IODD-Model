@@ -16,7 +16,7 @@ struct Unit : public NamedAttribute {
 
   Unit(uint16_t code, const std::string& abbr);
 
-  Unit(uint16_t code, const std::string& abbr, std::optional<TextID>&& name);
+  Unit(const TextIDPtr& name, uint16_t code, const std::string& abbr);
 
   ~Unit() = default;
 

@@ -1,6 +1,7 @@
 #ifndef __IODD_STANDARD_DEFINES_TEXT_ID_HPP
 #define __IODD_STANDARD_DEFINES_TEXT_ID_HPP
 
+#include <memory>
 #include <string>
 
 namespace IODD {
@@ -20,6 +21,8 @@ private:
   std::string id_;
   std::string locale_;
 };
+
+using TextIDPtr = std::shared_ptr<TextID>;
 } // namespace IODD
 
 #endif //__IODD_STANDARD_DEFINES_TEXT_ID_HPP

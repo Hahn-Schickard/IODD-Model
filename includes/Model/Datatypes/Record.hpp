@@ -14,15 +14,21 @@
 
 namespace IODD {
 
+struct RecordItemNotDescribed : public std::runtime_error {
+  explicit RecordItemNotDescribed(const std::string& name)
+      : runtime_error(
+            "Requested record item " + name + " does not have a description") {}
+};
+
 struct RecordItem {
   RecordItem() = default;
 
   RecordItem(uint8_t subindex,
       uint16_t offset,
       SimpleDatatype&& value,
-      TextID&& name,
+      const TextIDPtr& name,
       std::optional<AccessRights> access = std::nullopt,
-      std::optional<TextID>&& desc = std::nullopt);
+      const TextIDPtr& desc = nullptr);
 
   ~RecordItem() = default;
 
@@ -34,19 +40,21 @@ struct RecordItem {
 
   Datatype type() const;
 
-  TextID name() const;
+  TextIDPtr name() const;
 
   std::optional<AccessRights> access() const;
 
-  std::optional<TextID> description() const;
+  TextIDPtr description() const;
+
+  TextIDPtr tryDescription() const;
 
 private:
   uint8_t subindex_;
   uint16_t offset_;
   SimpleDatatype value_;
-  TextID name_;
+  TextIDPtr name_;
   std::optional<AccessRights> access_;
-  std::optional<TextID> desc_;
+  TextIDPtr desc_;
 };
 
 using RecordItem_Ptr = std::shared_ptr<RecordItem>;

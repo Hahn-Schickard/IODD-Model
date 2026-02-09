@@ -14,6 +14,8 @@ struct Repository {
       const VariablesMap& std_variables,
       DescriptorsMap&& descriptors);
 
+  ~Repository();
+
   DeviceDescriptorPtr getDescriptor(
       const std::string& vendor_id, const std::string& device_id) const;
 

@@ -9,8 +9,8 @@ struct RecordRef : public VariableRef {
   RecordRef(const VariablePtr& variable,
       uint8_t subindex,
       ButtonValue value,
-      const std::optional<TextID>& description = std::nullopt,
-      const std::optional<TextID>& action_started_msg = std::nullopt);
+      const TextIDPtr& description = nullptr,
+      const TextIDPtr& action_started_msg = nullptr);
 
   RecordRef(const VariablePtr& variable,
       uint8_t subindex,

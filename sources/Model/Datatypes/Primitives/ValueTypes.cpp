@@ -9,8 +9,8 @@ namespace IODD {
 template <typename T> SingleValue<T>::SingleValue(T value) : value_(value) {}
 
 template <typename T>
-SingleValue<T>::SingleValue(T value, optional<TextID>&& name)
-    : NamedAttribute(move(name)), value_(value) {}
+SingleValue<T>::SingleValue(T value, const TextIDPtr& name)
+    : NamedAttribute(name), value_(value) {}
 
 template <typename T> size_t SingleValue<T>::hash() const noexcept {
   return std::hash<T>{}(value_);
@@ -26,8 +26,8 @@ ValueRange<T>::ValueRange(T lower, T upper) : lower_(lower), upper_(upper) {
 }
 
 template <typename T>
-ValueRange<T>::ValueRange(T lower, T upper, optional<TextID>&& name)
-    : NamedAttribute(move(name)), lower_(lower), upper_(upper) {}
+ValueRange<T>::ValueRange(T lower, T upper, const TextIDPtr& name)
+    : NamedAttribute(name), lower_(lower), upper_(upper) {}
 
 template <typename T> bool ValueRange<T>::inRange(T value) const noexcept {
   return (value > lower_) && (value < upper_);

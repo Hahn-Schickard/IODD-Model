@@ -7,13 +7,20 @@ namespace IODD {
 DeviceIdentity::DeviceIdentity(uint16_t vendor_id,
     const string& vendor_name,
     uint32_t device_id,
-    const TextID& device_name)
+    const TextIDPtr& device_name)
     : vendor_id_(vendor_id), vendor_name_(vendor_name), device_id_(device_id),
       device_name_(device_name) {
   if (!device_name_) {
     throw invalid_argument(
         "Failed to create DeviceIdentity. Device name can not be empty");
   }
+}
+
+DeviceIdentity::DeviceIdentity(DeviceIdentity&& other) noexcept {
+  swap(vendor_id_, other.vendor_id_);
+  swap(vendor_name_, other.vendor_name_);
+  swap(device_id_, other.device_id_);
+  swap(device_name_, other.device_name_);
 }
 
 string DeviceIdentity::getIdentifier() const {
@@ -26,12 +33,12 @@ string DeviceIdentity::getVendorName() const { return vendor_name_; }
 
 uint32_t DeviceIdentity::getDeviceId() const { return device_id_; }
 
-TextID DeviceIdentity::getDeviceName() const { return device_name_; }
+TextIDPtr DeviceIdentity::getDeviceName() const { return device_name_; }
 
 DeviceDescriptor::DeviceDescriptor(uint16_t vendor_id,
     const string& vendor_name,
     uint32_t device_id,
-    const TextID& device_name,
+    const TextIDPtr& device_name,
     const UnitsMapPtr& units,
     VariablesMap&& variables,
     ProcessDataCollection&& process_data,

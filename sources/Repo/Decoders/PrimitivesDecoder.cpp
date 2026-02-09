@@ -5,12 +5,12 @@ using namespace std;
 using namespace pugi;
 
 namespace IODD {
-TextID decodeLocalization(const xml_node& locales, const string& text_id) {
+TextIDPtr decodeLocalization(const xml_node& locales, const string& text_id) {
   string localization =
       locales.find_child_by_attribute("Text", "id", text_id.c_str())
           .attribute("value")
           .as_string();
-  return TextID(text_id, localization);
+  return make_shared<TextID>(text_id, localization);
 }
 
 optional<AccessRights> decodeAccessRights(const xml_node& node) {
@@ -34,7 +34,7 @@ optional<AccessRights> decodeAccessRights(const xml_node& node) {
   }
 }
 
-optional<TextID> decodeLocalizedText(
+TextIDPtr decodeLocalizedText(
     const string& child_name, const xml_node& node, const xml_node& locales) {
   if (auto name_node = node.child(child_name.c_str()); !name_node.empty()) {
     try {
@@ -45,6 +45,6 @@ optional<TextID> decodeLocalizedText(
           "Could not get localization for " + child_name + " field");
     }
   }
-  return nullopt;
+  return nullptr;
 }
 } // namespace IODD

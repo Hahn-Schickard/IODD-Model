@@ -5,12 +5,16 @@ using namespace std;
 namespace IODD {
 
 ProcessDataT::ProcessDataT(
-    const string& id, uint16_t bits, TextID&& name, DataValue&& value)
-    : FixedBitLength(bits), id_(id), name_(move(name)), value_(move(value)) {}
+    const string& id, uint16_t bits, const TextIDPtr& name, DataValue&& value)
+    : FixedBitLength(bits), id_(id), name_(name), value_(move(value)) {
+  if (!name) {
+    throw invalid_argument("Process Data Type must have a valid name");
+  }
+}
 
 string ProcessDataT::id() const { return id_; }
 
-TextID ProcessDataT::name() const { return name_; }
+TextIDPtr ProcessDataT::name() const { return name_; }
 
 DataValue ProcessDataT::value() const { return value_; }
 

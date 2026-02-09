@@ -5,9 +5,9 @@ using namespace std;
 namespace IODD {
 Menu::Menu(const string& id,
     vector<Ref>&& references,
-    optional<TextID>&& name,
+    const TextIDPtr& name,
     const optional<Condition>& condition)
-    : id_(id), references_(move(references)), name_(move(name)),
+    : id_(id), references_(move(references)), name_(name),
       condition_(condition) {
   if (id_.empty()) {
     throw invalid_argument("Menu ID can not be empty");
@@ -23,7 +23,14 @@ string Menu::id() const { return id_; }
 
 Menu::Refs Menu::references() const { return references_; }
 
-optional<TextID> Menu::name() const { return name_; }
+TextIDPtr Menu::name() const { return name_; }
+
+TextIDPtr Menu::tryName() const {
+  if (!name_) {
+    throw MenuHasNoName(id_);
+  }
+  return name_;
+}
 
 optional<Condition> Menu::condition() const { return condition_; }
 

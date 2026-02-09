@@ -17,7 +17,7 @@ VariablesMap decodeVariables(const xml_node& xml,
     auto index = getXMLAttribute("index", variable).as_ullong();
 
     auto name_locale = decodeLocalizedText("Name", variable, locales);
-    if (!name_locale.has_value()) {
+    if (!name_locale) {
       throw runtime_error("Variable " + id + " does no have name localization");
     }
 
@@ -54,7 +54,7 @@ VariablesMap decodeVariables(const xml_node& xml,
         }
         variables.emplace(id,
             make_shared<Variable>(index,
-                move(name_locale.value()),
+                name_locale,
                 access.value(),
                 move(data_value),
                 move(description),
@@ -65,7 +65,7 @@ VariablesMap decodeVariables(const xml_node& xml,
       } catch (const ProcessDataUnionAsValue&) {
         variables.emplace(id,
             make_shared<Variable>(index,
-                move(name_locale.value()),
+                name_locale,
                 access.value(),
                 nullptr,
                 move(description),

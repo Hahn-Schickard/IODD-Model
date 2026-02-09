@@ -10,13 +10,17 @@ namespace IODD {
 RecordItem::RecordItem(uint8_t subindex,
     uint16_t offset,
     SimpleDatatype&& value,
-    TextID&& name,
+    const TextIDPtr& name,
     optional<AccessRights> access,
-    optional<TextID>&& desc)
+    const TextIDPtr& desc)
     : subindex_(subindex),
       // NOLINTNEXTLINE(readability-magic-numbers)
       offset_(FixedBitLength<0, 1855>(offset).bitLength()), value_(move(value)),
-      name_(move(name)), access_(access), desc_(move(desc)) {}
+      name_(name), access_(access), desc_(desc) {
+  if (!name) {
+    throw invalid_argument("RecordItem must have a name");
+  }
+}
 
 uint8_t RecordItem::subindex() const { return subindex_; }
 
@@ -26,11 +30,18 @@ SimpleDatatype RecordItem::value() const { return value_; }
 
 Datatype RecordItem::type() const { return toDatatype(value_); }
 
-TextID RecordItem::name() const { return name_; }
+TextIDPtr RecordItem::name() const { return name_; }
 
 optional<AccessRights> RecordItem::access() const { return access_; }
 
-optional<TextID> RecordItem::description() const { return desc_; }
+TextIDPtr RecordItem::description() const { return desc_; }
+
+TextIDPtr RecordItem::tryDescription() const {
+  if (!desc_) {
+    throw RecordItemNotDescribed(name_->id());
+  }
+  return desc_;
+}
 
 RecordT::RecordT(uint16_t bit_length, RecordItems&& items)
     : RecordT(bit_length, false, move(items)) {}

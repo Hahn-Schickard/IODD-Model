@@ -12,7 +12,9 @@ struct DeviceIdentity {
   DeviceIdentity(uint16_t vendor_id,
       const std::string& vendor_name,
       uint32_t device_id,
-      const TextID& device_name);
+      const TextIDPtr& device_name);
+
+  DeviceIdentity(DeviceIdentity&& other) noexcept;
 
   ~DeviceIdentity() = default;
 
@@ -24,13 +26,13 @@ struct DeviceIdentity {
 
   uint32_t getDeviceId() const;
 
-  TextID getDeviceName() const;
+  TextIDPtr getDeviceName() const;
 
 private:
   uint16_t vendor_id_;
   std::string vendor_name_;
   uint32_t device_id_;
-  TextID device_name_;
+  TextIDPtr device_name_;
 };
 
 struct DeviceDescriptor : public DeviceIdentity {
@@ -39,7 +41,7 @@ struct DeviceDescriptor : public DeviceIdentity {
   DeviceDescriptor(uint16_t vendor_id,
       const std::string& vendor_name,
       uint32_t device_id,
-      const TextID& device_name,
+      const TextIDPtr& device_name,
       const UnitsMapPtr& units,
       VariablesMap&& variables,
       ProcessDataCollection&& process_data,

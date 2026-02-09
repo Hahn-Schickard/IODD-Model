@@ -4,16 +4,24 @@
 #include "Datatypes/Datatypes.hpp"
 #include "Datatypes/ProcessData.hpp"
 
+#include <stdexcept>
+
 namespace IODD {
+
+struct VariableNotDescribed : public std::runtime_error {
+  explicit VariableNotDescribed(size_t index)
+      : runtime_error("Requested variable " + std::to_string(index) +
+            " does not have a description") {}
+};
 
 struct Variable {
   Variable() = default;
 
   Variable(size_t index,
-      TextID&& name,
+      const TextIDPtr& name,
       AccessRights access,
       DataValue&& value,
-      std::optional<TextID>&& desc = std::nullopt,
+      const TextIDPtr& desc = nullptr,
       const std::optional<SimpleDatatypeValue>& default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
@@ -25,10 +33,10 @@ struct Variable {
       const std::optional<DataValue>& value);
 
   Variable(size_t index,
-      TextID&& name,
+      const TextIDPtr& name,
       AccessRights access,
       const ProcessDataTPtr& process_data = nullptr,
-      std::optional<TextID>&& desc = std::nullopt,
+      const TextIDPtr& desc = nullptr,
       const std::optional<SimpleDatatypeValue>& default_value = std::nullopt,
       bool dynamic = false,
       bool modifies_others = false,
@@ -40,7 +48,7 @@ struct Variable {
 
   size_t index() const;
 
-  TextID name() const;
+  TextIDPtr name() const;
 
   AccessRights access() const;
 
@@ -55,7 +63,9 @@ struct Variable {
 
   SimpleDatatypeValue defaultValue() const;
 
-  std::optional<TextID> description() const;
+  TextIDPtr description() const;
+
+  TextIDPtr tryDescription() const;
 
   bool dynamic() const;
 
@@ -65,11 +75,11 @@ struct Variable {
 
 private:
   size_t index_;
-  TextID name_;
+  TextIDPtr name_;
   AccessRights access_;
   std::optional<DataValue> value_;
   ProcessDataTPtr process_data_;
-  std::optional<TextID> desc_;
+  TextIDPtr desc_;
   std::optional<SimpleDatatypeValue> default_;
   bool dynamic_;
   bool modifies_others_;

@@ -28,6 +28,13 @@ Repository::Repository(const UnitsMapPtr& units,
     : units_(units), datatypes_(datatypes), std_variables_(std_variables),
       descriptors_(move(descriptors)) {}
 
+Repository::~Repository() {
+  descriptors_.clear();
+  std_variables_.clear();
+  datatypes_.reset();
+  units_.reset();
+}
+
 DeviceDescriptorPtr Repository::getDescriptor(
     const string& vendor_id, const string& device_id) const {
   auto identity = makeDeviceIdentity(vendor_id, device_id);

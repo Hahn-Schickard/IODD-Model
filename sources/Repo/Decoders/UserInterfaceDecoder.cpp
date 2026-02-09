@@ -142,7 +142,7 @@ MenuPtr decodeMenu(const UnitsMapPtr& units,
   }
 
   std::vector<Menu::Ref> refs;
-  optional<TextID> name = decodeLocalizedText("Name", xml, locales);
+  TextIDPtr name = decodeLocalizedText("Name", xml, locales);
 
   for (const auto& child : xml.children()) {
     if (strcmp(child.name(), "VariableRef") == 0) {

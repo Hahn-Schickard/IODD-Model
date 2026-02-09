@@ -7,16 +7,16 @@ using namespace std;
 namespace IODD {
 
 Variable::Variable(size_t index,
-    TextID&& name,
+    const TextIDPtr& name,
     AccessRights access,
     DataValue&& value,
-    optional<TextID>&& desc,
+    const TextIDPtr& desc,
     const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
     bool excluded)
-    : index_(index), name_(move(name)), access_(access), value_(move(value)),
-      desc_(move(desc)), default_(default_value), dynamic_(dynamic),
+    : index_(index), name_(name), access_(access), value_(move(value)),
+      desc_(desc), default_(default_value), dynamic_(dynamic),
       modifies_others_(modifies_others), excluded_(excluded) {}
 
 Variable::Variable(const Variable& other,
@@ -34,23 +34,27 @@ Variable::Variable(const Variable& other,
     }
   } else {
     throw logic_error("Can not expand variable " + to_string(index_) + " " +
-        name_.locale() + " DataValue type. It uses ProcessDataT");
+        name_->locale() + " DataValue type. It uses ProcessDataT");
   }
 }
 
 Variable::Variable(size_t index,
-    TextID&& name,
+    const TextIDPtr& name,
     AccessRights access,
     const ProcessDataTPtr& process_data,
-    optional<TextID>&& desc,
+    const TextIDPtr& desc,
     const optional<SimpleDatatypeValue>& default_value,
     bool dynamic,
     bool modifies_others,
     bool excluded)
-    : index_(index), name_(move(name)), access_(access),
-      process_data_(process_data), desc_(move(desc)), default_(default_value),
-      dynamic_(dynamic), modifies_others_(modifies_others),
-      excluded_(excluded) {}
+    : index_(index), name_(name), access_(access), process_data_(process_data),
+      desc_(desc), default_(default_value), dynamic_(dynamic),
+      modifies_others_(modifies_others), excluded_(excluded) {
+  if (!name_) {
+    throw invalid_argument(
+        "Variable " + to_string(index) + " must have a valid name");
+  }
+}
 
 Variable::Variable(const Variable& other, const ProcessDataTPtr& process_data)
     : index_(other.index_), name_(other.name_), access_(other.access_),
@@ -63,7 +67,7 @@ Variable::Variable(const Variable& other, const ProcessDataTPtr& process_data)
 
 size_t Variable::index() const { return index_; }
 
-TextID Variable::name() const { return name_; }
+TextIDPtr Variable::name() const { return name_; }
 
 AccessRights Variable::access() const { return access_; }
 
@@ -78,8 +82,8 @@ DataValue Variable::value() const {
   } else if (process_data_) {
     return process_data_->value();
   } else {
-    throw runtime_error("Variable " + to_string(index_) + " " + name_.locale() +
-        " does not use DataValue type");
+    throw runtime_error("Variable " + to_string(index_) + " " +
+        name_->locale() + " does not use DataValue type");
   }
 }
 
@@ -91,7 +95,7 @@ NamedAttributePtr Variable::valueName(
     return process_data_->valueName(value, subindex);
   } else {
     throw runtime_error("Can not get value name from variable " +
-        to_string(index_) + " " + name_.locale() +
+        to_string(index_) + " " + name_->locale() +
         ". Variable does not have a value type");
   }
 }
@@ -103,7 +107,7 @@ Datatype Variable::type() const {
     return process_data_->type();
   } else {
     throw runtime_error("Can not get variable datatype " + to_string(index_) +
-        " " + name_.locale() + ". Variable does not have a value type");
+        " " + name_->locale() + ". Variable does not have a value type");
   }
 }
 
@@ -111,11 +115,18 @@ SimpleDatatypeValue Variable::defaultValue() const {
   if (default_.has_value()) {
     return default_.value();
   } else {
-    throw runtime_error(name_.id() + " Variable has no default value");
+    throw runtime_error(name_->id() + " Variable has no default value");
   }
 }
 
-optional<TextID> Variable::description() const { return desc_; }
+TextIDPtr Variable::description() const { return desc_; }
+
+TextIDPtr Variable::tryDescription() const {
+  if (!desc_) {
+    throw VariableNotDescribed(index_);
+  }
+  return desc_;
+}
 
 bool Variable::dynamic() const { return dynamic_; }
 

@@ -9,8 +9,8 @@ namespace IODD {
 RecordRef::RecordRef(const VariablePtr& variable,
     uint8_t subindex,
     ButtonValue value,
-    const optional<TextID>& description,
-    const optional<TextID>& action_started_msg)
+    const TextIDPtr& description,
+    const TextIDPtr& action_started_msg)
     : VariableRef(variable, value, description, action_started_msg),
       subindex_(subindex) {}
 

@@ -13,7 +13,7 @@ template <typename T> struct SingleValue : public NamedAttribute {
 
   explicit SingleValue(T value);
 
-  SingleValue(T value, std::optional<TextID>&& name);
+  SingleValue(T value, const TextIDPtr& name);
 
   ~SingleValue() = default;
 
@@ -37,7 +37,7 @@ template <typename T> struct ValueRange : public NamedAttribute {
 
   ValueRange(T lower, T upper);
 
-  ValueRange(T lower, T upper, std::optional<TextID>&& name);
+  ValueRange(T lower, T upper, const TextIDPtr& name);
 
   ~ValueRange() = default;
 

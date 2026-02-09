@@ -5,21 +5,32 @@
 
 #include <memory>
 #include <optional>
+#include <stdexcept>
 
 namespace IODD {
+struct AttributeNotNamed : public std::runtime_error {
+  AttributeNotNamed()
+      : runtime_error("Requested attribute does not have a name") {}
+};
 
 struct NamedAttribute {
   NamedAttribute() = default;
 
-  explicit NamedAttribute(std::optional<TextID>&& name)
-      : name_(std::move(name)) {}
+  explicit NamedAttribute(const TextIDPtr& name) : name_(name) {}
 
-  ~NamedAttribute() = default;
+  virtual ~NamedAttribute() = default;
 
-  std::optional<TextID> name() { return name_; }
+  TextIDPtr tryName() {
+    if (!name_) {
+      throw AttributeNotNamed();
+    }
+    return name_;
+  }
+
+  TextIDPtr name() { return name_; }
 
 private:
-  std::optional<TextID> name_ = std::nullopt;
+  TextIDPtr name_ = nullptr;
 };
 
 using NamedAttributePtr = std::shared_ptr<NamedAttribute>;
