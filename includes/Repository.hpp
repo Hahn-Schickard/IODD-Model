@@ -11,11 +11,7 @@ namespace IODD {
 struct Repository {
   Repository(const UnitsMapPtr& units,
       const DatatypesMapPtr& datatypes,
-      VariablesMap&& std_variables,
-      DescriptorsMap&& descriptors);
-
-  Repository(const UnitsMapPtr& units,
-      std::pair<DatatypesMapPtr, VariablesMap> std_defines,
+      const VariablesMap& std_variables,
       DescriptorsMap&& descriptors);
 
   DeviceDescriptorPtr getDescriptor(

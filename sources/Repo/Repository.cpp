@@ -23,18 +23,10 @@ string makeDeviceIdentity(const string& vendor_id, const string& device_id) {
 
 Repository::Repository(const UnitsMapPtr& units,
     const DatatypesMapPtr& datatypes,
-    VariablesMap&& std_variables,
+    const VariablesMap& std_variables,
     DescriptorsMap&& descriptors)
-    : units_(units), datatypes_(datatypes), std_variables_(move(std_variables)),
+    : units_(units), datatypes_(datatypes), std_variables_(std_variables),
       descriptors_(move(descriptors)) {}
-
-Repository::Repository(const UnitsMapPtr& units,
-    std::pair<DatatypesMapPtr, VariablesMap> std_defines,
-    DescriptorsMap&& descriptors)
-    : Repository(units,
-          move(std_defines.first),
-          move(std_defines.second),
-          move(descriptors)) {}
 
 DeviceDescriptorPtr Repository::getDescriptor(
     const string& vendor_id, const string& device_id) const {
@@ -59,7 +51,9 @@ RepositoryPtr makeRepository(const filesystem::path& dir) {
   auto descriptors =
       decodeDescriptors(std_units_map, std_variables_map, dir / "iodds");
 
-  return make_unique<Repository>(
-      move(std_units_map), move(std_variables_map), move(descriptors));
+  return make_unique<Repository>(std_units_map,
+      std_variables_map.first,
+      std_variables_map.second,
+      move(descriptors));
 }
 } // namespace IODD
