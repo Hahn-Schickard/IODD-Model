@@ -330,8 +330,8 @@ size_t getBitLength(SimpleDatatype data_type) {
   auto result = Variant_Visitor::match(
       data_type,
       [](const BooleanT_Ptr&) -> size_t { return 1; },
-      [](const UIntegerT_Ptr& type) -> size_t { return type->bitLength(); },
-      [](const IntegerT_Ptr& type) -> size_t { return type->bitLength(); },
+      [](const UIntegerT_Ptr& type) { return type->bitLength(); },
+      [](const IntegerT_Ptr& type) { return type->bitLength(); },
       [](const auto& type) -> size_t { return type->length() * BYTE_SIZE; });
   return result;
 }
