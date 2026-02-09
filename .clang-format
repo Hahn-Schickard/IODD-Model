@@ -7,4 +7,6 @@ AlignTrailingComments: false
 PointerAlignment: Left
 BinPackArguments: false
 BinPackParameters: false
+PackConstructorInitializers: Never
+BreakConstructorInitializers: AfterColon
 ExperimentalAutoDetectBinPacking: false
