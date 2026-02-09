@@ -9,25 +9,20 @@
 
 namespace IODD {
 struct AttributeNotNamed : public std::runtime_error {
-  AttributeNotNamed()
-      : runtime_error("Requested attribute does not have a name") {}
+  AttributeNotNamed() :
+      runtime_error("Requested attribute does not have a name") {}
 };
 
 struct NamedAttribute {
   NamedAttribute() = default;
 
-  explicit NamedAttribute(const TextIDPtr& name) : name_(name) {}
+  explicit NamedAttribute(const TextIDPtr& name);
 
   virtual ~NamedAttribute() = default;
 
-  TextIDPtr tryName() {
-    if (!name_) {
-      throw AttributeNotNamed();
-    }
-    return name_;
-  }
+  TextIDPtr tryName();
 
-  TextIDPtr name() { return name_; }
+  TextIDPtr name();
 
 private:
   TextIDPtr name_ = nullptr;

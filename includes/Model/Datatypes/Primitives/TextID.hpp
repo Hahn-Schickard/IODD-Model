@@ -2,6 +2,7 @@
 #define __IODD_STANDARD_DEFINES_TEXT_ID_HPP
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 namespace IODD {
@@ -14,8 +15,6 @@ struct TextID {
   std::string id() const;
 
   std::string locale() const;
-
-  explicit operator bool() const;
 
 private:
   std::string id_;
