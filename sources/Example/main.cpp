@@ -107,8 +107,9 @@ void printMenu(const MenuPtr& menu, const size_t offset) {
         [&offset](const RecordRefPtr& record_ref) {
           printRecordRef(record_ref, offset + PADDING_SIZE);
         },
-        [&offset](
-            const MenuPtr& menu) { printMenu(menu, offset + PADDING_SIZE); });
+        [&offset](const MenuPtr& menu_ptr) {
+          printMenu(menu_ptr, offset + PADDING_SIZE);
+        });
   }
 }
 
