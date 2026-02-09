@@ -13,8 +13,7 @@ using namespace pugi;
 
 namespace IODD {
 optional<float> decodeFloatAttribute(const xml_node& xml, const string& name) {
-  auto attribute = xml.attribute(name.c_str());
-  if (!attribute.empty()) {
+  if (auto attribute = xml.attribute(name.c_str()); !attribute.empty()) {
     return attribute.as_float();
   }
   return nullopt;

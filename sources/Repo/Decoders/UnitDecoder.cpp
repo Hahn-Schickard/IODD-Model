@@ -32,16 +32,15 @@ UnitsMapPtr decodeUnits(const filesystem::path& path) {
 }
 
 UnitPtr findUnit(uint16_t id, const UnitsMapPtr& units) {
-  auto it = units->find(id);
-  if (it != units->end()) {
+  if (auto it = units->find(id); it != units->end()) {
     return it->second;
   }
   return nullptr;
 }
 
 UnitPtr decodeUnitPtr(const UnitsMapPtr& units, const xml_node& xml) {
-  auto unit_attribute = xml.attribute("unitCode");
-  if (!unit_attribute.empty()) {
+  if (auto unit_attribute = xml.attribute("unitCode");
+      !unit_attribute.empty()) {
     auto unit_id = unit_attribute.as_uint();
     return findUnit(unit_id, units);
   }
